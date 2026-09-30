@@ -1,0 +1,763 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../../data/bhissm.db"
+}
+
+model State {
+  id         String     @id @default(uuid())
+  name       String
+  code       String     @unique
+  type       String     @default("state")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  
+  districts  District[]
+  facilities Facility[]
+  users      User[]
+  emergencies Emergency[]
+  alerts     Alert[]
+  nationalReserveReleases NationalReserveRelease[]
+
+  @@map("states")
+}
+
+model District {
+  id        String     @id @default(uuid())
+  stateId   String     @map("state_id")
+  name      String
+  code      String     @unique
+  createdAt DateTime   @default(now()) @map("created_at")
+  
+  state     State      @relation(fields: [stateId], references: [id])
+  facilities Facility[]
+  emergencies Emergency[]
+
+  @@map("districts")
+}
+
+
+model Facility {
+  id          String    @id @default(uuid())
+  districtId  String?   @map("district_id")
+  stateId     String    @map("state_id")
+  name        String
+  type        String
+  level       String
+  address     String?
+  lat         Float?
+  lng         Float?
+  contact     String?
+  isActive    Int       @default(1) @map("is_active")
+  hasBloodBank Int      @default(0) @map("has_blood_bank")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  
+  district    District? @relation(fields: [districtId], references: [id])
+  state       State     @relation(fields: [stateId], references: [id])
+  users       User[]
+  inventories Inventory[]
+  inventoryBatches InventoryBatch[]
+  inventoryTransactions InventoryTransaction[]
+  inventoryReservations InventoryReservation[]
+  consumptionRecords ConsumptionRecord[]
+  supplyRiskRecords SupplyRiskRecord[]
+  supplyOrders SupplyOrder[]
+  capacities HospitalCapacity[]
+  ambulances Ambulance[]
+  medicalStaff MedicalStaff[]
+  emergencies Emergency[]
+  resourceOffers ResourceOffer[]
+  sourceMovements ResourceMovement[] @relation("SourceMovements")
+  destinationMovements ResourceMovement[] @relation("DestMovements")
+  bloodBanks BloodBank[]
+  bloodInventories BloodInventory[]
+  bloodRequests BloodRequest[]
+  preparednessPlans PreparednessPlan[]
+  alerts Alert[]
+  auditLogs AuditLog[]
+  donorReplenishments DonorReplenishmentRequest[]
+  replenSourceMovements DonorReplenishmentMovement[] @relation("ReplenSourceMovements")
+  replenDestMovements DonorReplenishmentMovement[] @relation("ReplenDestMovements")
+  nationalReserveReleases NationalReserveRelease[]
+  demandForecasts DemandForecast[]
+
+  @@map("facilities")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  username     String    @unique
+  passwordHash String    @map("password_hash")
+  fullName     String    @map("full_name")
+  role         String
+  facilityId   String?   @map("facility_id")
+  stateId      String?   @map("state_id")
+  isActive     Int       @default(1) @map("is_active")
+  lastLogin    DateTime? @map("last_login")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  
+  facility     Facility? @relation(fields: [facilityId], references: [id])
+  state        State?    @relation(fields: [stateId], references: [id])
+  consumptionRecords ConsumptionRecord[]
+  supplyOrders SupplyOrder[]
+  emergencies  Emergency[] @relation("ActivatedBy")
+  confirmedEmergencies Emergency[] @relation("ConfirmedBy")
+  requirements EmergencyRequirement[]
+  resourceOffers ResourceOffer[] @relation("OfferedBy")
+  acceptedOffers ResourceOffer[] @relation("AcceptedBy")
+  bloodRequests BloodRequest[]
+  bloodOffers  BloodOffer[]
+  preparednessPlans PreparednessPlan[] @relation("CreatedBy")
+  approvedPlans PreparednessPlan[] @relation("ApprovedBy")
+  inventoryReservations InventoryReservation[]
+  movements    ResourceMovement[]
+  nationalReleases NationalReserveRelease[]
+  auditLogs    AuditLog[]
+  capacityUpdates HospitalCapacity[]
+
+  @@map("users")
+}
+
+model Medicine {
+  id                  String    @id @default(uuid())
+  name                String
+  genericName         String    @map("generic_name")
+  brand               String?
+  strength            String?
+  dosageForm          String    @map("dosage_form")
+  category            String
+  unitType            String    @map("unit_type")
+  criticality         String    @default("standard")
+  storageRequirement  String    @default("room_temperature") @map("storage_requirement")
+  isVaccine           Int       @default(0) @map("is_vaccine")
+  isActive            Int       @default(1) @map("is_active")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  
+  inventories         Inventory[]
+  batches             InventoryBatch[]
+  transactions        InventoryTransaction[]
+  reservations        InventoryReservation[]
+  consumptionRecords  ConsumptionRecord[]
+  forecasts           DemandForecast[]
+  supplyRisks         SupplyRiskRecord[]
+  supplyOrders        SupplyOrder[]
+  requirements        EmergencyRequirement[]
+  offers              ResourceOffer[]
+  movements           ResourceMovement[]
+  donorReplenishments DonorReplenishmentRequest[]
+  replenMovements     DonorReplenishmentMovement[]
+  nationalReserve     NationalReserve?
+  nationalReleases    NationalReserveRelease[]
+  prepositioningRecs  PrepositioningRecommendation[]
+  alerts              Alert[]
+
+  @@map("medicines")
+}
+
+model Inventory {
+  id                    String    @id @default(uuid())
+  facilityId            String    @map("facility_id")
+  medicineId            String    @map("medicine_id")
+  currentStock          Int       @default(0) @map("current_stock")
+  reservedStock         Int       @default(0) @map("reserved_stock")
+  safetyThreshold       Int       @default(0) @map("safety_threshold")
+  reorderLevel          Int       @default(0) @map("reorder_level")
+  avgDailyConsumption   Float     @default(0) @map("avg_daily_consumption")
+  leadTimeDays          Int       @default(7) @map("lead_time_days")
+  emergencyLeadTimeDays Int       @default(3) @map("emergency_lead_time_days")
+  supplier              String?
+  deliveryReliability   Float     @default(0.9) @map("delivery_reliability")
+  lastUpdated           DateTime  @default(now()) @map("last_updated")
+  
+  facility              Facility  @relation(fields: [facilityId], references: [id])
+  medicine              Medicine  @relation(fields: [medicineId], references: [id])
+  batches               InventoryBatch[]
+
+  @@unique([facilityId, medicineId])
+  @@map("inventory")
+}
+
+model InventoryBatch {
+  id              String    @id @default(uuid())
+  inventoryId     String    @map("inventory_id")
+  facilityId      String    @map("facility_id")
+  medicineId      String    @map("medicine_id")
+  batchNumber     String    @map("batch_number")
+  manufacturer    String?
+  receivedDate    DateTime  @map("received_date")
+  expiryDate      DateTime  @map("expiry_date")
+  quantity        Int       @default(0)
+  reservedQuantity Int      @default(0) @map("reserved_quantity")
+  storageLocation String?   @map("storage_location")
+  status          String    @default("usable")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  inventory       Inventory @relation(fields: [inventoryId], references: [id])
+  facility        Facility  @relation(fields: [facilityId], references: [id])
+  medicine        Medicine  @relation(fields: [medicineId], references: [id])
+  transactions    InventoryTransaction[]
+  reservations    InventoryReservation[]
+
+  @@map("inventory_batches")
+}
+
+model InventoryTransaction {
+  id              String    @id @default(uuid())
+  facilityId      String    @map("facility_id")
+  medicineId      String    @map("medicine_id")
+  batchId         String?   @map("batch_id")
+  transactionType String    @map("transaction_type")
+  quantity        Int
+  referenceId     String?   @map("reference_id")
+  referenceType   String?   @map("reference_type")
+  notes           String?
+  performedBy     String?   @map("performed_by")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  facility        Facility  @relation(fields: [facilityId], references: [id])
+  medicine        Medicine  @relation(fields: [medicineId], references: [id])
+  batch           InventoryBatch? @relation(fields: [batchId], references: [id])
+
+  @@map("inventory_transactions")
+}
+
+model InventoryReservation {
+  id            String    @id @default(uuid())
+  facilityId    String    @map("facility_id")
+  medicineId    String    @map("medicine_id")
+  batchId       String?   @map("batch_id")
+  quantity      Int
+  reason        String?
+  referenceId   String?   @map("reference_id")
+  referenceType String?   @map("reference_type")
+  status        String    @default("active")
+  reservedBy    String?   @map("reserved_by")
+  expiresAt     DateTime? @map("expires_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  facility      Facility  @relation(fields: [facilityId], references: [id])
+  medicine      Medicine  @relation(fields: [medicineId], references: [id])
+  batch         InventoryBatch? @relation(fields: [batchId], references: [id])
+  user          User?     @relation(fields: [reservedBy], references: [id])
+
+  @@map("inventory_reservations")
+}
+
+model ConsumptionRecord {
+  id          String    @id @default(uuid())
+  facilityId  String    @map("facility_id")
+  medicineId  String    @map("medicine_id")
+  date        String
+  quantity    Int
+  recordedBy  String?   @map("recorded_by")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  
+  facility    Facility  @relation(fields: [facilityId], references: [id])
+  medicine    Medicine  @relation(fields: [medicineId], references: [id])
+  user        User?     @relation(fields: [recordedBy], references: [id])
+
+  @@unique([facilityId, medicineId, date])
+  @@map("consumption_records")
+}
+
+model DemandForecast {
+  id            String    @id @default(uuid())
+  facilityId    String    @map("facility_id")
+  medicineId    String    @map("medicine_id")
+  forecastDate  String    @map("forecast_date")
+  forecastDays  Int       @default(30) @map("forecast_days")
+  dailyForecast Float     @map("daily_forecast")
+  totalForecast Float     @map("total_forecast")
+  seasonalFactor Float    @default(1.0) @map("seasonal_factor")
+  confidence    Float     @default(0.8)
+  method        String    @default("weighted_moving_average")
+  generatedAt   DateTime  @default(now()) @map("generated_at")
+  
+  facility      Facility  @relation(fields: [facilityId], references: [id])
+  medicine      Medicine  @relation(fields: [medicineId], references: [id])
+
+  @@map("demand_forecasts")
+}
+
+model SupplyRiskRecord {
+  id                  String    @id @default(uuid())
+  facilityId          String    @map("facility_id")
+  medicineId          String    @map("medicine_id")
+  demandRisk          String    @default("low") @map("demand_risk")
+  supplyRisk          String    @default("low") @map("supply_risk")
+  daysOfStock         Float?    @map("days_of_stock")
+  predictedStockoutDate String? @map("predicted_stockout_date")
+  leadTimeDays        Int?      @map("lead_time_days")
+  riskFactors         String?   @map("risk_factors")
+  assessmentDate      DateTime  @default(now()) @map("assessment_date")
+  
+  facility            Facility  @relation(fields: [facilityId], references: [id])
+  medicine            Medicine  @relation(fields: [medicineId], references: [id])
+
+  @@map("supply_risk_records")
+}
+
+model SupplyOrder {
+  id               String    @id @default(uuid())
+  facilityId       String    @map("facility_id")
+  medicineId       String    @map("medicine_id")
+  orderedQuantity  Int       @map("ordered_quantity")
+  expectedQuantity Int?      @map("expected_quantity")
+  supplier         String?
+  orderDate        DateTime  @map("order_date")
+  expectedArrival  DateTime? @map("expected_arrival")
+  actualArrival    DateTime? @map("actual_arrival")
+  status           String    @default("ordered")
+  delayReason      String?   @map("delay_reason")
+  disruptionFlag   Int       @default(0) @map("disruption_flag")
+  createdBy        String?   @map("created_by")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  
+  facility         Facility  @relation(fields: [facilityId], references: [id])
+  medicine         Medicine  @relation(fields: [medicineId], references: [id])
+  user             User?     @relation(fields: [createdBy], references: [id])
+
+  @@map("supply_orders")
+}
+
+model HospitalCapacity {
+  id            String    @id @default(uuid())
+  facilityId    String    @map("facility_id")
+  careType      String    @map("care_type")
+  totalBeds     Int       @default(0) @map("total_beds")
+  availableBeds Int       @default(0) @map("available_beds")
+  occupiedBeds  Int       @default(0) @map("occupied_beds")
+  reservedBeds  Int       @default(0) @map("reserved_beds")
+  lastUpdated   DateTime  @default(now()) @map("last_updated")
+  updatedBy     String?   @map("updated_by")
+  
+  facility      Facility  @relation(fields: [facilityId], references: [id])
+  user          User?     @relation(fields: [updatedBy], references: [id])
+
+  @@unique([facilityId, careType])
+  @@map("hospital_capacity")
+}
+
+model Ambulance {
+  id                  String    @id @default(uuid())
+  facilityId          String    @map("facility_id")
+  registration        String    @unique
+  ambulanceType       String    @map("ambulance_type")
+  provider            String?
+  status              String    @default("available")
+  currentZone         String?   @map("current_zone")
+  assignedIncident    String?   @map("assigned_incident")
+  availableFrom       DateTime? @map("available_from")
+  deploymentTimeMinutes Int     @default(15) @map("deployment_time_minutes")
+  capacity            Int       @default(1)
+  equipment           String?
+  lastUpdated         DateTime  @default(now()) @map("last_updated")
+  
+  facility            Facility  @relation(fields: [facilityId], references: [id])
+  resourceOffers      ResourceOffer[]
+
+  @@map("ambulances")
+}
+
+model MedicalStaff {
+  id                  String    @id @default(uuid())
+  facilityId          String    @map("facility_id")
+  staffType           String    @map("staff_type")
+  specialty           String?
+  name                String
+  contact             String?
+  status              String    @default("available")
+  availableFrom       DateTime? @map("available_from")
+  availableUntil      DateTime? @map("available_until")
+  deploymentTimeMinutes Int     @default(30) @map("deployment_time_minutes")
+  assignedIncident    String?   @map("assigned_incident")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  
+  facility            Facility  @relation(fields: [facilityId], references: [id])
+  resourceOffers      ResourceOffer[]
+
+  @@map("medical_staff")
+}
+
+model Emergency {
+  id                  String    @id @default(uuid())
+  title               String
+  emergencyType       String    @map("emergency_type")
+  location            String
+  facilityId          String?   @map("facility_id")
+  districtId          String?   @map("district_id")
+  stateId             String    @map("state_id")
+  severity            String
+  description         String?
+  estimatedCasualties Int       @default(0) @map("estimated_casualties")
+  expectedDurationHours Int?    @map("expected_duration_hours")
+  status              String    @default("initiated")
+  loadCritical        Int       @default(0) @map("load_critical")
+  loadSerious         Int       @default(0) @map("load_serious")
+  loadMinor           Int       @default(0) @map("load_minor")
+  loadDeceased        Int       @default(0) @map("load_deceased")
+  loadUnassessed      Int       @default(0) @map("load_unassessed")
+  activatedBy         String?   @map("activated_by")
+  confirmedBy         String?   @map("confirmed_by")
+  activatedAt         DateTime? @map("activated_at")
+  confirmedAt         DateTime? @map("confirmed_at")
+  closedAt            DateTime? @map("closed_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  
+  facility            Facility? @relation(fields: [facilityId], references: [id])
+  district            District? @relation(fields: [districtId], references: [id])
+  state               State     @relation(fields: [stateId], references: [id])
+  activatedByUser     User?     @relation("ActivatedBy", fields: [activatedBy], references: [id])
+  confirmedByUser     User?     @relation("ConfirmedBy", fields: [confirmedBy], references: [id])
+  requirements        EmergencyRequirement[]
+  offers              ResourceOffer[]
+  movements           ResourceMovement[]
+  nationalReleases    NationalReserveRelease[]
+  bloodRequests       BloodRequest[]
+  alerts              Alert[]
+
+  @@map("emergencies")
+}
+
+model EmergencyRequirement {
+  id               String    @id @default(uuid())
+  emergencyId      String    @map("emergency_id")
+  resourceType     String    @map("resource_type")
+  medicineId       String?   @map("medicine_id")
+  bloodGroup       String?   @map("blood_group")
+  bloodComponent   String?   @map("blood_component")
+  description      String?
+  quantityRequired Int       @map("quantity_required")
+  quantityConfirmed Int      @default(0) @map("quantity_confirmed")
+  priority         String    @default("urgent")
+  requiredBy       DateTime? @map("required_by")
+  status           String    @default("requested")
+  createdBy        String?   @map("created_by")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  
+  emergency        Emergency @relation(fields: [emergencyId], references: [id])
+  medicine         Medicine? @relation(fields: [medicineId], references: [id])
+  user             User?     @relation(fields: [createdBy], references: [id])
+  offers           ResourceOffer[]
+  movements        ResourceMovement[]
+  nationalReleases NationalReserveRelease[]
+
+  @@map("emergency_requirements")
+}
+
+model ResourceOffer {
+  id                  String    @id @default(uuid())
+  requirementId       String    @map("requirement_id")
+  emergencyId         String    @map("emergency_id")
+  offeringFacilityId  String    @map("offering_facility_id")
+  resourceType        String    @map("resource_type")
+  medicineId          String?   @map("medicine_id")
+  ambulanceId         String?   @map("ambulance_id")
+  staffId             String?   @map("staff_id")
+  quantityOffered     Int       @map("quantity_offered")
+  quantityAccepted    Int       @default(0) @map("quantity_accepted")
+  availableFrom       DateTime? @map("available_from")
+  availableUntil      DateTime? @map("available_until")
+  deploymentTimeMinutes Int?    @map("deployment_time_minutes")
+  safeTransferableQty Int?      @map("safe_transferable_qty")
+  protectedStock      Int?      @map("protected_stock")
+  status              String    @default("offered")
+  offeredBy           String?   @map("offered_by")
+  acceptedBy          String?   @map("accepted_by")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @default(now()) @map("updated_at")
+  
+  requirement         EmergencyRequirement @relation(fields: [requirementId], references: [id])
+  emergency           Emergency @relation(fields: [emergencyId], references: [id])
+  facility            Facility  @relation(fields: [offeringFacilityId], references: [id])
+  medicine            Medicine? @relation(fields: [medicineId], references: [id])
+  ambulance           Ambulance? @relation(fields: [ambulanceId], references: [id])
+  staff               MedicalStaff? @relation(fields: [staffId], references: [id])
+  offeredByUser       User?     @relation("OfferedBy", fields: [offeredBy], references: [id])
+  acceptedByUser      User?     @relation("AcceptedBy", fields: [acceptedBy], references: [id])
+  movements           ResourceMovement[]
+
+  @@map("resource_offers")
+}
+
+model ResourceMovement {
+  id                    String    @id @default(uuid())
+  offerId               String?   @map("offer_id")
+  requirementId         String?   @map("requirement_id")
+  emergencyId           String?   @map("emergency_id")
+  sourceFacilityId      String    @map("source_facility_id")
+  destinationFacilityId String    @map("destination_facility_id")
+  resourceType          String    @map("resource_type")
+  medicineId            String?   @map("medicine_id")
+  quantityTransferred   Int       @map("quantity_transferred")
+  quantityUsed          Int       @default(0) @map("quantity_used")
+  quantityReturned      Int       @default(0) @map("quantity_returned")
+  status                String    @default("pending")
+  dispatchedAt          DateTime? @map("dispatched_at")
+  receivedAt            DateTime? @map("received_at")
+  returnedAt            DateTime? @map("returned_at")
+  needsReplenishment    Int       @default(0) @map("needs_replenishment")
+  replenishmentQuantity Int       @default(0) @map("replenishment_quantity")
+  createdBy             String?   @map("created_by")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  
+  offer                 ResourceOffer? @relation(fields: [offerId], references: [id])
+  requirement           EmergencyRequirement? @relation(fields: [requirementId], references: [id])
+  emergency             Emergency? @relation(fields: [emergencyId], references: [id])
+  sourceFacility        Facility  @relation("SourceMovements", fields: [sourceFacilityId], references: [id])
+  destFacility          Facility  @relation("DestMovements", fields: [destinationFacilityId], references: [id])
+  medicine              Medicine? @relation(fields: [medicineId], references: [id])
+  user                  User?     @relation(fields: [createdBy], references: [id])
+
+  @@map("resource_movements")
+}
+
+model DonorReplenishmentRequest {
+  id                      String    @id @default(uuid())
+  donorFacilityId         String    @map("donor_facility_id")
+  resourceType            String    @map("resource_type")
+  medicineId              String?   @map("medicine_id")
+  quantityDonated         Int       @map("quantity_donated")
+  quantityToReplenish     Int       @map("quantity_to_replenish")
+  currentStockAfterDonation Int?    @map("current_stock_after_donation")
+  protectedStock          Int?      @map("protected_stock")
+  targetRestorationStock  Int?      @map("target_restoration_stock")
+  priority                String    @default("high")
+  reason                  String?
+  status                  String    @default("pending")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  
+  facility                Facility  @relation(fields: [donorFacilityId], references: [id])
+  medicine                Medicine? @relation(fields: [medicineId], references: [id])
+  movements               DonorReplenishmentMovement[]
+
+  @@map("donor_replenishment_requests")
+}
+
+model DonorReplenishmentMovement {
+  id                    String    @id @default(uuid())
+  replenishmentId       String    @map("replenishment_id")
+  sourceFacilityId      String    @map("source_facility_id")
+  destinationFacilityId String    @map("destination_facility_id")
+  medicineId            String?   @map("medicine_id")
+  quantity              Int
+  status                String    @default("planned")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  
+  request               DonorReplenishmentRequest @relation(fields: [replenishmentId], references: [id])
+  sourceFacility        Facility  @relation("ReplenSourceMovements", fields: [sourceFacilityId], references: [id])
+  destFacility          Facility  @relation("ReplenDestMovements", fields: [destinationFacilityId], references: [id])
+  medicine              Medicine? @relation(fields: [medicineId], references: [id])
+
+  @@map("donor_replenishment_movements")
+}
+
+model NationalReserve {
+  id                 String    @id @default(uuid())
+  medicineId         String    @unique @map("medicine_id")
+  totalQuantity      Int       @default(0) @map("total_quantity")
+  protectedQuantity  Int       @default(0) @map("protected_quantity")
+  emergencyAvailable Int       @default(0) @map("emergency_available")
+  allocatedQuantity  Int       @default(0) @map("allocated_quantity")
+  releasedQuantity   Int       @default(0) @map("released_quantity")
+  storageLocation    String?   @map("storage_location")
+  lastUpdated        DateTime  @default(now()) @map("last_updated")
+  
+  medicine           Medicine  @relation(fields: [medicineId], references: [id])
+  releases           NationalReserveRelease[]
+
+  @@map("national_reserves")
+}
+
+model NationalReserveRelease {
+  id                    String    @id @default(uuid())
+  reserveId             String    @map("reserve_id")
+  medicineId            String    @map("medicine_id")
+  requirementId         String?   @map("requirement_id")
+  emergencyId           String?   @map("emergency_id")
+  quantity              Int
+  destinationFacilityId String?   @map("destination_facility_id")
+  destinationStateId    String?   @map("destination_state_id")
+  reason                String?
+  status                String    @default("pending")
+  releasedBy            String?   @map("released_by")
+  approvedAt            DateTime? @map("approved_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  
+  reserve               NationalReserve @relation(fields: [reserveId], references: [id])
+  medicine              Medicine  @relation(fields: [medicineId], references: [id])
+  requirement           EmergencyRequirement? @relation(fields: [requirementId], references: [id])
+  emergency             Emergency? @relation(fields: [emergencyId], references: [id])
+  destFacility          Facility? @relation(fields: [destinationFacilityId], references: [id])
+  destState             State?    @relation(fields: [destinationStateId], references: [id])
+  releasedByUser        User?     @relation(fields: [releasedBy], references: [id])
+
+  @@map("national_reserve_releases")
+}
+
+
+model BloodBank {
+  id            String    @id @default(uuid())
+  facilityId    String    @map("facility_id")
+  name          String
+  type          String    @default("government")
+  licenseNumber String?   @map("license_number")
+  isActive      Int       @default(1) @map("is_active")
+  contact       String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  facility      Facility  @relation(fields: [facilityId], references: [id])
+  inventory     BloodInventory[]
+  offers        BloodOffer[]
+
+  @@map("blood_banks")
+}
+
+model BloodInventory {
+  id            String    @id @default(uuid())
+  bloodBankId   String    @map("blood_bank_id")
+  facilityId    String    @map("facility_id")
+  bloodGroup    String    @map("blood_group")
+  component     String
+  availableUnits Int      @default(0) @map("available_units")
+  reservedUnits Int       @default(0) @map("reserved_units")
+  collectionDate DateTime? @map("collection_date")
+  expiryDate    DateTime? @map("expiry_date")
+  status        String    @default("available")
+  lastUpdated   DateTime  @default(now()) @map("last_updated")
+  
+  bloodBank     BloodBank @relation(fields: [bloodBankId], references: [id])
+  facility      Facility  @relation(fields: [facilityId], references: [id])
+
+  @@unique([bloodBankId, bloodGroup, component])
+  @@map("blood_inventory")
+}
+
+model BloodRequest {
+  id                  String    @id @default(uuid())
+  requestingFacilityId String   @map("requesting_facility_id")
+  emergencyId         String?   @map("emergency_id")
+  bloodGroup          String    @map("blood_group")
+  component           String
+  unitsRequired       Int       @map("units_required")
+  unitsConfirmed      Int       @default(0) @map("units_confirmed")
+  priority            String    @default("urgent")
+  requiredBy          DateTime? @map("required_by")
+  reason              String?
+  status              String    @default("requested")
+  requestedBy         String?   @map("requested_by")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  
+  facility            Facility  @relation(fields: [requestingFacilityId], references: [id])
+  emergency           Emergency? @relation(fields: [emergencyId], references: [id])
+  user                User?     @relation(fields: [requestedBy], references: [id])
+  offers              BloodOffer[]
+
+  @@map("blood_requests")
+}
+
+model BloodOffer {
+  id              String    @id @default(uuid())
+  requestId       String    @map("request_id")
+  bloodBankId     String    @map("blood_bank_id")
+  sourceFacilityId String   @map("source_facility_id")
+  bloodGroup      String    @map("blood_group")
+  component       String
+  unitsOffered    Int       @map("units_offered")
+  unitsAccepted   Int       @default(0) @map("units_accepted")
+  etaMinutes      Int?      @map("eta_minutes")
+  status          String    @default("offered")
+  offeredBy       String?   @map("offered_by")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  request         BloodRequest @relation(fields: [requestId], references: [id])
+  bloodBank       BloodBank @relation(fields: [bloodBankId], references: [id])
+  user            User?     @relation(fields: [offeredBy], references: [id])
+
+  @@map("blood_offers")
+}
+
+model PreparednessPlan {
+  id            String    @id @default(uuid())
+  title         String
+  disasterType  String    @map("disaster_type")
+  facilityId    String?   @map("facility_id")
+  districtId    String?   @map("district_id")
+  stateId       String    @map("state_id")
+  riskLevel     String    @default("medium") @map("risk_level")
+  description   String?
+  status        String    @default("planning")
+  createdBy     String?   @map("created_by")
+  approvedBy    String?   @map("approved_by")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  
+  facility      Facility? @relation(fields: [facilityId], references: [id])
+  createdByUser User?     @relation("CreatedBy", fields: [createdBy], references: [id])
+  approvedByUser User?    @relation("ApprovedBy", fields: [approvedBy], references: [id])
+  recommendations PrepositioningRecommendation[]
+
+  @@map("preparedness_plans")
+}
+
+model PrepositioningRecommendation {
+  id                    String    @id @default(uuid())
+  planId                String    @map("plan_id")
+  facilityId            String    @map("facility_id")
+  medicineId            String    @map("medicine_id")
+  currentCoverageDays   Float?    @map("current_coverage_days")
+  recommendedCoverageDays Float?  @map("recommended_coverage_days")
+  additionalQuantity    Int       @map("additional_quantity")
+  priority              String    @default("high")
+  sourceRecommendation  String?   @map("source_recommendation")
+  status                String    @default("pending")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  
+  plan                  PreparednessPlan @relation(fields: [planId], references: [id])
+  medicine              Medicine  @relation(fields: [medicineId], references: [id])
+
+  @@map("prepositioning_recommendations")
+}
+
+model Alert {
+  id          String    @id @default(uuid())
+  facilityId  String?   @map("facility_id")
+  stateId     String?   @map("state_id")
+  alertType   String    @map("alert_type")
+  severity    String    @default("warning")
+  title       String
+  message     String
+  medicineId  String?   @map("medicine_id")
+  emergencyId String?   @map("emergency_id")
+  isRead      Int       @default(0) @map("is_read")
+  isResolved  Int       @default(0) @map("is_resolved")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  
+  facility    Facility? @relation(fields: [facilityId], references: [id])
+  state       State?    @relation(fields: [stateId], references: [id])
+  medicine    Medicine? @relation(fields: [medicineId], references: [id])
+  emergency   Emergency? @relation(fields: [emergencyId], references: [id])
+
+  @@map("alerts")
+}
+
+model AuditLog {
+  id           String    @id @default(uuid())
+  userId       String?   @map("user_id")
+  action       String
+  resourceType String?   @map("resource_type")
+  resourceId   String?   @map("resource_id")
+  facilityId   String?   @map("facility_id")
+  details      String?
+  ipAddress    String?   @map("ip_address")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  
+  user         User?     @relation(fields: [userId], references: [id])
+  facility     Facility? @relation(fields: [facilityId], references: [id])
+
+  @@map("audit_logs")
+}

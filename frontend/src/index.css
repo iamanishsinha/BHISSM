@@ -1,0 +1,198 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #F8F1E7;
+    color: #2D2926;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #D4C8BC #F8F1E7;
+  }
+  
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: #F8F1E7;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background-color: #D4C8BC;
+    border-radius: 3px;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-bhissm-surface border border-bhissm-border rounded-lg shadow-sm p-4;
+  }
+  
+  .btn-primary {
+    @apply bg-bhissm-dark text-white px-4 py-2 rounded text-sm font-medium hover:bg-bhissm-secondary transition-colors;
+  }
+  
+  .btn-accent {
+    @apply bg-bhissm-accent text-bhissm-dark px-4 py-2 rounded text-sm font-medium hover:opacity-90 transition-opacity;
+  }
+  
+  .btn-danger {
+    @apply bg-bhissm-critical text-white px-4 py-2 rounded text-sm font-medium hover:opacity-90 transition-opacity;
+  }
+  
+  .btn-outline {
+    @apply border border-bhissm-border text-bhissm-secondary px-4 py-2 rounded text-sm font-medium hover:bg-bhissm-pink transition-colors;
+  }
+  
+  .badge-critical {
+    @apply bg-red-100 text-red-700 border border-red-200 text-xs px-2 py-0.5 rounded-full font-medium;
+  }
+  
+  .badge-warning {
+    @apply bg-amber-100 text-amber-700 border border-amber-200 text-xs px-2 py-0.5 rounded-full font-medium;
+  }
+  
+  .badge-success {
+    @apply bg-green-100 text-green-700 border border-green-200 text-xs px-2 py-0.5 rounded-full font-medium;
+  }
+  
+  .badge-info {
+    @apply bg-blue-100 text-blue-700 border border-blue-200 text-xs px-2 py-0.5 rounded-full font-medium;
+  }
+  
+  .badge-neutral {
+    @apply bg-gray-100 text-gray-600 border border-gray-200 text-xs px-2 py-0.5 rounded-full font-medium;
+  }
+
+  .input-field {
+    @apply border border-bhissm-border rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-bhissm-accent/50 w-full;
+  }
+  
+  .select-field {
+    @apply border border-bhissm-border rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-bhissm-accent/50 w-full;
+  }
+  
+  .table-header {
+    @apply text-xs font-semibold text-bhissm-secondary uppercase tracking-wide bg-bhissm-bg px-3 py-2;
+  }
+  
+  .table-cell {
+    @apply px-3 py-2.5 text-sm border-b border-bhissm-border/50;
+  }
+  
+  .nav-item {
+    @apply flex items-center gap-2 px-3 py-2 rounded text-sm text-bhissm-secondary hover:bg-bhissm-pink hover:text-bhissm-dark transition-colors cursor-pointer;
+  }
+  
+  .nav-item-active {
+    @apply flex items-center gap-2 px-3 py-2 rounded text-sm bg-bhissm-accent/30 text-bhissm-dark font-medium;
+  }
+
+  .section-title {
+    @apply text-base font-semibold text-bhissm-dark border-b border-bhissm-border pb-2 mb-4;
+  }
+
+  .stat-card {
+    @apply card flex flex-col gap-1;
+  }
+  
+  .stat-value {
+    @apply text-2xl font-bold text-bhissm-dark;
+  }
+  
+  .stat-label {
+    @apply text-xs text-bhissm-secondary uppercase tracking-wide;
+  }
+
+  .demo-badge {
+    @apply text-xs bg-amber-100 text-amber-800 border border-amber-300 px-2.5 py-0.5 rounded-full font-mono font-semibold;
+  }
+
+  /* BHISSM Flagship Hackathon Brand Identity */
+  .bhissm-brand-title {
+    background: linear-gradient(135deg, #2D2926 0%, #7A2832 55%, #2D2926 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.03em;
+  }
+
+  .bhissm-emblem-box {
+    background: linear-gradient(145deg, #2D2926 0%, #463733 55%, #692B32 100%);
+    box-shadow: 0 4px 14px rgba(45, 41, 38, 0.22), inset 0 1px 0 rgba(255, 249, 241, 0.25);
+  }
+}
+
+/* High-Visibility Emergency Siren & Strobe Animations */
+@keyframes emergencyStrobe {
+  0%, 100% {
+    background-color: #DC2626;
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7), 0 0 18px rgba(220, 38, 38, 0.65);
+    transform: scale(1);
+  }
+  50% {
+    background-color: #991B1B;
+    box-shadow: 0 0 0 8px rgba(220, 38, 38, 0), 0 0 26px rgba(239, 68, 68, 0.95);
+    transform: scale(1.04);
+  }
+}
+
+@keyframes emergencyBannerGlow {
+  0%, 100% {
+    border-color: #EF4444;
+    box-shadow: 0 4px 20px -2px rgba(220, 38, 38, 0.22), inset 0 0 0 1px rgba(220, 38, 38, 0.15);
+  }
+  50% {
+    border-color: #B91C1C;
+    box-shadow: 0 4px 26px 2px rgba(220, 38, 38, 0.38), inset 0 0 0 1px rgba(220, 38, 38, 0.3);
+  }
+}
+
+@keyframes sirenAlternatingLeft {
+  0%, 49% { opacity: 1; background-color: #EF4444; box-shadow: 0 0 12px #EF4444; }
+  50%, 100% { opacity: 0.25; background-color: #7F1D1D; box-shadow: none; }
+}
+
+@keyframes sirenAlternatingRight {
+  0%, 49% { opacity: 0.25; background-color: #7F1D1D; box-shadow: none; }
+  50%, 100% { opacity: 1; background-color: #EF4444; box-shadow: 0 0 12px #EF4444; }
+}
+
+.emergency-beacon-core {
+  animation: emergencyStrobe 1.3s ease-in-out infinite;
+}
+
+.emergency-banner-glow {
+  animation: emergencyBannerGlow 2s ease-in-out infinite;
+}
+
+.siren-light-left {
+  animation: sirenAlternatingLeft 0.75s infinite;
+}
+
+.siren-light-right {
+  animation: sirenAlternatingRight 0.75s infinite;
+}
+
+/* Emergency mode urgency pulse */
+@keyframes urgentPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.emergency-active {
+  animation: urgentPulse 2s ease-in-out infinite;
+}
+
+/* Risk colors */
+.risk-critical { color: #B65C62; }
+.risk-high { color: #C59655; }
+.risk-medium { color: #8B8038; }
+.risk-low { color: #6F8B72; }
+
