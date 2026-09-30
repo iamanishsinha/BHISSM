@@ -30,8 +30,10 @@ app.use(cors({
   origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, 'http://localhost:5173'] : true,
   credentials: true,
 }));
+app.options('*', cors());
 app.use(compression() as any);
 app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // SSE clients registry for real-time updates
 const sseClients = new Set<Response>();
@@ -43,19 +45,32 @@ export function broadcast(eventType: string, data: any) {
   });
 }
 
-// Health check
-app.get('/api/health', (req: Request, res: Response) => {
+// Health check endpoint (accessible on both /api/health and /health)
+app.get(['/api/health', '/health'], async (req: Request, res: Response) => {
+  let dbStatus = 'disconnected';
+  let userCount = 0;
+  try {
+    const prisma = getDb();
+    userCount = await prisma.user.count();
+    dbStatus = 'connected';
+  } catch (err: any) {
+    dbStatus = `error: ${err.message}`;
+  }
+
   res.json({
     status: 'ok',
     service: 'BHISSM API',
     version: '1.0.0',
+    is_serverless: Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME),
+    db_status: dbStatus,
+    users_count: userCount,
     timestamp: new Date().toISOString(),
     note: 'DEMO / SIMULATED DATA — Not connected to government databases',
   });
 });
 
 // SSE endpoint
-app.get('/api/events', (req: Request, res: Response) => {
+app.get(['/api/events', '/events'], (req: Request, res: Response) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -66,26 +81,26 @@ app.get('/api/events', (req: Request, res: Response) => {
   req.on('close', () => sseClients.delete(res));
 });
 
-// API Routes
-app.use('/api/auth', authRouter);
-app.use('/api/inventory', inventoryRouter);
-app.use('/api/forecast', forecastRouter);
-app.use('/api/emergencies', emergenciesRouter);
-app.use('/api/blood-bank', bloodBankRouter);
-app.use('/api/national-reserve', nationalReserveRouter);
-app.use('/api/facilities', facilitiesRouter);
-app.use('/api/alerts', alertsRouter);
+// API Routes (mounted on both /api/* and /* to match regardless of whether proxy strips /api)
+app.use(['/api/auth', '/auth'], authRouter);
+app.use(['/api/inventory', '/inventory'], inventoryRouter);
+app.use(['/api/forecast', '/forecast'], forecastRouter);
+app.use(['/api/emergencies', '/emergencies'], emergenciesRouter);
+app.use(['/api/blood-bank', '/blood-bank'], bloodBankRouter);
+app.use(['/api/national-reserve', '/national-reserve'], nationalReserveRouter);
+app.use(['/api/facilities', '/facilities'], facilitiesRouter);
+app.use(['/api/alerts', '/alerts'], alertsRouter);
 
 // States and districts
 import { authenticate } from './middleware/auth';
 
-app.get('/api/states', authenticate, async (req: Request, res: Response) => {
+app.get(['/api/states', '/states'], authenticate, async (req: Request, res: Response) => {
   const prisma = getDb();
   const states = await prisma.state.findMany({ orderBy: { name: 'asc' } });
   res.json(states);
 });
 
-app.get('/api/districts', authenticate, async (req: Request, res: Response) => {
+app.get(['/api/districts', '/districts'], authenticate, async (req: Request, res: Response) => {
   const prisma = getDb();
   const { state_id } = req.query as any;
   const districts = await prisma.district.findMany({
@@ -95,7 +110,7 @@ app.get('/api/districts', authenticate, async (req: Request, res: Response) => {
   res.json(districts);
 });
 
-app.get('/api/medicines', authenticate, async (req: Request, res: Response) => {
+app.get(['/api/medicines', '/medicines'], authenticate, async (req: Request, res: Response) => {
   const prisma = getDb();
   const { category, criticality, is_vaccine } = req.query as any;
   const medicines = await prisma.medicine.findMany({
@@ -112,7 +127,7 @@ app.get('/api/medicines', authenticate, async (req: Request, res: Response) => {
 
 // 404 handler
 app.use((req: Request, res: Response) => {
-  res.status(404).json({ error: 'Route not found' });
+  res.status(404).json({ error: 'Route not found', path: req.path, method: req.method });
 });
 
 // Error handler

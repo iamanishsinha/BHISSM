@@ -18,11 +18,16 @@ function resolveDatabaseUrl(): string {
 
     // On Vercel, the container filesystem is read-only EXCEPT for /tmp.
     // Copy the bundled seed database to /tmp/bhissm.db so that SQLite has full read/write permissions.
-    if (!fs.existsSync(tmpDbPath)) {
+    if (!fs.existsSync(tmpDbPath) || fs.statSync(tmpDbPath).size === 0) {
       const candidates = [
+        path.join(__dirname, '..', 'bhissm.db'),
+        path.join(__dirname, 'bhissm.db'),
+        path.join(process.cwd(), 'dist', 'bhissm.db'),
+        path.join(process.cwd(), 'bhissm.db'),
         path.join(__dirname, '..', '..', 'prisma', 'bhissm.db'),
         path.join(__dirname, '..', '..', 'data', 'bhissm.db'),
         path.join(process.cwd(), 'prisma', 'bhissm.db'),
+        path.join(process.cwd(), 'backend', 'dist', 'bhissm.db'),
         path.join(process.cwd(), 'backend', 'prisma', 'bhissm.db'),
         path.join(process.cwd(), 'data', 'bhissm.db'),
         path.join(process.cwd(), 'backend', 'data', 'bhissm.db'),
@@ -30,10 +35,10 @@ function resolveDatabaseUrl(): string {
 
       let copied = false;
       for (const candidate of candidates) {
-        if (fs.existsSync(candidate)) {
+        if (fs.existsSync(candidate) && fs.statSync(candidate).size > 0) {
           try {
             fs.copyFileSync(candidate, tmpDbPath);
-            console.log(`[BHISSM DB] Initialized writable SQLite database at ${tmpDbPath} from ${candidate}`);
+            console.log(`[BHISSM DB] Initialized writable SQLite database at ${tmpDbPath} from ${candidate} (${fs.statSync(candidate).size} bytes)`);
             copied = true;
             break;
           } catch (err) {

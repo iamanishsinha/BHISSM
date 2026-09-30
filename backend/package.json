@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "prisma generate && tsc",
+    "build": "prisma generate && tsc && node -e \"const fs = require('fs'); fs.mkdirSync('dist', { recursive: true }); fs.copyFileSync('prisma/bhissm.db', 'dist/bhissm.db');\"",
     "start": "node dist/index.js",
     "seed": "tsx src/db/seed.ts",
     "db:generate": "prisma generate",

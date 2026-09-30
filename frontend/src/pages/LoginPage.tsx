@@ -48,9 +48,10 @@ export default function LoginPage() {
     } catch (err: any) {
       console.error('Login error:', err);
       if (!err.response) {
-        setError('Cannot connect to BHISSM backend API server. Please verify the backend service is reachable.');
+        setError(`Cannot reach BHISSM API (${err.message || 'Network Error'}). Please check /api/health.`);
       } else {
-        setError(err.response?.data?.error || 'Authentication rejected. Check credentials.');
+        const errorText = err.response?.data?.error || err.response?.data?.message || `HTTP ${err.response.status}: Authentication failed`;
+        setError(errorText);
       }
     } finally {
       setLoading(false);
