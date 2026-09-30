@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, 'http://localhost:5173'] : true,
   credentials: true,
 }));
 app.use(compression() as any);

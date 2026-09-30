@@ -48,7 +48,7 @@ export default function LoginPage() {
     } catch (err: any) {
       console.error('Login error:', err);
       if (!err.response) {
-        setError('Cannot connect to BHISSM backend server at http://localhost:3001. Please verify backend is running.');
+        setError('Cannot connect to BHISSM backend API server. Please verify the backend service is reachable.');
       } else {
         setError(err.response?.data?.error || 'Authentication rejected. Check credentials.');
       }
