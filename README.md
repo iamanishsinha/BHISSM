@@ -208,3 +208,5 @@ npm run dev
 cd D:\Programming\BHISSM\frontend
 npm run dev
 ```
+BHISMM founder and presented by Anish Sinha,
+Member Mayank Mani Pandey.
