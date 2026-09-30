@@ -8,6 +8,9 @@ import { getDb } from './db/connection';
 
 dotenv.config();
 
+// Eagerly resolve database path and initialize writable copy in serverless environments
+getDb();
+
 // Routes
 import authRouter from './routes/auth';
 import inventoryRouter from './routes/inventory';

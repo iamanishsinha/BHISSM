@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:../../data/bhissm.db"
+  url      = "file:./bhissm.db"
 }
 
 model State {

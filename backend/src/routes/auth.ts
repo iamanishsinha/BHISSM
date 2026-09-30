@@ -11,6 +11,19 @@ router.post('/login', async (req: Request, res: Response) => {
     if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
 
     const prisma = getDb();
+
+    // Auto-seed check if users table is empty on cold start
+    const userCount = await prisma.user.count().catch(() => 0);
+    if (userCount === 0) {
+      console.log('[Auth] Database empty on login request, running auto-seed...');
+      try {
+        const { seed } = await import('../db/seed');
+        await seed();
+      } catch (seedErr) {
+        console.error('[Auth] Auto-seed error:', seedErr);
+      }
+    }
+
     const user = await prisma.user.findUnique({
       where: { username, isActive: 1 },
       include: { facility: true, state: true },
@@ -20,8 +33,13 @@ router.post('/login', async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } });
-    await prisma.auditLog.create({ data: { userId: user.id, action: 'LOGIN', details: JSON.stringify({ username }), ipAddress: req.ip } });
+    // Attempt to record lastLogin and audit log, but do not block login if write fails
+    try {
+      await prisma.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } });
+      await prisma.auditLog.create({ data: { userId: user.id, action: 'LOGIN', details: JSON.stringify({ username }), ipAddress: req.ip } });
+    } catch (auditErr) {
+      console.warn('[Auth] Non-blocking audit log warning:', auditErr);
+    }
 
     const authUser = { id: user.id, username: user.username, role: user.role as any, facility_id: user.facilityId, state_id: user.stateId, full_name: user.fullName };
     const token = signToken(authUser);
@@ -31,7 +49,8 @@ router.post('/login', async (req: Request, res: Response) => {
       user: { ...authUser, facility_name: user.facility?.name, state_name: user.state?.name },
     });
   } catch (err: any) {
-    return res.status(500).json({ error: err.message });
+    console.error('[Auth] Login error:', err);
+    return res.status(500).json({ error: err.message || 'Server error during authentication' });
   }
 });
 

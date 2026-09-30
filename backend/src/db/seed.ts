@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
+import { getDb } from './connection';
 
 export async function seed() {
+  const prisma = getDb();
   console.log('🌱 Verifying & seeding BHISSM multi-state and national demo data (30+ medicines & hospital networks)...');
 
   // ─── States ───────────────────────────────────────────────────────────────
