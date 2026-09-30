@@ -208,6 +208,32 @@ npm run dev
 cd D:\Programming\BHISSM\frontend
 npm run dev
 ```
+
+---
+
+## ☁️ Deploying to Vercel (100% Zero-Config Full-Stack)
+
+BHISSM is configured for seamless single-project deployment on Vercel:
+- **Frontend**: Vite + React SPA compiled into `dist/` and served globally via Vercel Edge CDN.
+- **Backend API**: Express API deployed as a Vercel Serverless Function via `api/index.ts`, handling all `/api/*` endpoints.
+- **Database**: Bundled SQLite database with all demo hospitals, medicines, and state networks automatically mounted to writable `/tmp/bhissm.db` on Lambda cold start.
+
+### Vercel Project Settings:
+1. **Root Directory**: Leave as `.` (repository root). Do NOT set to `backend` or `frontend`.
+2. **Framework Preset**: `Vite` or `Other`.
+3. **Build Command**: `npm run build` (or leave default, `package.json` provides `vercel-build`).
+4. **Output Directory**: `dist` (configured in `vercel.json`).
+
+### Git Push Steps:
+```powershell
+git add .
+git commit -m "Configure full-stack Vercel deployment with serverless API and Vite frontend"
+git push origin main
+```
+
+---
+
 BHISMM Devloping Team : </br>
 Anish Sinha </br>
 Mayank Mani Pandey
+

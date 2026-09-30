@@ -20,6 +20,9 @@ function resolveDatabaseUrl(): string {
     // Copy the bundled seed database to /tmp/bhissm.db so that SQLite has full read/write permissions.
     if (!fs.existsSync(tmpDbPath) || fs.statSync(tmpDbPath).size === 0) {
       const candidates = [
+        path.join(process.cwd(), 'api', 'bhissm.db'),
+        path.join(__dirname, '..', 'api', 'bhissm.db'),
+        path.join(__dirname, '..', '..', 'api', 'bhissm.db'),
         path.join(__dirname, '..', 'bhissm.db'),
         path.join(__dirname, 'bhissm.db'),
         path.join(process.cwd(), 'dist', 'bhissm.db'),
@@ -31,6 +34,9 @@ function resolveDatabaseUrl(): string {
         path.join(process.cwd(), 'backend', 'prisma', 'bhissm.db'),
         path.join(process.cwd(), 'data', 'bhissm.db'),
         path.join(process.cwd(), 'backend', 'data', 'bhissm.db'),
+        path.resolve('backend/prisma/bhissm.db'),
+        path.resolve('api/bhissm.db'),
+        path.resolve('bhissm.db'),
       ];
 
       let copied = false;

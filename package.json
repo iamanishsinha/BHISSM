@@ -8,11 +8,38 @@
     "dev:backend": "npm run dev --prefix backend",
     "dev:frontend": "npm run dev --prefix frontend",
     "seed": "npm run seed --prefix backend",
-    "build": "npm run build --prefix frontend && npm run build --prefix backend",
+    "postinstall": "prisma generate",
+    "build": "npm install --prefix backend && npm run build --prefix backend && npm install --prefix frontend && npm run build --prefix frontend && node -e \"const fs = require('fs'); fs.cpSync('frontend/dist', 'dist', { recursive: true }); try { fs.copyFileSync('backend/prisma/bhissm.db', 'dist/bhissm.db'); } catch(e){ console.warn('DB copy warning:', e.message); }\"",
+    "vercel-build": "npm run build",
     "setup:backend": "npm install --prefix backend && npm run db:push --prefix backend && npm run seed --prefix backend",
     "setup:frontend": "npm install --prefix frontend"
   },
+  "dependencies": {
+    "@prisma/client": "^5.10.2",
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-rate-limit": "^7.2.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.0",
+    "zod": "^3.22.4"
+  },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "@types/bcryptjs": "^2.4.6",
+    "@types/compression": "^1.7.5",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.11.5",
+    "@types/uuid": "^9.0.7",
+    "concurrently": "^9.1.2",
+    "prisma": "^5.10.2",
+    "typescript": "^5.3.3"
+  },
+  "prisma": {
+    "schema": "backend/prisma/schema.prisma"
   }
 }

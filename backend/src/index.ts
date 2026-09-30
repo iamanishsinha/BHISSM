@@ -52,6 +52,11 @@ app.get(['/api/health', '/health'], async (req: Request, res: Response) => {
   try {
     const prisma = getDb();
     userCount = await prisma.user.count();
+    if (userCount === 0) {
+      const { seed } = await import('./db/seed');
+      await seed();
+      userCount = await prisma.user.count();
+    }
     dbStatus = 'connected';
   } catch (err: any) {
     dbStatus = `error: ${err.message}`;
@@ -66,6 +71,23 @@ app.get(['/api/health', '/health'], async (req: Request, res: Response) => {
     users_count: userCount,
     timestamp: new Date().toISOString(),
     note: 'DEMO / SIMULATED DATA — Not connected to government databases',
+  });
+});
+
+app.get(['/api'], (_req: Request, res: Response) => {
+  res.json({
+    status: 'ok',
+    service: 'BHISSM API Server',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth/login',
+      inventory: '/api/inventory',
+      forecast: '/api/forecast',
+      emergencies: '/api/emergencies',
+      facilities: '/api/facilities',
+      states: '/api/states',
+    }
   });
 });
 
@@ -138,19 +160,21 @@ app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
 
 import { seed } from './db/seed';
 
-app.listen(PORT, async () => {
-  console.log(`
+if (!process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  app.listen(PORT, async () => {
+    console.log(`
 ╔══════════════════════════════════════════════════╗
 ║          BHISSM Backend API Server               ║
 ║  Server: http://localhost:${PORT}                   ║
 ║  Data: DEMO / SIMULATED                          ║
 ╚══════════════════════════════════════════════════╝
-  `);
-  try {
-    await seed();
-  } catch (e) {
-    console.error('Startup seed check warning:', e);
-  }
-});
+    `);
+    try {
+      await seed();
+    } catch (e) {
+      console.error('Startup seed check warning:', e);
+    }
+  });
+}
 
 export default app;

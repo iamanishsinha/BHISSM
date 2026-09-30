@@ -2300,3 +2300,24 @@ Because enclaves like **Puducherry UT** are geographically intertwined with **Ta
 └─────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
+---
+
+# 73. PRODUCTION FULL-STACK VERCEL DEPLOYMENT ARCHITECTURE
+
+To ensure BHISSM deploys reliably on Vercel as a unified full-stack application while preserving standard local development (`npm run dev`):
+
+1. **Dual Entrypoint Architecture**:
+   - **Local Development**: Express listens on port 3001; Vite dev server runs on port 5173 with `/api` proxy.
+   - **Vercel Cloud**: Serverless Function at `api/index.ts` automatically serves all `/api/*` endpoints; static React Vite SPA is built into `dist/` and served at the root with SPA rewrites to `/index.html`.
+2. **Serverless SQLite Persistence & Cold Start Handling**:
+   - Vercel functions execute in a read-only container except for `/tmp`.
+   - On cold start, `backend/src/db/connection.ts` eagerly copies the bundled seed database (`backend/prisma/bhissm.db` / `api/bhissm.db`) to `/tmp/bhissm.db`, granting full read/write capabilities for real-time authentication, audits, and transactions.
+   - If user count is 0 on cold start, `auth.ts` and `/api/health` automatically run the master seed routine.
+3. **Multi-Target Prisma Binary Generation**:
+   - `backend/prisma/schema.prisma` configures `binaryTargets = ["native", "rhel-openssl-3.0.x", "rhel-openssl-1.0.x"]` so query engines are bundled for both Windows (local dev) and Linux (Vercel Lambda).
+4. **Vercel Configuration (`vercel.json`)**:
+   - Configured with `outputDirectory: "dist"`, function bundle inclusion for `backend/prisma/**`, and routing rewrites:
+     - `/api` & `/api/(.*)` $\rightarrow$ `/api/index`
+     - `/(.*)` $\rightarrow$ `/index.html`
+
+
