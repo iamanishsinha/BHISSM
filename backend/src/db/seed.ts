@@ -1,8 +1,9 @@
 import bcrypt from 'bcryptjs';
 import { getDb } from './connection';
 
+const prisma = getDb();
+
 export async function seed() {
-  const prisma = getDb();
   console.log('🌱 Verifying & seeding BHISSM multi-state and national demo data (30+ medicines & hospital networks)...');
 
   // ─── States ───────────────────────────────────────────────────────────────
