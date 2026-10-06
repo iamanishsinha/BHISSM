@@ -50,6 +50,7 @@ model Facility {
   name        String
   type        String
   level       String
+  sector      String    @default("government")
   address     String?
   lat         Float?
   lng         Float?

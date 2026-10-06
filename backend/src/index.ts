@@ -20,6 +20,7 @@ import bloodBankRouter from './routes/bloodBank';
 import nationalReserveRouter from './routes/nationalReserve';
 import facilitiesRouter from './routes/facilities';
 import alertsRouter from './routes/alerts';
+import masterDataRouter from './routes/masterData';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -58,6 +59,13 @@ app.get(['/api/health', '/health'], async (req: Request, res: Response) => {
       userCount = await prisma.user.count();
     }
     dbStatus = 'connected';
+    // Run master database consolidation check
+    try {
+      const { autoConsolidateMasterDatabase } = await import('./db/masterProvisioner');
+      await autoConsolidateMasterDatabase();
+    } catch (conErr) {
+      console.warn('[MasterDB] Auto-consolidation warning:', conErr);
+    }
   } catch (err: any) {
     dbStatus = `error: ${err.message}`;
   }
@@ -112,6 +120,7 @@ app.use(['/api/blood-bank', '/blood-bank'], bloodBankRouter);
 app.use(['/api/national-reserve', '/national-reserve'], nationalReserveRouter);
 app.use(['/api/facilities', '/facilities'], facilitiesRouter);
 app.use(['/api/alerts', '/alerts'], alertsRouter);
+app.use(['/api/master-data', '/master-data'], masterDataRouter);
 
 // States and districts
 import { authenticate } from './middleware/auth';

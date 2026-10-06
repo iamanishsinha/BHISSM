@@ -276,15 +276,17 @@ export default function InventoryPage() {
     setFormMsg(null);
     try {
       const res = await API.post('/national-reserve/state-redistribute', {
+        destination_facility_id: redistForm.target_facility_id,
         target_facility_id: redistForm.target_facility_id,
         medicine_id: redistForm.medicine_id,
         quantity: Number(redistForm.quantity),
         priority: redistForm.priority,
+        notes: redistForm.remarks,
         remarks: redistForm.remarks,
       });
       setFormMsg({
         type: 'success',
-        text: res.data?.message || 'Medicine redistributed from State Reserve to hospital!',
+        text: res.data?.message || 'Medicine allocated from State Reserve to hospital successfully!',
       });
       setTimeout(() => {
         setShowRedistributeModal(false);
@@ -293,9 +295,10 @@ export default function InventoryPage() {
         fetchCatalogAndStateData();
       }, 1100);
     } catch (err: any) {
+      console.error('State redistribute error:', err);
       setFormMsg({
         type: 'error',
-        text: err.response?.data?.error || 'Failed to redistribute from State Reserve',
+        text: err.response?.data?.error || err.response?.data?.message || 'Failed to allocate medicine from State Reserve',
       });
     }
   };
@@ -471,7 +474,14 @@ export default function InventoryPage() {
               {stateReserveStock?.depot && (
                 <div className="px-2.5 py-1 rounded bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-mono">
                   <strong>{stateReserveStock.depot.name}:</strong>{' '}
-                  {stateReserveStock.summary?.total_units?.toLocaleString() || 0} Reserve Units Ready
+                  {(
+                    stateReserveStock.summary?.total_units ??
+                    (stateReserveStock.stock || []).reduce(
+                      (sum: number, s: any) => sum + (s.current_stock || s.available_to_distribute || 0),
+                      0
+                    )
+                  ).toLocaleString()}{' '}
+                  Reserve Units Ready
                 </div>
               )}
               {selectedFacilityId && (
@@ -1180,14 +1190,29 @@ export default function InventoryPage() {
                 <select
                   className="select-field"
                   value={redistForm.medicine_id}
-                  onChange={(e) => setRedistForm({ ...redistForm, medicine_id: e.target.value })}
+                  onChange={(e) => {
+                    const sel = (stateReserveStock?.stock || []).find((s: any) => s.medicine_id === e.target.value);
+                    setRedistForm({
+                      ...redistForm,
+                      medicine_id: e.target.value,
+                      medicine_name: sel?.medicine_name || '',
+                    });
+                  }}
                   required
                 >
-                  {(stateReserveStock?.stock || []).map((s: any) => (
-                    <option key={s.medicine_id} value={s.medicine_id}>
-                      {s.medicine_name} — State Reserve Available: {s.state_reserve_stock.toLocaleString()} {s.unit_type}s
+                  {redistForm.medicine_id && !(stateReserveStock?.stock || []).some((s: any) => s.medicine_id === redistForm.medicine_id) && (
+                    <option value={redistForm.medicine_id}>
+                      {redistForm.medicine_name || 'Selected Formulation'} (Checking Reserve Stock...)
                     </option>
-                  ))}
+                  )}
+                  {(stateReserveStock?.stock || []).map((s: any) => {
+                    const avail = s.available_to_distribute ?? s.state_reserve_stock ?? s.current_stock ?? 0;
+                    return (
+                      <option key={s.medicine_id} value={s.medicine_id}>
+                        {s.medicine_name} — State Reserve Available: {avail.toLocaleString()} {s.unit_type || 'unit'}s
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 

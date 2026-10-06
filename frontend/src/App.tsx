@@ -11,6 +11,8 @@ import BloodBankPage from './pages/BloodBankPage';
 import CapacityPage from './pages/CapacityPage';
 import NationalReservePage from './pages/NationalReservePage';
 import AuditAlertsPage from './pages/AuditAlertsPage';
+import CorridorPage from './pages/CorridorPage';
+import MasterAdminPage from './pages/MasterAdminPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -53,6 +55,9 @@ export default function App() {
             <Route path="capacity" element={<CapacityPage />} />
             <Route path="national-reserve" element={<NationalReservePage />} />
             <Route path="audit-alerts" element={<AuditAlertsPage />} />
+            <Route path="corridor" element={<CorridorPage />} />
+            <Route path="admin/master-data" element={<MasterAdminPage />} />
+            <Route path="master-data" element={<MasterAdminPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

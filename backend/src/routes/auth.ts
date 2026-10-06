@@ -90,4 +90,69 @@ router.post('/logout', authenticate, async (req: Request, res: Response) => {
   return res.json({ message: 'Logged out' });
 });
 
+// GET /api/auth/directory — Dynamic Live Directory of all Command Nodes from Master Database
+router.get('/directory', async (_req: Request, res: Response) => {
+  try {
+    const prisma = getDb();
+    const users = await prisma.user.findMany({
+      where: { isActive: 1 },
+      include: {
+        facility: {
+          include: { district: true, state: true },
+        },
+        state: true,
+      },
+      orderBy: [{ role: 'asc' }, { username: 'asc' }],
+    });
+
+    const directory = users.map((u) => {
+      let roleLabel: 'National' | 'State' | 'Hospital' = 'Hospital';
+      if (u.role === 'national') roleLabel = 'National';
+      else if (u.role === 'state') roleLabel = 'State';
+
+      const stateCode = u.facility?.state?.code || u.state?.code || 'NA';
+      const stateName = u.facility?.state?.name || u.state?.name || 'Union Government';
+      const districtName = u.facility?.district?.name || '';
+
+      // Standard credential format
+      let standardPass = `BHISSM@Demo#${stateCode}`;
+      if (u.role === 'national') {
+        standardPass = u.username.includes('director') ? 'BHISSM@National#Dir01' : 'BHISSM@National#01';
+      } else if (u.role === 'state') {
+        standardPass = `BHISSM@State#${stateCode}`;
+      }
+
+      let jurisdiction = '';
+      if (u.role === 'national') {
+        jurisdiction = 'Apex Authority • Central Reserves & Nationwide Strategic Logistics';
+      } else if (u.role === 'state') {
+        jurisdiction = `${stateName} State Health Directorate • Warehouses & District Network`;
+      } else {
+        jurisdiction = u.facility?.name
+          ? `${u.facility.name}${districtName ? `, ${districtName}` : ''} • ${u.facility.sector?.toUpperCase() || 'CIVIL'}`
+          : `${stateName} Facility Node`;
+      }
+
+      return {
+        id: u.id,
+        user: u.username,
+        pass: standardPass,
+        label: u.fullName || u.username,
+        role: roleLabel,
+        stateName,
+        stateCode,
+        districtName,
+        facilityName: u.facility?.name,
+        facilityId: u.facilityId,
+        sector: u.facility?.sector || 'government',
+        jurisdiction,
+      };
+    });
+
+    return res.json(directory);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;

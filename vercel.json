@@ -6,7 +6,7 @@
     "api/index.ts": {
       "memory": 1024,
       "maxDuration": 30,
-      "includeFiles": "backend/prisma/bhissm.db"
+      "includeFiles": "{backend/prisma/bhissm.db,api/bhissm.db}"
     }
   },
   "rewrites": [

@@ -117,8 +117,7 @@ router.get('/dashboard', async (req: Request, res: Response) => {
 
     // National Level Filter:
     // If user is national and hasn't filtered to a single state,
-    // only major national disasters (> 500 casualties) are counted as active emergencies!
-    const emergencyWhere: any = { status: { in: ['active', 'initiated'] } };
+    const emergencyWhere: any = { status: 'active' };
     if (user.role === 'national' && !effectiveStateId) {
       emergencyWhere.estimatedCasualties = { gte: 500 };
     } else {

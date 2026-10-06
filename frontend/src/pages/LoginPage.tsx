@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import API from '../lib/api';
 import {
   Globe,
   Landmark,
@@ -10,7 +11,10 @@ import {
   CheckCircle,
   AlertCircle,
   KeyRound,
-  Sparkles
+  Sparkles,
+  Search,
+  MapPin,
+  Filter
 } from 'lucide-react';
 
 interface CredentialItem {
@@ -18,7 +22,8 @@ interface CredentialItem {
   user: string;
   pass: string;
   role: 'National' | 'State' | 'Hospital';
-  stateGroup: 'National' | 'Puducherry' | 'Tamil Nadu' | 'Karnataka' | 'Other';
+  region: 'National' | 'North' | 'South' | 'West' | 'East' | 'Central' | 'North-East' | 'Union Territories';
+  stateName: string;
   jurisdiction: string;
 }
 
@@ -27,10 +32,12 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   const [username, setUsername] = useState('state_puducherry_admin');
-  const [password, setPassword] = useState('BHISSM@State#P01');
+  const [password, setPassword] = useState('BHISSM@State#PY');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'All' | 'National' | 'Puducherry' | 'Tamil Nadu' | 'Karnataka' | 'Other'>('All');
+  const [activeRegion, setActiveRegion] = useState<string>('All');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [roleFilter, setRoleFilter] = useState<'all' | 'national' | 'state' | 'hospital'>('all');
 
   // If already logged in, redirect immediately to dashboard
   useEffect(() => {
@@ -50,7 +57,10 @@ export default function LoginPage() {
       if (!err.response) {
         setError(`Cannot reach BHISSM API (${err.message || 'Network Error'}). Please check /api/health.`);
       } else {
-        const errorText = err.response?.data?.error || err.response?.data?.message || `HTTP ${err.response.status}: Authentication failed`;
+        const errorText =
+          err.response?.data?.error ||
+          err.response?.data?.message ||
+          `HTTP ${err.response.status}: Authentication failed`;
         setError(errorText);
       }
     } finally {
@@ -64,218 +74,676 @@ export default function LoginPage() {
   };
 
   const demoCredentials: CredentialItem[] = [
-    // National Command
+    // ─── 1. National Command Grid
     {
-      label: 'National Stockpile Monitor',
+      label: 'National Strategic Stockpile Monitor',
       user: 'national_monitor_01',
       pass: 'BHISSM@National#01',
       role: 'National',
-      stateGroup: 'National',
-      jurisdiction: 'Apex Authority (Stockpile Releases & Nationwide View)',
+      region: 'National',
+      stateName: 'Union Government',
+      jurisdiction: 'Apex Authority • Central Reserves, Interstate Dispatches & Disaster Escalation (>500)',
     },
     {
-      label: 'National Logistics Director',
+      label: 'National Health Logistics Directorate',
       user: 'national_director_01',
       pass: 'BHISSM@National#Dir01',
       role: 'National',
-      stateGroup: 'National',
-      jurisdiction: 'Central Disaster Health Coordinator',
+      region: 'National',
+      stateName: 'Union Government',
+      jurisdiction: 'Central Disaster Health Coordinator • Nationwide Stockpile Logistics',
     },
 
-    // Puducherry UT
+    // ─── 2. Southern Region States & UTs
     {
-      label: 'Puducherry UT State Admin',
-      user: 'state_puducherry_admin',
-      pass: 'BHISSM@State#P01',
+      label: 'Puducherry State Health Command',
+      user: 'state_py_admin',
+      pass: 'BHISSM@State#PY',
       role: 'State',
-      stateGroup: 'Puducherry',
-      jurisdiction: 'Puducherry UT Health Department',
+      region: 'South',
+      stateName: 'Puducherry',
+      jurisdiction: 'Puducherry UT Health Department • State Reserve Depot & Regional Redistribution',
     },
     {
-      label: 'JIPMER Central Hospital',
+      label: 'JIPMER Apex Hospital Node',
       user: 'hospital_jipmer_01',
       pass: 'BHISSM@Demo#J01',
       role: 'Hospital',
-      stateGroup: 'Puducherry',
-      jurisdiction: 'JIPMER Apex Medical College, Puducherry',
+      region: 'South',
+      stateName: 'Puducherry',
+      jurisdiction: 'JIPMER Apex Institute of National Importance, Puducherry',
     },
     {
-      label: 'GH Puducherry Hospital',
+      label: 'Indira Gandhi GH Puducherry Node',
       user: 'hospital_puducherry_01',
       pass: 'BHISSM@Demo#P01',
       role: 'Hospital',
-      stateGroup: 'Puducherry',
-      jurisdiction: 'Indira Gandhi Govt General Hospital, Puducherry',
+      region: 'South',
+      stateName: 'Puducherry',
+      jurisdiction: 'Indira Gandhi Govt General Hospital, White Town, Puducherry',
     },
     {
-      label: 'PIMS (Kalapet, Puducherry)',
+      label: 'PIMS Kalapet Medical College Node',
       user: 'hospital_pims_01',
       pass: 'BHISSM@Demo#PIMS01',
       role: 'Hospital',
-      stateGroup: 'Puducherry',
-      jurisdiction: 'Pondicherry Institute of Medical Sciences, Kalapet',
+      region: 'South',
+      stateName: 'Puducherry',
+      jurisdiction: 'Pondicherry Institute of Medical Sciences, Kalapet, Puducherry',
     },
     {
-      label: 'Rajiv Gandhi Women & Children',
-      user: 'hospital_rggwch_01',
-      pass: 'BHISSM@Demo#RGW01',
-      role: 'Hospital',
-      stateGroup: 'Puducherry',
-      jurisdiction: 'Rajiv Gandhi Govt Women & Children Hospital, Puducherry',
-    },
-    {
-      label: 'East Coast Hospitals (Private)',
-      user: 'hospital_eastcoast_01',
-      pass: 'BHISSM@Demo#ECH01',
-      role: 'Hospital',
-      stateGroup: 'Puducherry',
-      jurisdiction: 'East Coast Hospitals (Private Multi-Specialty), Puducherry',
-    },
-    {
-      label: 'Auroville Health Centre',
-      user: 'hospital_auroville_01',
-      pass: 'BHISSM@Demo#AV01',
-      role: 'Hospital',
-      stateGroup: 'Puducherry',
-      jurisdiction: 'Auroville Health Centre (Aspiration, Auroville Area)',
-    },
-
-    // Tamil Nadu
-    {
-      label: 'Tamil Nadu State Admin',
-      user: 'state_tamilnadu_admin',
-      pass: 'BHISSM@State#TN01',
+      label: 'Tamil Nadu State Health Command',
+      user: 'state_tn_admin',
+      pass: 'BHISSM@State#TN',
       role: 'State',
-      stateGroup: 'Tamil Nadu',
-      jurisdiction: 'Tamil Nadu State Health Command, Chennai',
+      region: 'South',
+      stateName: 'Tamil Nadu',
+      jurisdiction: 'Tamil Nadu State Health Directorate • TNMSC Warehouses & District Network',
     },
     {
-      label: 'Santigiri Hospital (Auroville Area)',
-      user: 'hospital_santigiri_01',
-      pass: 'BHISSM@Demo#AV02',
-      role: 'Hospital',
-      stateGroup: 'Tamil Nadu',
-      jurisdiction: 'Santigiri & Quiet Healing Hospital, Auroville - Villupuram Border',
-    },
-    {
-      label: 'GH Villupuram Hospital',
-      user: 'hospital_villupuram_01',
-      pass: 'BHISSM@Demo#V01',
-      role: 'Hospital',
-      stateGroup: 'Tamil Nadu',
-      jurisdiction: 'Government Medical College Hospital, Villupuram (Adjacent to PY)',
-    },
-    {
-      label: 'GH Cuddalore Hospital',
-      user: 'hospital_cuddalore_01',
-      pass: 'BHISSM@Demo#C01',
-      role: 'Hospital',
-      stateGroup: 'Tamil Nadu',
-      jurisdiction: 'Government General Hospital, Cuddalore (Adjacent to PY)',
-    },
-    {
-      label: 'Stanley Medical College',
-      user: 'hospital_stanley_01',
-      pass: 'BHISSM@Demo#TN01',
-      role: 'Hospital',
-      stateGroup: 'Tamil Nadu',
-      jurisdiction: 'Government Stanley Hospital, Chennai',
-    },
-    {
-      label: 'Rajiv Gandhi GH Chennai',
+      label: 'Rajiv Gandhi GH Chennai Node',
       user: 'hospital_rajivgandhi_01',
       pass: 'BHISSM@Demo#TN02',
       role: 'Hospital',
-      stateGroup: 'Tamil Nadu',
-      jurisdiction: 'Rajiv Gandhi Govt General Hospital, Chennai',
+      region: 'South',
+      stateName: 'Tamil Nadu',
+      jurisdiction: 'Rajiv Gandhi Govt General Hospital (Madras Medical College), Chennai',
     },
-
-    // Karnataka
     {
-      label: 'Karnataka State Admin',
-      user: 'state_karnataka_admin',
-      pass: 'BHISSM@State#KA01',
+      label: 'Govt Stanley Medical College Node',
+      user: 'hospital_stanley_01',
+      pass: 'BHISSM@Demo#TN01',
+      role: 'Hospital',
+      region: 'South',
+      stateName: 'Tamil Nadu',
+      jurisdiction: 'Government Stanley Medical College Hospital, Royapuram, Chennai',
+    },
+    {
+      label: 'Military Hospital Chennai (Defence) Node',
+      user: 'hospital_mh_chennai_01',
+      pass: 'BHISSM@Demo#MH01',
+      role: 'Hospital',
+      region: 'South',
+      stateName: 'Tamil Nadu',
+      jurisdiction: 'Military Hospital Chennai, Nandambakkam • Armed Forces Medical Services',
+    },
+    {
+      label: 'Southern Railway HQ Hospital Node',
+      user: 'hospital_railway_perambur_01',
+      pass: 'BHISSM@Demo#SR01',
+      role: 'Hospital',
+      region: 'South',
+      stateName: 'Tamil Nadu',
+      jurisdiction: 'Southern Railway Headquarters Hospital, Perambur, Chennai',
+    },
+    {
+      label: 'Apollo Hospitals Main Chennai Node',
+      user: 'hospital_apollo_chennai_01',
+      pass: 'BHISSM@Demo#APO01',
+      role: 'Hospital',
+      region: 'South',
+      stateName: 'Tamil Nadu',
+      jurisdiction: 'Apollo Hospitals Main, Greams Road • Private Multi-Specialty Tertiary',
+    },
+    {
+      label: 'Villupuram Govt Medical College Node',
+      user: 'hospital_villupuram_01',
+      pass: 'BHISSM@Demo#V01',
+      role: 'Hospital',
+      region: 'South',
+      stateName: 'Tamil Nadu',
+      jurisdiction: 'Government Villupuram Medical College Hospital (GVMCH), Mundiyampakkam',
+    },
+    {
+      label: 'Cuddalore District General Hospital Node',
+      user: 'hospital_cuddalore_01',
+      pass: 'BHISSM@Demo#C01',
+      role: 'Hospital',
+      region: 'South',
+      stateName: 'Tamil Nadu',
+      jurisdiction: 'Government District Headquarters Hospital, Manjakuppam, Cuddalore',
+    },
+    {
+      label: 'Karnataka State Health Command',
+      user: 'state_ka_admin',
+      pass: 'BHISSM@State#KA',
       role: 'State',
-      stateGroup: 'Karnataka',
-      jurisdiction: 'Karnataka Health & Family Welfare, Bengaluru',
+      region: 'South',
+      stateName: 'Karnataka',
+      jurisdiction: 'Karnataka Health & Family Welfare Directorate, Bengaluru',
     },
     {
-      label: 'Victoria Hospital Bengaluru',
+      label: 'Victoria Hospital Bengaluru Node',
       user: 'hospital_victoria_01',
       pass: 'BHISSM@Demo#KA01',
       role: 'Hospital',
-      stateGroup: 'Karnataka',
-      jurisdiction: 'Bangalore Medical College (BMCRI), Bengaluru',
+      region: 'South',
+      stateName: 'Karnataka',
+      jurisdiction: 'Victoria Hospital (Bangalore Medical College - BMCRI), Bengaluru',
     },
     {
-      label: 'Bowring Hospital Bengaluru',
-      user: 'hospital_bowring_01',
-      pass: 'BHISSM@Demo#KA02',
-      role: 'Hospital',
-      stateGroup: 'Karnataka',
-      jurisdiction: 'Bowring & Lady Curzon Hospital, Bengaluru',
-    },
-
-    // Other States
-    {
-      label: 'Andhra Pradesh State Admin',
-      user: 'state_andhra_admin',
-      pass: 'BHISSM@State#AP01',
+      label: 'Kerala State Health Command',
+      user: 'state_kl_admin',
+      pass: 'BHISSM@State#KL',
       role: 'State',
-      stateGroup: 'Other',
-      jurisdiction: 'Andhra Pradesh State Health Authority, Vijayawada',
-    },
-    {
-      label: 'Kerala State Admin',
-      user: 'state_kerala_admin',
-      pass: 'BHISSM@State#KL01',
-      role: 'State',
-      stateGroup: 'Other',
+      region: 'South',
+      stateName: 'Kerala',
       jurisdiction: 'Kerala Health Services Directorate, Thiruvananthapuram',
     },
     {
-      label: 'Maharashtra State Admin',
-      user: 'state_maharashtra_admin',
-      pass: 'BHISSM@State#MH01',
-      role: 'State',
-      stateGroup: 'Other',
-      jurisdiction: 'Public Health Department, Mumbai',
-    },
-    {
-      label: 'King George Hospital Vizag',
-      user: 'hospital_kgh_01',
-      pass: 'BHISSM@Demo#AP01',
-      role: 'Hospital',
-      stateGroup: 'Other',
-      jurisdiction: 'KGH Visakhapatnam, Andhra Pradesh',
-    },
-    {
-      label: 'GMC Thiruvananthapuram',
+      label: 'GMC Thiruvananthapuram Node',
       user: 'hospital_gmct_01',
       pass: 'BHISSM@Demo#KL01',
       role: 'Hospital',
-      stateGroup: 'Other',
-      jurisdiction: 'Government Medical College, Kerala',
+      region: 'South',
+      stateName: 'Kerala',
+      jurisdiction: 'Government Medical College, Medical College PO, Thiruvananthapuram',
     },
     {
-      label: 'KEM Hospital Mumbai',
+      label: 'Andhra Pradesh State Health Authority',
+      user: 'state_ap_admin',
+      pass: 'BHISSM@State#AP',
+      role: 'State',
+      region: 'South',
+      stateName: 'Andhra Pradesh',
+      jurisdiction: 'Andhra Pradesh State Health Authority, Vijayawada',
+    },
+    {
+      label: 'King George Hospital Vizag Node',
+      user: 'hospital_kgh_01',
+      pass: 'BHISSM@Demo#AP01',
+      role: 'Hospital',
+      region: 'South',
+      stateName: 'Andhra Pradesh',
+      jurisdiction: 'King George Hospital (Andhra Medical College), Visakhapatnam',
+    },
+    {
+      label: 'Telangana State Health Command',
+      user: 'state_tg_admin',
+      pass: 'BHISSM@State#TG',
+      role: 'State',
+      region: 'South',
+      stateName: 'Telangana',
+      jurisdiction: 'Telangana Health & Family Welfare Department, Hyderabad',
+    },
+    {
+      label: 'Osmania General Hospital Node',
+      user: 'hospital_osmania_01',
+      pass: 'BHISSM@Demo#TG01',
+      role: 'Hospital',
+      region: 'South',
+      stateName: 'Telangana',
+      jurisdiction: 'Osmania General Hospital, Afzal Gunj, Hyderabad',
+    },
+    {
+      label: 'Lakshadweep UT Health Command',
+      user: 'state_ld_admin',
+      pass: 'BHISSM@State#LD',
+      role: 'State',
+      region: 'South',
+      stateName: 'Lakshadweep',
+      jurisdiction: 'Lakshadweep Health Services Directorate, Kavaratti',
+    },
+
+    // ─── 3. Northern Region States & UTs
+    {
+      label: 'Delhi UT Health Command',
+      user: 'state_dl_admin',
+      pass: 'BHISSM@State#DL',
+      role: 'State',
+      region: 'North',
+      stateName: 'Delhi',
+      jurisdiction: 'Delhi State Health Mission & Central Drug Depot, New Delhi',
+    },
+    {
+      label: 'AIIMS New Delhi Apex Node',
+      user: 'hospital_aiims_01',
+      pass: 'BHISSM@Demo#DL01',
+      role: 'Hospital',
+      region: 'North',
+      stateName: 'Delhi',
+      jurisdiction: 'All India Institute of Medical Sciences (AIIMS Delhi), Ansari Nagar',
+    },
+    {
+      label: 'Safdarjung Hospital Node',
+      user: 'hospital_sjh_01',
+      pass: 'BHISSM@Demo#DL02',
+      role: 'Hospital',
+      region: 'North',
+      stateName: 'Delhi',
+      jurisdiction: 'Safdarjung Hospital & VMMC, New Delhi',
+    },
+    {
+      label: 'Uttar Pradesh State Health Command',
+      user: 'state_up_admin',
+      pass: 'BHISSM@State#UP',
+      role: 'State',
+      region: 'North',
+      stateName: 'Uttar Pradesh',
+      jurisdiction: 'Uttar Pradesh Medical Health & Family Welfare, Lucknow',
+    },
+    {
+      label: 'KGMU Lucknow Command Node',
+      user: 'hospital_kgmu_01',
+      pass: 'BHISSM@Demo#UP01',
+      role: 'Hospital',
+      region: 'North',
+      stateName: 'Uttar Pradesh',
+      jurisdiction: "King George's Medical University (KGMU), Chowk, Lucknow",
+    },
+    {
+      label: 'RMLIMS Lucknow Node',
+      user: 'hospital_rmlims_01',
+      pass: 'BHISSM@Demo#UP02',
+      role: 'Hospital',
+      region: 'North',
+      stateName: 'Uttar Pradesh',
+      jurisdiction: 'Dr. Ram Manohar Lohia Institute of Medical Sciences, Gomti Nagar',
+    },
+    {
+      label: 'Haryana State Health Command',
+      user: 'state_hr_admin',
+      pass: 'BHISSM@State#HR',
+      role: 'State',
+      region: 'North',
+      stateName: 'Haryana',
+      jurisdiction: 'Haryana Health Services Directorate, Panchkula / Chandigarh',
+    },
+    {
+      label: 'Punjab State Health Command',
+      user: 'state_pb_admin',
+      pass: 'BHISSM@State#PB',
+      role: 'State',
+      region: 'North',
+      stateName: 'Punjab',
+      jurisdiction: 'Punjab Health & Family Welfare Department, Chandigarh',
+    },
+    {
+      label: 'Himachal Pradesh Health Command',
+      user: 'state_hp_admin',
+      pass: 'BHISSM@State#HP',
+      role: 'State',
+      region: 'North',
+      stateName: 'Himachal Pradesh',
+      jurisdiction: 'Himachal Pradesh Directorate of Health Services, Shimla',
+    },
+    {
+      label: 'Uttarakhand State Health Command',
+      user: 'state_uk_admin',
+      pass: 'BHISSM@State#UK',
+      role: 'State',
+      region: 'North',
+      stateName: 'Uttarakhand',
+      jurisdiction: 'Uttarakhand Medical Health & Family Welfare, Dehradun',
+    },
+    {
+      label: 'Govt Doon Hospital Dehradun Node',
+      user: 'hospital_doon_01',
+      pass: 'BHISSM@Demo#UK01',
+      role: 'Hospital',
+      region: 'North',
+      stateName: 'Uttarakhand',
+      jurisdiction: 'Government Doon Medical College & Hospital, Dehradun',
+    },
+    {
+      label: 'Jammu & Kashmir UT Health Command',
+      user: 'state_jk_admin',
+      pass: 'BHISSM@State#JK',
+      role: 'State',
+      region: 'North',
+      stateName: 'Jammu and Kashmir',
+      jurisdiction: 'Health & Medical Education Department J&K, Srinagar / Jammu',
+    },
+    {
+      label: 'GMC Hospital Jammu Node',
+      user: 'hospital_gmc_jammu_01',
+      pass: 'BHISSM@Demo#JK01',
+      role: 'Hospital',
+      region: 'North',
+      stateName: 'Jammu and Kashmir',
+      jurisdiction: 'Government Medical College & Associated Hospitals, Bakshi Nagar, Jammu',
+    },
+    {
+      label: 'Ladakh UT Health Command',
+      user: 'state_la_admin',
+      pass: 'BHISSM@State#LA',
+      role: 'State',
+      region: 'North',
+      stateName: 'Ladakh',
+      jurisdiction: 'Health Services Directorate, UT of Ladakh, Leh',
+    },
+    {
+      label: 'Chandigarh UT Health Command',
+      user: 'state_ch_admin',
+      pass: 'BHISSM@State#CH',
+      role: 'State',
+      region: 'North',
+      stateName: 'Chandigarh',
+      jurisdiction: 'Chandigarh Administration Health Department, Chandigarh',
+    },
+    {
+      label: 'PGIMER Chandigarh Apex Node',
+      user: 'hospital_pgimer_01',
+      pass: 'BHISSM@Demo#CH01',
+      role: 'Hospital',
+      region: 'North',
+      stateName: 'Chandigarh',
+      jurisdiction: 'Postgraduate Institute of Medical Education & Research (PGIMER), Chandigarh',
+    },
+
+    // ─── 4. Western Region States & UTs
+    {
+      label: 'Maharashtra Public Health Directorate',
+      user: 'state_mh_admin',
+      pass: 'BHISSM@State#MH',
+      role: 'State',
+      region: 'West',
+      stateName: 'Maharashtra',
+      jurisdiction: 'Public Health Department, Government of Maharashtra, Mumbai',
+    },
+    {
+      label: 'KEM Hospital Mumbai Command Node',
       user: 'hospital_kem_01',
       pass: 'BHISSM@Demo#MH01',
       role: 'Hospital',
-      stateGroup: 'Other',
-      jurisdiction: 'King Edward Memorial Hospital, Mumbai',
+      region: 'West',
+      stateName: 'Maharashtra',
+      jurisdiction: 'King Edward Memorial Hospital & Seth GS Medical College, Parel, Mumbai',
+    },
+    {
+      label: 'Sir JJ Hospital Mumbai Node',
+      user: 'hospital_jj_01',
+      pass: 'BHISSM@Demo#MH02',
+      role: 'Hospital',
+      region: 'West',
+      stateName: 'Maharashtra',
+      jurisdiction: 'Sir J.J. Group of Government Hospitals & Grant Medical College, Mumbai',
+    },
+    {
+      label: 'Gujarat Health & Family Welfare',
+      user: 'state_gj_admin',
+      pass: 'BHISSM@State#GJ',
+      role: 'State',
+      region: 'West',
+      stateName: 'Gujarat',
+      jurisdiction: 'Health & Family Welfare Department, Gandhinagar',
+    },
+    {
+      label: 'Civil Hospital Ahmedabad Node',
+      user: 'hospital_civil_ahm_01',
+      pass: 'BHISSM@Demo#GJ01',
+      role: 'Hospital',
+      region: 'West',
+      stateName: 'Gujarat',
+      jurisdiction: 'Civil Hospital & BJ Medical College, Asarwa, Ahmedabad',
+    },
+    {
+      label: 'Rajasthan Medical & Health Command',
+      user: 'state_rj_admin',
+      pass: 'BHISSM@State#RJ',
+      role: 'State',
+      region: 'West',
+      stateName: 'Rajasthan',
+      jurisdiction: 'Medical Health & Family Welfare Department, Jaipur',
+    },
+    {
+      label: 'SMS Hospital Jaipur Node',
+      user: 'hospital_sms_01',
+      pass: 'BHISSM@Demo#RJ01',
+      role: 'Hospital',
+      region: 'West',
+      stateName: 'Rajasthan',
+      jurisdiction: 'Sawai Man Singh (SMS) Hospital & Medical College, Jaipur',
+    },
+    {
+      label: 'Goa Directorate of Health Services',
+      user: 'state_ga_admin',
+      pass: 'BHISSM@State#GA',
+      role: 'State',
+      region: 'West',
+      stateName: 'Goa',
+      jurisdiction: 'Directorate of Health Services, Campal, Panaji, Goa',
+    },
+    {
+      label: 'Dadra & Nagar Haveli & Daman & Diu UT',
+      user: 'state_dn_admin',
+      pass: 'BHISSM@State#DN',
+      role: 'State',
+      region: 'West',
+      stateName: 'Dadra and Nagar Haveli and Daman and Diu',
+      jurisdiction: 'Health & Medical Services Directorate, Silvassa',
+    },
+
+    // ─── 5. Eastern Region States & UTs
+    {
+      label: 'West Bengal Health & Family Welfare',
+      user: 'state_wb_admin',
+      pass: 'BHISSM@State#WB',
+      role: 'State',
+      region: 'East',
+      stateName: 'West Bengal',
+      jurisdiction: 'Department of Health & Family Welfare, Swasthya Bhawan, Kolkata',
+    },
+    {
+      label: 'Calcutta Medical College Node',
+      user: 'hospital_calcutta_mc_01',
+      pass: 'BHISSM@Demo#WB01',
+      role: 'Hospital',
+      region: 'East',
+      stateName: 'West Bengal',
+      jurisdiction: 'Medical College and Hospital (Calcutta Medical College), College St, Kolkata',
+    },
+    {
+      label: 'Bihar Health Department Command',
+      user: 'state_br_admin',
+      pass: 'BHISSM@State#BR',
+      role: 'State',
+      region: 'East',
+      stateName: 'Bihar',
+      jurisdiction: 'State Health Society Bihar, Vikas Bhawan, Patna',
+    },
+    {
+      label: 'Patna Medical College Hospital Node',
+      user: 'hospital_pmch_01',
+      pass: 'BHISSM@Demo#BR01',
+      role: 'Hospital',
+      region: 'East',
+      stateName: 'Bihar',
+      jurisdiction: 'Patna Medical College & Hospital (PMCH), Ashok Rajpath, Patna',
+    },
+    {
+      label: 'Jharkhand Health Services Command',
+      user: 'state_jh_admin',
+      pass: 'BHISSM@State#JH',
+      role: 'State',
+      region: 'East',
+      stateName: 'Jharkhand',
+      jurisdiction: 'Department of Health Medical Education & Family Welfare, Ranchi',
+    },
+    {
+      label: 'Odisha Health & Family Welfare',
+      user: 'state_od_admin',
+      pass: 'BHISSM@State#OD',
+      role: 'State',
+      region: 'East',
+      stateName: 'Odisha',
+      jurisdiction: 'Health & Family Welfare Department, Secretariat, Bhubaneswar',
+    },
+    {
+      label: 'SCB Medical College Cuttack Node',
+      user: 'hospital_scb_01',
+      pass: 'BHISSM@Demo#OD01',
+      role: 'Hospital',
+      region: 'East',
+      stateName: 'Odisha',
+      jurisdiction: 'SCB Medical College & Hospital, Mangalabag, Cuttack',
+    },
+    {
+      label: 'Andaman & Nicobar UT Health Command',
+      user: 'state_an_admin',
+      pass: 'BHISSM@State#AN',
+      role: 'State',
+      region: 'East',
+      stateName: 'Andaman and Nicobar Islands',
+      jurisdiction: 'Directorate of Health Services, A&N Administration, Port Blair',
+    },
+
+    // ─── 6. Central Region States
+    {
+      label: 'Madhya Pradesh Public Health Command',
+      user: 'state_mp_admin',
+      pass: 'BHISSM@State#MP',
+      role: 'State',
+      region: 'Central',
+      stateName: 'Madhya Pradesh',
+      jurisdiction: 'Public Health and Medical Education Department, Bhopal',
+    },
+    {
+      label: 'Hamidia Hospital Bhopal Node',
+      user: 'hospital_hamidia_01',
+      pass: 'BHISSM@Demo#MP01',
+      role: 'Hospital',
+      region: 'Central',
+      stateName: 'Madhya Pradesh',
+      jurisdiction: 'Hamidia Hospital (Gandhi Medical College), Sultania Road, Bhopal',
+    },
+    {
+      label: 'Chhattisgarh Health & Family Welfare',
+      user: 'state_cg_admin',
+      pass: 'BHISSM@State#CG',
+      role: 'State',
+      region: 'Central',
+      stateName: 'Chhattisgarh',
+      jurisdiction: 'Department of Health & Family Welfare, Mahanadi Bhawan, Raipur',
+    },
+
+    // ─── 7. North-Eastern Region States
+    {
+      label: 'Assam Health & Family Welfare Command',
+      user: 'state_as_admin',
+      pass: 'BHISSM@State#AS',
+      role: 'State',
+      region: 'North-East',
+      stateName: 'Assam',
+      jurisdiction: 'Health & Family Welfare Department, Janata Bhawan, Dispur, Guwahati',
+    },
+    {
+      label: 'Gauhati Medical College Hospital Node',
+      user: 'hospital_gmch_01',
+      pass: 'BHISSM@Demo#AS01',
+      role: 'Hospital',
+      region: 'North-East',
+      stateName: 'Assam',
+      jurisdiction: 'Gauhati Medical College & Hospital (GMCH), Bhangagarh, Guwahati',
+    },
+    {
+      label: 'Arunachal Pradesh Health Command',
+      user: 'state_ar_admin',
+      pass: 'BHISSM@State#AR',
+      role: 'State',
+      region: 'North-East',
+      stateName: 'Arunachal Pradesh',
+      jurisdiction: 'Directorate of Health Services, Naharlagun, Itanagar',
+    },
+    {
+      label: 'Manipur Health Services Command',
+      user: 'state_mn_admin',
+      pass: 'BHISSM@State#MN',
+      role: 'State',
+      region: 'North-East',
+      stateName: 'Manipur',
+      jurisdiction: 'Directorate of Health Services, Lamphelpat, Imphal',
+    },
+    {
+      label: 'Meghalaya Health & Family Welfare',
+      user: 'state_ml_admin',
+      pass: 'BHISSM@State#ML',
+      role: 'State',
+      region: 'North-East',
+      stateName: 'Meghalaya',
+      jurisdiction: 'Department of Health & Family Welfare, Shillong',
+    },
+    {
+      label: 'Mizoram Health & Family Welfare',
+      user: 'state_mz_admin',
+      pass: 'BHISSM@State#MZ',
+      role: 'State',
+      region: 'North-East',
+      stateName: 'Mizoram',
+      jurisdiction: 'Directorate of Health Services, Dinthar, Aizawl',
+    },
+    {
+      label: 'Nagaland Health & Family Welfare',
+      user: 'state_nl_admin',
+      pass: 'BHISSM@State#NL',
+      role: 'State',
+      region: 'North-East',
+      stateName: 'Nagaland',
+      jurisdiction: 'Department of Health & Family Welfare, Kohima',
+    },
+    {
+      label: 'Tripura Health & Family Welfare',
+      user: 'state_tr_admin',
+      pass: 'BHISSM@State#TR',
+      role: 'State',
+      region: 'North-East',
+      stateName: 'Tripura',
+      jurisdiction: 'Directorate of Health Services, Gurkhabasti, Agartala',
+    },
+    {
+      label: 'Sikkim Health & Family Welfare',
+      user: 'state_sk_admin',
+      pass: 'BHISSM@State#SK',
+      role: 'State',
+      region: 'North-East',
+      stateName: 'Sikkim',
+      jurisdiction: 'Health Care, Human Services and Family Welfare, Gangtok',
     },
   ];
 
-  const filteredCredentials =
-    activeTab === 'All'
-      ? demoCredentials
-      : demoCredentials.filter((c) => c.stateGroup === activeTab);
+  const [credentialsList, setCredentialsList] = useState<CredentialItem[]>(demoCredentials);
+
+  // Dynamically load live credentials directly from the master database!
+  useEffect(() => {
+    const fetchLiveDirectory = async () => {
+      try {
+        const res = await API.get('/auth/directory');
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          const enhanced = res.data.map((item: any) => {
+            const fallback = demoCredentials.find((d) => d.user === item.user);
+            return {
+              ...item,
+              region: fallback?.region || (item.stateCode === 'NA' ? 'National' : 'South'),
+            };
+          });
+          setCredentialsList(enhanced);
+        }
+      } catch (e) {
+        // Gracefully fallback to baseline demoCredentials
+      }
+    };
+    fetchLiveDirectory();
+  }, []);
+
+  const regions = ['All', 'National', 'North', 'South', 'West', 'East', 'Central', 'North-East'] as const;
+
+  const filteredCredentials = credentialsList.filter((c) => {
+    const matchesRegion = activeRegion === 'All' || c.region === activeRegion;
+    const matchesRole = roleFilter === 'all' || c.role.toLowerCase() === roleFilter;
+    const matchesSearch =
+      !searchTerm ||
+      c.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.jurisdiction.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.stateName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.role.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesRegion && matchesRole && matchesSearch;
+  });
 
   return (
     <div className="min-h-screen bg-bhissm-bg py-8 px-4 flex flex-col items-center justify-center font-sans antialiased text-bhissm-dark">
-      {/* Flagship BHISSM Hackathon Identity Hero */}
-      <div className="w-full max-w-5xl mb-6 card p-6 bg-gradient-to-r from-[#FFF9F1] via-[#FDF3E7] to-[#FAE8EB]/75 border-2 border-bhissm-border shadow-md">
+      {/* Flagship BHISSM Identity Hero */}
+      <div className="w-full max-w-6xl mb-6 card p-6 bg-gradient-to-r from-[#FFF9F1] via-[#FDF3E7] to-[#FAE8EB]/75 border-2 border-bhissm-border shadow-md">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bhissm-emblem-box text-[#FFF9F1] flex flex-col items-center justify-center border-2 border-[#E8A7B5] shadow-md shrink-0">
@@ -287,11 +755,11 @@ export default function LoginPage() {
 
             <div className="text-left">
               <div className="flex flex-wrap items-center gap-2.5">
-                <h1 className="text-4xl sm:text-5xl font-black tracking-tight bhissm-brand-title leading-none">
+                <h1 className="text-3xl sm:text-4xl font-black tracking-tight bhissm-brand-title leading-none">
                   BHISSM
                 </h1>
                 <span className="text-[11px] bg-[#2D2926] text-[#FFF9F1] px-2.5 py-1 rounded-md font-mono font-bold tracking-wider border border-[#D4C8BC]">
-                  NATIONAL COMMAND GRID
+                  PAN-INDIA COMMAND GRID
                 </span>
                 <span className="text-[11px] bg-[#F4D5DC] text-[#2D2926] px-2.5 py-1 rounded-md font-mono font-bold border border-[#E8A7B5]">
                   v2.0
@@ -301,23 +769,23 @@ export default function LoginPage() {
                 Bharat Health Initiative for SupplyChain Sourcing &amp; Management
               </p>
               <p className="text-xs text-bhissm-secondary mt-0.5">
-                Federated National &amp; Inter-State Healthcare Supply Chain, FEFO Intelligence &amp; 2-Step Disaster Mobilization Grid.
+                Fully operational portal covering <strong>36 States &amp; Union Territories</strong>, <strong>36 State Reserve Depots</strong>, and <strong>100+ Hospitals</strong> with live FEFO tracking, 2-step disaster mobilization, and interstate mutual aid.
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap md:flex-col items-end gap-1.5 shrink-0">
-            <span className="demo-badge">MULTI-TIER VERIFIABLE COMMAND</span>
-            <span className="text-[10px] font-mono bg-red-100 text-red-900 border border-red-300 px-2.5 py-0.5 rounded-full font-bold">
-              🚨 CROSS-BORDER MUTUAL AID ACTIVE
+            <span className="demo-badge">FEDERATED NATIONAL HEALTH GRID</span>
+            <span className="text-[10px] font-mono bg-emerald-100 text-emerald-900 border border-emerald-300 px-2.5 py-0.5 rounded-full font-bold">
+              🟢 36 STATES &amp; UTs CONNECTED
             </span>
           </div>
         </div>
       </div>
 
-      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Direct Login Card (4 cols) */}
-        <div className="lg:col-span-5 card space-y-4 shadow-sm border border-bhissm-border">
+        <div className="lg:col-span-4 card space-y-4 shadow-sm border border-bhissm-border">
           <div className="border-b border-bhissm-border pb-2 flex items-center justify-between">
             <h2 className="text-sm font-bold text-bhissm-dark uppercase font-mono tracking-wider flex items-center gap-1.5">
               <KeyRound className="w-4 h-4 text-bhissm-dark" />
@@ -343,7 +811,7 @@ export default function LoginPage() {
 
             <div>
               <label className="block text-xs font-semibold text-bhissm-secondary mb-1 uppercase font-mono">
-                Access Password
+                Security Password
               </label>
               <input
                 type="password"
@@ -356,16 +824,16 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 text-red-800 text-xs rounded leading-relaxed flex items-start gap-2">
+              <div className="p-3 bg-red-50 text-red-900 text-xs rounded-lg border border-red-300 flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 text-red-700 shrink-0 mt-0.5" />
-                <div>{error}</div>
+                <span className="leading-tight">{error}</span>
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full py-2.5 text-xs font-bold font-mono tracking-wider flex items-center justify-center gap-2"
+              className="btn-primary w-full py-2.5 text-xs font-bold font-mono tracking-wide flex items-center justify-center gap-2 cursor-pointer shadow-sm"
             >
               {loading ? 'AUTHENTICATING TELEMETRY...' : 'SIGN IN TO COMMAND DASHBOARD'}
               <ArrowRight className="w-3.5 h-3.5" />
@@ -373,34 +841,67 @@ export default function LoginPage() {
           </form>
 
           <div className="pt-2 border-t border-bhissm-border text-[11px] text-bhissm-secondary space-y-1 font-mono">
-            <div>• Hospital: Single Facility Scope</div>
-            <div>• State: Whole State / UT Inter-Hospital Scope</div>
-            <div>• National: Nationwide Strategic Stockpile Scope</div>
+            <div>• <strong>Hospital Node:</strong> Single facility pharmacy, ICU beds &amp; ambulances</div>
+            <div>• <strong>State Command:</strong> All hospitals in state, State Reserve Depot &amp; redistribution</div>
+            <div>• <strong>National Grid:</strong> Apex strategic medical stockpile &amp; interstate disaster relief</div>
           </div>
         </div>
 
-        {/* Right Column: Multi-State Interactive Credentials Directory (7 cols) */}
-        <div className="lg:col-span-7 card space-y-3 shadow-sm border border-bhissm-border">
+        {/* Right Column: Multi-State Interactive Credentials Directory (8 cols) */}
+        <div className="lg:col-span-8 card space-y-3 shadow-sm border border-bhissm-border">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-bhissm-border pb-2.5">
             <div>
               <h2 className="text-sm font-bold text-bhissm-dark uppercase font-mono tracking-wider flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-bhissm-accent" />
-                Select Jurisdiction or Role
+                Select Jurisdiction or Hospital Node
               </h2>
               <p className="text-[11px] text-bhissm-secondary">
-                Click <strong>"Quick Login"</strong> to instantly enter as that role, or click the card to load credentials.
+                Click <strong>"Quick Login"</strong> to instantly enter as that role, or click the card to copy credentials.
               </p>
+            </div>
+            <span className="text-[10px] font-mono bg-[#F8F1E7] border border-bhissm-border px-2 py-0.5 rounded font-bold">
+              {filteredCredentials.length} Nodes Available
+            </span>
+          </div>
+
+          {/* Search Bar & Role Filter */}
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <div className="relative flex-1 w-full">
+              <Search className="w-3.5 h-3.5 text-bhissm-secondary absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                className="input-field pl-8 py-1.5 text-xs font-mono"
+                placeholder="Search by state, hospital, city or username..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <div className="flex items-center gap-1 w-full sm:w-auto">
+              {(['all', 'national', 'state', 'hospital'] as const).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setRoleFilter(r)}
+                  className={`px-2.5 py-1 text-[11px] font-mono rounded uppercase font-bold transition-colors ${
+                    roleFilter === r
+                      ? 'bg-bhissm-dark text-[#FFF9F1]'
+                      : 'bg-[#F8F1E7] text-bhissm-secondary hover:text-bhissm-dark border border-bhissm-border/60'
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* State / Jurisdiction Category Tabs */}
+          {/* Region Tabs */}
           <div className="flex flex-wrap gap-1 p-1 bg-[#F8F1E7] rounded border border-bhissm-border text-xs font-mono font-semibold">
-            {(['All', 'National', 'Puducherry', 'Tamil Nadu', 'Karnataka', 'Other'] as const).map((tab) => (
+            {regions.map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => setActiveRegion(tab)}
                 className={`px-2.5 py-1 rounded transition-colors ${
-                  activeTab === tab
+                  activeRegion === tab
                     ? 'bg-bhissm-surface text-bhissm-dark font-bold shadow-xs border border-bhissm-border/60'
                     : 'text-bhissm-secondary hover:text-bhissm-dark hover:bg-bhissm-pink/40'
                 }`}
@@ -411,69 +912,65 @@ export default function LoginPage() {
           </div>
 
           {/* Credentials Cards List */}
-          <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
-            {filteredCredentials.map((c) => (
-              <div
-                key={c.user}
-                className="p-2.5 border border-bhissm-border rounded bg-white hover:bg-[#FDF9F3] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
-              >
+          <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
+            {filteredCredentials.length === 0 ? (
+              <div className="p-8 text-center text-xs text-bhissm-secondary font-mono">
+                No matching logins found. Try clearing your search term.
+              </div>
+            ) : (
+              filteredCredentials.map((c) => (
                 <div
-                  className="cursor-pointer flex-1"
-                  onClick={() => {
-                    setUsername(c.user);
-                    setPassword(c.pass);
-                  }}
+                  key={c.user}
+                  className="p-2.5 border border-bhissm-border rounded bg-white hover:bg-[#FDF9F3] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-bhissm-dark">{c.label}</span>
-                    <span
-                      className={`text-[9px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
-                        c.role === 'National'
-                          ? 'bg-[#2D2926] text-[#FFF9F1]'
-                          : c.role === 'State'
-                          ? 'bg-blue-100 text-blue-900 border border-blue-200'
-                          : 'bg-emerald-100 text-emerald-900 border border-emerald-200'
-                      }`}
-                    >
-                      {c.role} ({c.stateGroup})
-                    </span>
-                  </div>
-                  <div className="text-[11px] text-bhissm-secondary mt-0.5">
-                    {c.jurisdiction}
-                  </div>
-                  <div className="text-[10px] font-mono text-bhissm-secondary/80 mt-0.5">
-                    User: <strong className="text-bhissm-dark">{c.user}</strong> • Pass: <strong className="text-bhissm-dark">{c.pass}</strong>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <button
+                  <div
+                    className="cursor-pointer flex-1"
                     onClick={() => {
                       setUsername(c.user);
                       setPassword(c.pass);
                     }}
-                    className="btn-outline text-[11px] py-1 px-2 font-mono"
-                    title="Populate input form"
                   >
-                    Auto-Fill
-                  </button>
-                  <button
-                    onClick={() => handlePerformLogin(c.user, c.pass)}
-                    disabled={loading}
-                    className="btn-primary text-[11px] py-1 px-2.5 font-mono font-bold flex items-center gap-1"
-                  >
-                    Quick Login →
-                  </button>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-bhissm-dark">{c.label}</span>
+                      <span
+                        className={`text-[9px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
+                          c.role === 'National'
+                            ? 'bg-black text-white'
+                            : c.role === 'State'
+                            ? 'bg-emerald-100 text-emerald-950 border border-emerald-300'
+                            : 'bg-blue-100 text-blue-950 border border-blue-300'
+                        }`}
+                      >
+                        {c.role}
+                      </span>
+                      <span className="text-[10px] text-bhissm-secondary font-mono">
+                        ({c.stateName})
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-bhissm-secondary mt-0.5 line-clamp-1">
+                      {c.jurisdiction}
+                    </div>
+                    <div className="text-[10px] font-mono text-bhissm-secondary/80 mt-1 flex items-center gap-2">
+                      <span>User: <strong className="text-bhissm-dark">{c.user}</strong></span>
+                      <span>•</span>
+                      <span>Pass: <strong className="text-bhissm-dark">{c.pass}</strong></span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handlePerformLogin(c.user, c.pass)}
+                      className="px-2.5 py-1.5 bg-bhissm-accent hover:bg-bhissm-accent/80 text-white rounded font-mono font-bold text-[11px] cursor-pointer transition-colors shadow-2xs"
+                    >
+                      Quick Login →
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
-      </div>
-
-      {/* Footer Notice */}
-      <div className="mt-8 text-center text-xs text-bhissm-secondary/70 font-mono">
-        BHISSM Multi-State Healthcare Command System • Developed for Mock Government Simulation
       </div>
     </div>
   );

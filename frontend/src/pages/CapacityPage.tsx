@@ -10,7 +10,8 @@ import {
   X,
   PlusCircle,
   UserPlus,
-  CheckCircle2
+  CheckCircle2,
+  Lock,
 } from 'lucide-react';
 
 export default function CapacityPage() {
@@ -25,9 +26,17 @@ export default function CapacityPage() {
   // Editing capacity inline
   const [editingCareType, setEditingCareType] = useState<string | null>(null);
   const [editBedForm, setEditBedForm] = useState({
-    available_beds: 0,
     occupied_beds: 0,
     reserved_beds: 0,
+  });
+
+  // Formal Bed Sanctioning State (State/National only)
+  const [showSanctionModal, setShowSanctionModal] = useState(false);
+  const [sanctionTarget, setSanctionTarget] = useState<any>(null);
+  const [sanctionForm, setSanctionForm] = useState({
+    new_total_beds: 100,
+    order_reference: 'TN-DME-SEC-ORD-2026/89',
+    reason: 'Formal Administrative Re-Sanctioning Order of Bed Quota',
   });
 
   // Manual Entry Modals
@@ -108,7 +117,6 @@ export default function CapacityPage() {
   const startEditBed = (item: any) => {
     setEditingCareType(item.careType);
     setEditBedForm({
-      available_beds: item.availableBeds,
       occupied_beds: item.occupiedBeds,
       reserved_beds: item.reservedBeds,
     });
@@ -117,7 +125,6 @@ export default function CapacityPage() {
   const handleSaveBed = async (careType: string) => {
     try {
       await API.put(`/facilities/${selectedFacilityId}/capacity/${careType}`, {
-        available_beds: Number(editBedForm.available_beds),
         occupied_beds: Number(editBedForm.occupied_beds),
         reserved_beds: Number(editBedForm.reserved_beds),
       });
@@ -125,6 +132,35 @@ export default function CapacityPage() {
       fetchFacilityCapacity(selectedFacilityId);
     } catch (err: any) {
       alert(err.response?.data?.error || 'Failed to update capacity');
+    }
+  };
+
+  const handleOpenSanctionModal = (capItem: any) => {
+    setSanctionTarget(capItem);
+    setSanctionForm({
+      new_total_beds: capItem.totalBeds,
+      order_reference: `STATE-ORD-${Date.now().toString().slice(-4)}`,
+      reason: 'Formal Administrative Capacity Re-Sanction Order',
+    });
+    setShowSanctionModal(true);
+  };
+
+  const handleSubmitSanction = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!sanctionTarget) return;
+    try {
+      await API.post(
+        `/facilities/${selectedFacilityId}/capacity/${sanctionTarget.careType}/sanction`,
+        {
+          total_beds: Number(sanctionForm.new_total_beds),
+          order_reference: sanctionForm.order_reference,
+          reason: sanctionForm.reason,
+        }
+      );
+      setShowSanctionModal(false);
+      fetchFacilityCapacity(selectedFacilityId);
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Failed to revise bed sanction quota');
     }
   };
 
@@ -391,23 +427,24 @@ export default function CapacityPage() {
 
                   {isEditing ? (
                     <div className="space-y-2 pt-1 font-mono">
-                      <div className="grid grid-cols-3 gap-1.5 text-center">
+                      <div className="text-[10px] text-stone-700 font-bold flex items-center justify-between pb-1 border-b border-gray-100">
+                        <span className="flex items-center gap-1">
+                          <Lock className="w-2.5 h-2.5 text-stone-500" />
+                          Sanctioned Quota: <strong>{item.totalBeds}</strong>
+                        </span>
+                        <span className="text-emerald-700">
+                          Vacant: <strong>{Math.max(0, item.totalBeds - Number(editBedForm.occupied_beds) - Number(editBedForm.reserved_beds))}</strong>
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-center">
                         <div>
-                          <label className="text-[10px] text-emerald-800 font-bold block">Avail</label>
+                          <label className="text-[10px] text-gray-700 font-bold block">Occupied Beds</label>
                           <input
                             type="number"
-                            className="input-field text-center py-1"
-                            value={editBedForm.available_beds}
-                            onChange={(e) =>
-                              setEditBedForm({ ...editBedForm, available_beds: Number(e.target.value) })
-                            }
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[10px] text-gray-700 font-bold block">Occupied</label>
-                          <input
-                            type="number"
-                            className="input-field text-center py-1"
+                            min="0"
+                            max={item.totalBeds}
+                            className="input-field text-center py-1 font-bold"
                             value={editBedForm.occupied_beds}
                             onChange={(e) =>
                               setEditBedForm({ ...editBedForm, occupied_beds: Number(e.target.value) })
@@ -415,10 +452,12 @@ export default function CapacityPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-[10px] text-amber-800 font-bold block">Reserved</label>
+                          <label className="text-[10px] text-amber-800 font-bold block">Reserved Beds</label>
                           <input
                             type="number"
-                            className="input-field text-center py-1"
+                            min="0"
+                            max={item.totalBeds}
+                            className="input-field text-center py-1 font-bold"
                             value={editBedForm.reserved_beds}
                             onChange={(e) =>
                               setEditBedForm({ ...editBedForm, reserved_beds: Number(e.target.value) })
@@ -438,7 +477,7 @@ export default function CapacityPage() {
                           onClick={() => handleSaveBed(item.careType)}
                           className="btn-primary text-[10px] py-1 px-2.5 flex items-center gap-1"
                         >
-                          <Save className="w-3 h-3" /> Save
+                          <Save className="w-3 h-3" /> Save Census
                         </button>
                       </div>
                     </div>
@@ -449,19 +488,30 @@ export default function CapacityPage() {
                           {item.availableBeds}
                         </div>
                         <div className="text-[10px] text-bhissm-secondary">
-                          Available of {item.totalBeds} Total
+                          Vacant of {item.totalBeds} Sanctioned
                         </div>
                       </div>
 
                       <div className="text-right text-[11px] text-bhissm-secondary space-y-0.5">
                         <div>Occupied: <strong>{item.occupiedBeds}</strong></div>
                         <div>Reserved: <strong>{item.reservedBeds}</strong></div>
-                        <button
-                          onClick={() => startEditBed(item)}
-                          className="text-bhissm-dark font-sans hover:underline flex items-center gap-1 justify-end pt-1"
-                        >
-                          <Edit2 className="w-3 h-3" /> Update Census
-                        </button>
+                        <div className="flex items-center justify-end gap-2 pt-1">
+                          <button
+                            onClick={() => startEditBed(item)}
+                            className="text-bhissm-dark font-sans hover:underline flex items-center gap-1"
+                          >
+                            <Edit2 className="w-3 h-3" /> Update Census
+                          </button>
+                          {(user?.role === 'state' || user?.role === 'national') && (
+                            <button
+                              onClick={() => handleOpenSanctionModal(item)}
+                              className="text-purple-900 font-sans hover:underline flex items-center gap-1 font-bold"
+                              title="Formal State Re-Sanction of Bed Quota"
+                            >
+                              <Lock className="w-2.5 h-2.5" /> Re-Sanction
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -965,6 +1015,105 @@ export default function CapacityPage() {
                 </button>
                 <button type="submit" className="btn-primary text-xs font-bold">
                   Save Bed Ward
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* FORMAL ADMINISTRATIVE BED RE-SANCTION PROTOCOL MODAL */}
+      {showSanctionModal && sanctionTarget && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="card bg-white max-w-md w-full p-5 shadow-2xl border-2 border-bhissm-dark space-y-4">
+            <div className="flex items-center justify-between border-b border-bhissm-border pb-2">
+              <h3 className="font-bold text-sm text-bhissm-dark uppercase font-mono flex items-center gap-2">
+                <Lock className="w-4 h-4 text-bhissm-dark" />
+                State Bed Quota Re-Sanction Protocol
+              </h3>
+              <button onClick={() => setShowSanctionModal(false)} className="cursor-pointer">
+                <X className="w-4 h-4 text-bhissm-secondary" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitSanction} className="space-y-3 text-xs font-mono">
+              <div className="p-3 bg-[#FAF6F0] rounded-xl border border-bhissm-border space-y-1">
+                <div className="text-bhissm-secondary font-bold uppercase text-[10px]">
+                  Target Ward Capacity
+                </div>
+                <div className="text-[11px] font-mono text-purple-900 font-bold uppercase">
+                  {sanctionTarget.careType.replace('_', ' ')} Care Ward
+                </div>
+                <div className="text-[10px] text-bhissm-secondary pt-1 flex justify-between">
+                  <span>Current Sanctioned: <strong>{sanctionTarget.totalBeds}</strong></span>
+                  <span>Occupied: <strong>{sanctionTarget.occupiedBeds}</strong></span>
+                  <span>Vacant: <strong className="text-emerald-700">{sanctionTarget.availableBeds}</strong></span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-bhissm-secondary uppercase mb-1">
+                  New Sanctioned Total Beds *
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  required
+                  value={sanctionForm.new_total_beds}
+                  onChange={(e) =>
+                    setSanctionForm({ ...sanctionForm, new_total_beds: Number(e.target.value) })
+                  }
+                  className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg text-sm font-bold"
+                />
+                <span className="text-[10px] text-bhissm-secondary block mt-1">
+                  Recalculated Vacant: <strong>{Math.max(0, sanctionForm.new_total_beds - sanctionTarget.occupiedBeds - sanctionTarget.reservedBeds)}</strong> beds
+                </span>
+              </div>
+
+              <div>
+                <label className="block font-bold text-bhissm-secondary uppercase mb-1">
+                  Administrative Order Reference *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. TN-DME-SEC-ORD-2026/89"
+                  value={sanctionForm.order_reference}
+                  onChange={(e) =>
+                    setSanctionForm({ ...sanctionForm, order_reference: e.target.value })
+                  }
+                  className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-bhissm-secondary uppercase mb-1">
+                  Operational Justification / Reason *
+                </label>
+                <textarea
+                  required
+                  rows={2}
+                  value={sanctionForm.reason}
+                  onChange={(e) =>
+                    setSanctionForm({ ...sanctionForm, reason: e.target.value })
+                  }
+                  className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                />
+              </div>
+
+              <div className="pt-3 border-t border-bhissm-border flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowSanctionModal(false)}
+                  className="btn btn-secondary text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary text-xs font-bold cursor-pointer"
+                >
+                  Authorize Re-Sanction
                 </button>
               </div>
             </form>

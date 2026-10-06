@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { ShieldAlert, LogOut, Radio, Hospital, Globe, Landmark, Activity, Siren } from 'lucide-react';
+import { ShieldAlert, LogOut, Radio, Hospital, Globe, Landmark, Activity, Siren, Clock, Database } from 'lucide-react';
 import API from '../lib/api';
 
 interface HeaderProps {
@@ -12,6 +12,26 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
   const { user, logout } = useAuth();
   const [unreadAlerts, setUnreadAlerts] = useState<number>(0);
   const [activeEmergencies, setActiveEmergencies] = useState<number>(0);
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+
+  // Real-time live date and time ticker (synced every 1000ms)
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedDate = currentTime.toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).toUpperCase();
+
+  const formattedTime = currentTime.toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
 
   const fetchStatus = async () => {
     try {
@@ -59,7 +79,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
   };
 
   return (
-    <header className="bg-gradient-to-r from-[#FFF9F1] via-[#FDF5EA] to-[#FFF9F1] border-b-2 border-bhissm-border px-4 lg:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+    <header className="bg-gradient-to-r from-[#FFF9F1] via-[#FDF5EA] to-[#FFF9F1] border-b-2 border-bhissm-border px-4 lg:px-6 py-2.5 flex items-center justify-between shrink-0 z-30 shadow-sm">
       <div className="flex items-center gap-3.5">
         <button
           onClick={onToggleSidebar}
@@ -95,14 +115,18 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
                 v2.0
               </span>
             </div>
-            <div className="text-[11px] text-bhissm-secondary font-semibold tracking-wide mt-0.5">
-              Bharat Health Initiative for SupplyChain Sourcing &amp; Management
+            <div className="text-[11px] text-bhissm-secondary font-semibold tracking-wide mt-0.5 flex items-center gap-2">
+              <span className="hidden sm:inline">Bharat Health Initiative for SupplyChain Sourcing &amp; Management</span>
+              <span className="inline-flex xl:hidden items-center gap-1 font-mono text-[10px] text-bhissm-dark font-bold bg-[#F4E7D7]/80 px-1.5 py-0.5 rounded border border-bhissm-border/60">
+                <Clock className="w-2.5 h-2.5 text-[#B65C62]" />
+                {formattedDate} {formattedTime} IST
+              </span>
             </div>
           </div>
         </Link>
       </div>
 
-      {/* Center Telemetry & High-Visibility Emergency Siren */}
+      {/* Center Telemetry, Live Date/Time & High-Visibility Emergency Siren */}
       <div className="hidden xl:flex items-center gap-3">
         {activeEmergencies > 0 && (
           <Link
@@ -131,10 +155,29 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
           </Link>
         )}
 
+        {/* Live Date and Time Telemetry (Small Font) */}
+        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/95 border border-bhissm-border rounded-md text-[10px] font-mono text-bhissm-dark shadow-2xs">
+          <Clock className="w-3 h-3 text-emerald-700 shrink-0" />
+          <span className="font-semibold text-bhissm-secondary">{formattedDate}</span>
+          <span className="font-black text-bhissm-dark">{formattedTime}</span>
+          <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-100 text-emerald-900 font-bold">IST</span>
+        </div>
+
         <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#FFF9F1] border border-bhissm-border rounded-md text-[11px] font-mono text-bhissm-secondary shadow-2xs">
           <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
           <span className="font-bold text-bhissm-dark">GRID ONLINE</span>
         </div>
+
+        {(user?.role === 'national' || user?.role === 'state') && (
+          <Link
+            to="/admin/master-data"
+            className="flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-[#FDF6ED] border border-bhissm-border rounded-md text-[11px] font-mono font-bold text-bhissm-dark shadow-2xs transition-colors"
+            title="Open Master Data & Infrastructure Governance Console"
+          >
+            <Database className="w-3.5 h-3.5 text-[#B65C62]" />
+            <span>Master Console</span>
+          </Link>
+        )}
 
         {unreadAlerts > 0 && (
           <Link
@@ -163,8 +206,12 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         <div className="hidden md:block">{getRoleBadge()}</div>
 
         <div className="hidden sm:block text-right border-l border-bhissm-border pl-3">
-          <div className="text-xs font-bold text-bhissm-dark leading-tight">{user?.full_name}</div>
-          <div className="text-[10px] text-bhissm-secondary font-mono">{user?.username}</div>
+          <div className="text-xs font-bold text-bhissm-dark leading-tight">
+            {user?.facility_name || (user?.state_name ? `${user.state_name} State Command` : 'National Command Grid')}
+          </div>
+          <div className="text-[10px] text-bhissm-secondary font-mono uppercase">
+            {user?.role} NODE • {user?.username}
+          </div>
         </div>
 
         <button

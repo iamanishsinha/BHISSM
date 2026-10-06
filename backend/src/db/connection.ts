@@ -64,7 +64,25 @@ function resolveDatabaseUrl(): string {
   }
 
   // Local development resolution
+  const masterPath = path.resolve('backend/prisma/bhissm.db');
+  const apiPath = path.resolve('api/bhissm.db');
+
+  // Auto-mirror master database: keep api/bhissm.db strictly synced with backend/prisma/bhissm.db
+  try {
+    if (fs.existsSync(masterPath) && fs.existsSync(path.dirname(apiPath))) {
+      const masterStat = fs.statSync(masterPath);
+      const apiStat = fs.existsSync(apiPath) ? fs.statSync(apiPath) : null;
+      if (!apiStat || masterStat.mtimeMs > apiStat.mtimeMs || apiStat.size === 0) {
+        fs.copyFileSync(masterPath, apiPath);
+        console.log(`[BHISSM DB] Auto-mirrored master database -> ${apiPath}`);
+      }
+    }
+  } catch (err) {
+    // Non-blocking sync warning
+  }
+
   const localCandidates = [
+    masterPath,
     path.join(__dirname, '..', '..', 'prisma', 'bhissm.db'),
     path.join(__dirname, '..', '..', 'data', 'bhissm.db'),
     path.join(process.cwd(), 'data', 'bhissm.db'),
@@ -73,14 +91,14 @@ function resolveDatabaseUrl(): string {
   ];
 
   for (const cand of localCandidates) {
-    if (fs.existsSync(cand)) {
+    if (fs.existsSync(cand) && fs.statSync(cand).size > 0) {
       const localUrl = `file:${cand}`;
       process.env.DATABASE_URL = localUrl;
       return localUrl;
     }
   }
 
-  const defaultPath = path.join(__dirname, '..', '..', 'prisma', 'bhissm.db');
+  const defaultPath = masterPath;
   const defaultUrl = `file:${defaultPath}`;
   process.env.DATABASE_URL = defaultUrl;
   return defaultUrl;

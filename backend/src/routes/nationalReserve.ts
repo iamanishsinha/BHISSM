@@ -35,14 +35,17 @@ export async function ensureStateReserveFacility(prisma: any, stateId: string) {
     });
   }
 
-  // Ensure baseline State Reserve inventory exists for this depot if empty
-  const existingInvCount = await prisma.inventory.count({ where: { facilityId: depot.id } });
-  if (existingInvCount === 0) {
-    const medicines = await prisma.medicine.findMany({ where: { isActive: 1 } });
-    const now = new Date();
-    const expDate = new Date(now.getTime() + 450 * 86400000);
-    for (const med of medicines) {
-      const baseStock = med.criticality === 'critical' ? 8000 : med.criticality === 'high' ? 5000 : 3500;
+  // Ensure baseline State Reserve inventory exists for this depot for all active medicines
+  const medicines = await prisma.medicine.findMany({ where: { isActive: 1 } });
+  const existingInvs = await prisma.inventory.findMany({ where: { facilityId: depot.id } });
+  const existingMedMap = new Map(existingInvs.map((i: any) => [i.medicineId, i]));
+
+  const now = new Date();
+  const expDate = new Date(now.getTime() + 450 * 86400000);
+  for (const med of medicines) {
+    const existing: any = existingMedMap.get(med.id);
+    const baseStock = med.criticality === 'critical' ? 10000 : med.criticality === 'high' ? 6000 : 4000;
+    if (!existing) {
       const inv = await prisma.inventory.create({
         data: {
           facilityId: depot.id,
@@ -72,6 +75,11 @@ export async function ensureStateReserveFacility(prisma: any, stateId: string) {
           storageLocation: med.isVaccine ? 'State Cold-Chain Vault (2-8°C)' : 'State Reserve Bay A',
           status: 'usable',
         },
+      });
+    } else if (existing.currentStock <= 0) {
+      await prisma.inventory.update({
+        where: { id: existing.id },
+        data: { currentStock: baseStock },
       });
     }
   }
@@ -435,10 +443,16 @@ router.get('/state-stock', async (req: Request, res: Response) => {
         current_stock: i.currentStock,
         reserved_stock: i.reservedStock,
         available_to_distribute: Math.max(0, i.currentStock - i.reservedStock),
+        state_reserve_stock: Math.max(0, i.currentStock - i.reservedStock),
         safety_threshold: i.safetyThreshold,
         last_updated: i.lastUpdated,
         batches_count: i.batches.length,
       })),
+      summary: {
+        total_units: inventories.reduce((sum, i) => sum + i.currentStock, 0),
+        total_medicines: inventories.filter((i) => !i.medicine.isVaccine).length,
+        total_vaccines: inventories.filter((i) => i.medicine.isVaccine).length,
+      },
       ledger: redistributions.map((tx) => ({
         id: tx.id,
         medicine_id: tx.medicineId,
@@ -460,17 +474,29 @@ router.post('/state-redistribute', async (req: Request, res: Response) => {
   try {
     const prisma = getDb();
     const user = req.user!;
-    const { medicine_id, destination_facility_id, quantity, notes, state_id } = req.body;
+    const {
+      medicine_id,
+      destination_facility_id,
+      target_facility_id,
+      quantity,
+      notes,
+      remarks,
+      priority,
+      state_id,
+    } = req.body;
 
+    const destId = destination_facility_id || target_facility_id;
     const qty = Number(quantity);
-    if (!medicine_id || !destination_facility_id || !qty || qty <= 0) {
+    const dispatchNotes = notes || remarks || priority || 'State Reserve Allocation';
+
+    if (!medicine_id || !destId || !qty || qty <= 0) {
       return res.status(400).json({
-        error: 'medicine_id, destination_facility_id, and a positive quantity are required',
+        error: 'medicine_id, destination_facility_id (or target_facility_id), and a positive quantity are required',
       });
     }
 
     const destHospital = await prisma.facility.findUnique({
-      where: { id: destination_facility_id },
+      where: { id: destId },
       include: { state: true },
     });
     if (!destHospital) {
@@ -487,7 +513,7 @@ router.post('/state-redistribute', async (req: Request, res: Response) => {
 
     const { depot: stateReserveDepot, state } = await ensureStateReserveFacility(prisma, effectiveStateId);
 
-    const stateInv = await prisma.inventory.findUnique({
+    let stateInv = await prisma.inventory.findUnique({
       where: {
         facilityId_medicineId: {
           facilityId: stateReserveDepot.id,
@@ -497,11 +523,48 @@ router.post('/state-redistribute', async (req: Request, res: Response) => {
       include: { medicine: true },
     });
 
-    if (!stateInv || stateInv.currentStock - stateInv.reservedStock < qty) {
+    if (!stateInv) {
+      const med = await prisma.medicine.findUnique({ where: { id: medicine_id } });
+      if (!med) return res.status(404).json({ error: 'Medicine not found in catalog' });
+      const baseStock = 10000;
+      stateInv = await prisma.inventory.create({
+        data: {
+          facilityId: stateReserveDepot.id,
+          medicineId: med.id,
+          currentStock: baseStock,
+          reservedStock: 0,
+          safetyThreshold: 1000,
+          reorderLevel: 1500,
+          avgDailyConsumption: 50,
+          leadTimeDays: 5,
+          emergencyLeadTimeDays: 2,
+          supplier: 'Central & State Medical Services Corporation',
+          deliveryReliability: 0.96,
+        },
+        include: { medicine: true },
+      });
+      await prisma.inventoryBatch.create({
+        data: {
+          inventoryId: stateInv.id,
+          facilityId: stateReserveDepot.id,
+          medicineId: med.id,
+          batchNumber: `SR-${state.code}-${med.name.slice(0, 3).toUpperCase()}-INIT`,
+          manufacturer: `${state.name} State Reserve Stockpile`,
+          receivedDate: new Date(),
+          expiryDate: new Date(Date.now() + 450 * 86400000),
+          quantity: baseStock,
+          reservedQuantity: 0,
+          storageLocation: med.isVaccine ? 'State Cold-Chain Vault (2-8°C)' : 'State Reserve Bay A',
+          status: 'usable',
+        },
+      });
+    }
+
+    const available = stateInv.currentStock - stateInv.reservedStock;
+    if (available < qty) {
       return res.status(400).json({
-        error: `Insufficient State Reserve stock for ${stateInv?.medicine?.name || 'selected medicine'}. Available in ${state.name} State Reserve: ${
-          stateInv ? stateInv.currentStock - stateInv.reservedStock : 0
-        }`,
+        error: `Insufficient State Reserve stock for ${stateInv?.medicine?.name || 'selected medicine'}. Available in ${state.name} State Reserve: ${available.toLocaleString()} units (Requested: ${qty.toLocaleString()}).`,
+        available,
       });
     }
 

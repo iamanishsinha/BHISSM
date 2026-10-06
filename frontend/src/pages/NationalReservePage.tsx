@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import API from '../lib/api';
 import {
@@ -15,10 +16,15 @@ import {
   Truck,
   Globe,
   MapPin,
+  Database,
 } from 'lucide-react';
 
 export default function NationalReservePage() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const [handledDeepLink, setHandledDeepLink] = useState(false);
+
   const [activeTab, setActiveTab] = useState<'state_reserve' | 'central_stockpile'>(
     user?.role === 'state' ? 'state_reserve' : 'central_stockpile'
   );
@@ -127,17 +133,32 @@ export default function NationalReservePage() {
   const handleOpenCentralRelease = (resItem: any) => {
     setFeedbackMsg(null);
     setReleaseForm({
-      medicine_id: resItem.medicine_id,
+      medicine_id: resItem.medicine_id || resItem.medicineId || resItem.id,
       quantity: Math.min(5000, resItem.immediately_available || 5000),
       destination_state_id:
         selectedStateIdForView ||
         statesList.find((s) => s.code === 'PY')?.id ||
         statesList[0]?.id ||
         '',
-      reason: `Central Strategic Reserve release to State Reserve Stockpile for ${resItem.medicine_name}`,
+      reason: `Central Strategic Reserve release to State Reserve Stockpile for ${resItem.medicine_name || 'Strategic Formulation'}`,
     });
     setShowCentralReleaseModal(true);
   };
+
+  // Auto-open Central Release modal when routed with ?release_med query parameter or navigation state
+  useEffect(() => {
+    const targetMedId = searchParams.get('release_med') || (location.state as any)?.releaseMedicineId;
+    if (targetMedId && !handledDeepLink && reserves.length > 0) {
+      const match = reserves.find(
+        (r) => r.medicine_id === targetMedId || r.medicineId === targetMedId || r.id === targetMedId
+      );
+      if (match) {
+        setActiveTab('central_stockpile');
+        handleOpenCentralRelease(match);
+        setHandledDeepLink(true);
+      }
+    }
+  }, [searchParams, location.state, reserves, handledDeepLink, statesList, selectedStateIdForView]);
 
   // Submit Central -> State Reserve Release
   const handleSubmitCentralRelease = async (e: React.FormEvent) => {
@@ -327,6 +348,15 @@ export default function NationalReservePage() {
               </select>
             </div>
           )}
+
+          <Link
+            to="/admin/master-data"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-bhissm-border hover:bg-[#FDF6ED] text-xs font-mono font-bold text-bhissm-dark transition-colors shadow-2xs"
+            title="Open Master Data & Infrastructure Governance Console"
+          >
+            <Database className="w-3.5 h-3.5 text-[#B65C62]" />
+            <span>Master Data Console</span>
+          </Link>
         </div>
       </div>
 

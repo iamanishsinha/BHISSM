@@ -1,64 +1,34 @@
 import bcrypt from 'bcryptjs';
 import { getDb } from './connection';
+import { ALL_STATES, ALL_DISTRICTS, ALL_HOSPITALS } from './geoData';
+import { syncMasterDatabaseFiles } from './masterProvisioner';
 
 const prisma = getDb();
 
 export async function seed() {
-  console.log('🌱 Verifying & seeding BHISSM multi-state and national demo data (30+ medicines & hospital networks)...');
+  console.log('🌱 Seeding & synchronizing BHISSM Pan-India 36 States & UTs Reserve Stockpiles and Hospital Networks...');
 
-  // ─── States ───────────────────────────────────────────────────────────────
-  const stateData = [
-    { name: 'Puducherry', code: 'PY', type: 'ut' },
-    { name: 'Tamil Nadu', code: 'TN', type: 'state' },
-    { name: 'Karnataka', code: 'KA', type: 'state' },
-    { name: 'Andhra Pradesh', code: 'AP', type: 'state' },
-    { name: 'Kerala', code: 'KL', type: 'state' },
-    { name: 'Maharashtra', code: 'MH', type: 'state' },
-    { name: 'West Bengal', code: 'WB', type: 'state' },
-    { name: 'Uttar Pradesh', code: 'UP', type: 'state' },
-    { name: 'NATIONAL', code: 'NA', type: 'national' },
-  ];
-
-  for (const s of stateData) {
-    await prisma.state.upsert({ where: { code: s.code }, update: { name: s.name, type: s.type }, create: s });
+  // ─── 1. States & Union Territories (28 States + 8 UTs + National) ───────────
+  for (const s of ALL_STATES) {
+    await prisma.state.upsert({
+      where: { code: s.code },
+      update: { name: s.name, type: s.type },
+      create: { name: s.name, code: s.code, type: s.type },
+    });
   }
 
   const states: Record<string, string> = {};
   const allStates = await prisma.state.findMany();
   for (const s of allStates) states[s.code] = s.id;
 
-  // ─── Districts ────────────────────────────────────────────────────────────
-  const districtData = [
-    // Puducherry
-    { state: 'PY', name: 'Puducherry', code: 'PY-PD' },
-    { state: 'PY', name: 'Karaikal', code: 'PY-KK' },
-    // Tamil Nadu
-    { state: 'TN', name: 'Chennai', code: 'TN-CHN' },
-    { state: 'TN', name: 'Villupuram', code: 'TN-VLR' },
-    { state: 'TN', name: 'Cuddalore', code: 'TN-CDL' },
-    { state: 'TN', name: 'Coimbatore', code: 'TN-CBE' },
-    { state: 'TN', name: 'Madurai', code: 'TN-MDU' },
-    // Karnataka
-    { state: 'KA', name: 'Bengaluru Urban', code: 'KA-BLR' },
-    { state: 'KA', name: 'Mysuru', code: 'KA-MYS' },
-    { state: 'KA', name: 'Belagavi', code: 'KA-BGM' },
-    { state: 'KA', name: 'Dakshina Kannada', code: 'KA-DK' },
-    // Andhra Pradesh
-    { state: 'AP', name: 'Visakhapatnam', code: 'AP-VSP' },
-    { state: 'AP', name: 'Krishna (Vijayawada)', code: 'AP-KRI' },
-    // Kerala
-    { state: 'KL', name: 'Thiruvananthapuram', code: 'KL-TVM' },
-    { state: 'KL', name: 'Ernakulam (Kochi)', code: 'KL-EKM' },
-    // Maharashtra
-    { state: 'MH', name: 'Mumbai City', code: 'MH-MUM' },
-    { state: 'MH', name: 'Pune', code: 'MH-PUN' },
-  ];
-
-  for (const d of districtData) {
+  // ─── 2. Districts Across All States & UTs ────────────────────────────────────
+  for (const d of ALL_DISTRICTS) {
+    const sId = states[d.state];
+    if (!sId) continue;
     await prisma.district.upsert({
       where: { code: d.code },
-      update: { name: d.name, stateId: states[d.state] },
-      create: { name: d.name, code: d.code, stateId: states[d.state] },
+      update: { name: d.name, stateId: sId },
+      create: { name: d.name, code: d.code, stateId: sId },
     });
   }
 
@@ -66,57 +36,31 @@ export async function seed() {
   const allDistricts = await prisma.district.findMany();
   for (const d of allDistricts) districts[d.code] = d.id;
 
-  // ─── Facilities ───────────────────────────────────────────────────────────
-  const facilityData = [
-    // Puducherry & Auroville Bioregion
-    { key: 'JIPMER', name: 'JIPMER (Jawaharlal Institute of Postgraduate Medical Education & Research)', type: 'medical_college', level: 'state', district: 'PY-PD', state: 'PY', hasBloodBank: 1, lat: 11.9416, lng: 79.8083 },
-    { key: 'PIMS_PY', name: 'PIMS (Pondicherry Institute of Medical Sciences, Kalapet, Puducherry)', type: 'medical_college', level: 'state', district: 'PY-PD', state: 'PY', hasBloodBank: 1, lat: 12.0315, lng: 79.8562 },
-    { key: 'RGGWCH_PY', name: 'Rajiv Gandhi Government Women and Children Hospital, Puducherry', type: 'government_hospital', level: 'state', district: 'PY-PD', state: 'PY', hasBloodBank: 1, lat: 11.9338, lng: 79.8095 },
-    { key: 'EAST_COAST_PY', name: 'East Coast Hospitals, Puducherry (Private)', type: 'private_hospital', level: 'district', district: 'PY-PD', state: 'PY', hasBloodBank: 1, lat: 11.9284, lng: 79.7965 },
-    { key: 'AUROVILLE_HC', name: 'Auroville Health Centre (Aspiration, Auroville Area)', type: 'community_hospital', level: 'district', district: 'PY-PD', state: 'PY', hasBloodBank: 0, lat: 12.0069, lng: 79.8106 },
-    { key: 'GH_PY', name: 'Government General Hospital Puducherry', type: 'government_hospital', level: 'state', district: 'PY-PD', state: 'PY', hasBloodBank: 1, lat: 11.9341, lng: 79.8307 },
-    { key: 'IGMCRI', name: 'Indira Gandhi Medical College & Research Institute Puducherry', type: 'medical_college', level: 'state', district: 'PY-PD', state: 'PY', hasBloodBank: 1, lat: 11.9219, lng: 79.7889 },
-    { key: 'CHC_OZHU', name: 'CHC Ozhukarai Puducherry', type: 'chc', level: 'district', district: 'PY-PD', state: 'PY', hasBloodBank: 0, lat: 11.9778, lng: 79.7944 },
-    { key: 'PHC_ARIY', name: 'PHC Ariyankuppam Puducherry', type: 'phc', level: 'phc', district: 'PY-PD', state: 'PY', hasBloodBank: 0, lat: 11.9127, lng: 79.8021 },
-    { key: 'GH_KRK', name: 'Government Hospital Karaikal', type: 'government_hospital', level: 'district', district: 'PY-KK', state: 'PY', hasBloodBank: 0, lat: 10.9254, lng: 79.8380 },
-    // Tamil Nadu (including Adjacent Border Districts: Villupuram / Auroville Border & Cuddalore)
-    { key: 'AUROVILLE_SANTIGIRI', name: 'Santigiri & Quiet Healing Hospital (Auroville Area - Villupuram Border)', type: 'private_hospital', level: 'district', district: 'TN-VLR', state: 'TN', hasBloodBank: 0, lat: 12.0150, lng: 79.8250 },
-    { key: 'GH_VLR', name: 'Government Medical College Hospital Villupuram', type: 'government_hospital', level: 'district', district: 'TN-VLR', state: 'TN', hasBloodBank: 1, lat: 11.9385, lng: 79.4923 },
-    { key: 'GH_CDL', name: 'Government General Hospital Cuddalore', type: 'government_hospital', level: 'district', district: 'TN-CDL', state: 'TN', hasBloodBank: 1, lat: 11.7480, lng: 79.7714 },
-    { key: 'STANLEY_CHN', name: 'Government Stanley Medical College & Hospital Chennai', type: 'medical_college', level: 'state', district: 'TN-CHN', state: 'TN', hasBloodBank: 1, lat: 13.1067, lng: 80.2889 },
-    { key: 'RAJIV_CHN', name: 'Rajiv Gandhi Government General Hospital Chennai', type: 'government_hospital', level: 'state', district: 'TN-CHN', state: 'TN', hasBloodBank: 1, lat: 13.0827, lng: 80.2707 },
-    { key: 'CMCH_CBE', name: 'Coimbatore Medical College Hospital', type: 'medical_college', level: 'district', district: 'TN-CBE', state: 'TN', hasBloodBank: 1, lat: 11.0016, lng: 76.9629 },
-    // Karnataka
-    { key: 'VICTORIA_BLR', name: 'Victoria Hospital (Bangalore Medical College)', type: 'medical_college', level: 'state', district: 'KA-BLR', state: 'KA', hasBloodBank: 1, lat: 12.9634, lng: 77.5752 },
-    { key: 'BOWRING_BLR', name: 'Bowring & Lady Curzon Hospital Bengaluru', type: 'government_hospital', level: 'state', district: 'KA-BLR', state: 'KA', hasBloodBank: 1, lat: 12.9830, lng: 77.6050 },
-    { key: 'KC_GEN_BLR', name: 'KC General Hospital Malleshwaram Bengaluru', type: 'government_hospital', level: 'district', district: 'KA-BLR', state: 'KA', hasBloodBank: 0, lat: 13.0035, lng: 77.5688 },
-    { key: 'KR_HOSP_MYS', name: 'Krishnarajendra (KR) Hospital Mysuru', type: 'medical_college', level: 'district', district: 'KA-MYS', state: 'KA', hasBloodBank: 1, lat: 12.3117, lng: 76.6522 },
-    // Andhra Pradesh
-    { key: 'KGH_VSP', name: 'King George Hospital Visakhapatnam', type: 'medical_college', level: 'state', district: 'AP-VSP', state: 'AP', hasBloodBank: 1, lat: 17.7088, lng: 83.3033 },
-    { key: 'GGH_VIJ', name: 'Government General Hospital Vijayawada', type: 'government_hospital', level: 'district', district: 'AP-KRI', state: 'AP', hasBloodBank: 1, lat: 16.5186, lng: 80.6200 },
-    // Kerala
-    { key: 'GMC_TVM', name: 'Government Medical College Thiruvananthapuram', type: 'medical_college', level: 'state', district: 'KL-TVM', state: 'KL', hasBloodBank: 1, lat: 8.5241, lng: 76.9205 },
-    // Maharashtra
-    { key: 'KEM_MUM', name: 'King Edward Memorial (KEM) Hospital Mumbai', type: 'medical_college', level: 'state', district: 'MH-MUM', state: 'MH', hasBloodBank: 1, lat: 19.0028, lng: 72.8427 },
-    // National
-    { key: 'NATIONAL_STORE', name: 'National Medical Reserve Store (Central Delhi)', type: 'government_hospital', level: 'national', district: null, state: 'NA', hasBloodBank: 0, lat: 28.6139, lng: 77.2090 },
-  ];
-
+  // ─── 3. Facilities (2-4 Hospitals per State/UT + National Store) ────────────
   const facilityMap: Record<string, string> = {};
 
-  for (const f of facilityData) {
-    let fac = await prisma.facility.findFirst({ where: { name: f.name } });
+  for (const f of ALL_HOSPITALS) {
+    const sId = states[f.state];
+    if (!sId) continue;
+    const dId = f.district ? districts[f.district] || null : null;
+
+    let fac = await prisma.facility.findFirst({
+      where: { name: f.name },
+    });
+
     if (!fac) {
       fac = await prisma.facility.create({
         data: {
           name: f.name,
           type: f.type,
           level: f.level,
-          districtId: f.district ? districts[f.district] : null,
-          stateId: states[f.state],
+          districtId: dId,
+          stateId: sId,
+          address: f.address || `${f.name}, ${f.state}`,
           hasBloodBank: f.hasBloodBank,
           lat: f.lat,
           lng: f.lng,
+          isActive: 1,
         },
       });
     } else {
@@ -125,81 +69,214 @@ export async function seed() {
         data: {
           type: f.type,
           level: f.level,
-          districtId: f.district ? districts[f.district] : null,
-          stateId: states[f.state],
+          districtId: dId,
+          stateId: sId,
+          address: f.address || fac.address,
           hasBloodBank: f.hasBloodBank,
           lat: f.lat,
           lng: f.lng,
+          isActive: 1,
         },
       });
     }
     facilityMap[f.key] = fac.id;
   }
 
-  // ─── Users & Role Logins ──────────────────────────────────────────────────
+  // ─── 4. State Medical Reserve Depots (1 Dedicated Depot for Each State & UT) ─
+  const depotMap: Record<string, string> = {};
+
+  for (const s of ALL_STATES) {
+    if (s.code === 'NA') continue;
+    const stateId = states[s.code];
+    if (!stateId) continue;
+
+    const depotName = `${s.name} ${s.type === 'ut' ? 'UT' : 'State'} Medical Reserve Depot`;
+    let depot = await prisma.facility.findFirst({
+      where: {
+        stateId,
+        OR: [{ level: 'state_reserve' }, { type: 'state_reserve' }],
+      },
+    });
+
+    if (!depot) {
+      depot = await prisma.facility.create({
+        data: {
+          name: depotName,
+          type: 'state_reserve',
+          level: 'state_reserve',
+          stateId,
+          address: `${s.name} Health Directorate Central Medical Warehouse`,
+          hasBloodBank: 0,
+          isActive: 1,
+        },
+      });
+    } else {
+      depot = await prisma.facility.update({
+        where: { id: depot.id },
+        data: {
+          name: depotName,
+          type: 'state_reserve',
+          level: 'state_reserve',
+          isActive: 1,
+        },
+      });
+    }
+    depotMap[s.code] = depot.id;
+  }
+
+  // ─── 5. Users & Command Logins (National, All 36 States/UTs, & Hospitals) ───
   const defaultPasswordHash = (pwd: string) => bcrypt.hashSync(pwd, 10);
 
-  const userData = [
-    // 1. National Command
-    { username: 'national_monitor_01', password: 'BHISSM@National#01', fullName: 'Dr. Vijay Sharma', role: 'national', facilityKey: null, stateCode: 'NA' },
-    { username: 'national_director_01', password: 'BHISSM@National#Dir01', fullName: 'Dr. Anita Sen', role: 'national', facilityKey: null, stateCode: 'NA' },
-
-    // 2. State Command Admins
-    { username: 'state_puducherry_admin', password: 'BHISSM@State#P01', fullName: 'Dr. Anand Krishnan', role: 'state', facilityKey: null, stateCode: 'PY' },
-    { username: 'state_tamilnadu_admin', password: 'BHISSM@State#TN01', fullName: 'Dr. M. Senthil Nathan', role: 'state', facilityKey: null, stateCode: 'TN' },
-    { username: 'state_karnataka_admin', password: 'BHISSM@State#KA01', fullName: 'Dr. K. S. Manjunath', role: 'state', facilityKey: null, stateCode: 'KA' },
-    { username: 'state_andhra_admin', password: 'BHISSM@State#AP01', fullName: 'Dr. Ch. Venkateswara Rao', role: 'state', facilityKey: null, stateCode: 'AP' },
-    { username: 'state_kerala_admin', password: 'BHISSM@State#KL01', fullName: 'Dr. V. S. Radhakrishnan', role: 'state', facilityKey: null, stateCode: 'KL' },
-    { username: 'state_maharashtra_admin', password: 'BHISSM@State#MH01', fullName: 'Dr. Sanjay Deshmukh', role: 'state', facilityKey: null, stateCode: 'MH' },
-
-    // 3. Hospital Nodes - Puducherry & Auroville Area
-    { username: 'hospital_puducherry_01', password: 'BHISSM@Demo#P01', fullName: 'Dr. Ramesh Kumar', role: 'hospital', facilityKey: 'GH_PY', stateCode: 'PY' },
-    { username: 'hospital_jipmer_01', password: 'BHISSM@Demo#J01', fullName: 'Dr. Priya Anand', role: 'hospital', facilityKey: 'JIPMER', stateCode: 'PY' },
-    { username: 'hospital_pims_01', password: 'BHISSM@Demo#PIMS01', fullName: 'Dr. Rebecca Thomas', role: 'hospital', facilityKey: 'PIMS_PY', stateCode: 'PY' },
-    { username: 'hospital_rggwch_01', password: 'BHISSM@Demo#RGW01', fullName: 'Dr. Latha Narayanan', role: 'hospital', facilityKey: 'RGGWCH_PY', stateCode: 'PY' },
-    { username: 'hospital_eastcoast_01', password: 'BHISSM@Demo#ECH01', fullName: 'Dr. Karthik Natarajan', role: 'hospital', facilityKey: 'EAST_COAST_PY', stateCode: 'PY' },
-    { username: 'hospital_auroville_01', password: 'BHISSM@Demo#AV01', fullName: 'Dr. Meera Sundaram', role: 'hospital', facilityKey: 'AUROVILLE_HC', stateCode: 'PY' },
-
-    // 4. Hospital Nodes - Tamil Nadu (including Adjacent Border Districts: Villupuram, Cuddalore, Auroville Border)
-    { username: 'hospital_cuddalore_01', password: 'BHISSM@Demo#C01', fullName: 'Dr. Suresh Babu', role: 'hospital', facilityKey: 'GH_CDL', stateCode: 'TN' },
-    { username: 'hospital_villupuram_01', password: 'BHISSM@Demo#V01', fullName: 'Dr. Kavitha Devi', role: 'hospital', facilityKey: 'GH_VLR', stateCode: 'TN' },
-    { username: 'hospital_santigiri_01', password: 'BHISSM@Demo#AV02', fullName: 'Dr. S. Prakash', role: 'hospital', facilityKey: 'AUROVILLE_SANTIGIRI', stateCode: 'TN' },
-    { username: 'hospital_stanley_01', password: 'BHISSM@Demo#TN01', fullName: 'Dr. Rajesh Venkataraman', role: 'hospital', facilityKey: 'STANLEY_CHN', stateCode: 'TN' },
-    { username: 'hospital_rajivgandhi_01', password: 'BHISSM@Demo#TN02', fullName: 'Dr. Aruna Chandrasekar', role: 'hospital', facilityKey: 'RAJIV_CHN', stateCode: 'TN' },
-
-    // 5. Hospital Nodes - Karnataka
-    { username: 'hospital_victoria_01', password: 'BHISSM@Demo#KA01', fullName: 'Dr. Gururaj Patil', role: 'hospital', facilityKey: 'VICTORIA_BLR', stateCode: 'KA' },
-    { username: 'hospital_bowring_01', password: 'BHISSM@Demo#KA02', fullName: 'Dr. Deepa Shivanand', role: 'hospital', facilityKey: 'BOWRING_BLR', stateCode: 'KA' },
-
-    // 6. Hospital Nodes - Andhra, Kerala, Maharashtra
-    { username: 'hospital_kgh_01', password: 'BHISSM@Demo#AP01', fullName: 'Dr. K. Subba Rao', role: 'hospital', facilityKey: 'KGH_VSP', stateCode: 'AP' },
-    { username: 'hospital_gmct_01', password: 'BHISSM@Demo#KL01', fullName: 'Dr. Thomas Mathew', role: 'hospital', facilityKey: 'GMC_TVM', stateCode: 'KL' },
-    { username: 'hospital_kem_01', password: 'BHISSM@Demo#MH01', fullName: 'Dr. Hemant Kulkarni', role: 'hospital', facilityKey: 'KEM_MUM', stateCode: 'MH' },
+  const userData: Array<{
+    username: string;
+    password: string;
+    fullName: string;
+    role: string;
+    facilityKey: string | null;
+    stateCode: string;
+  }> = [
+    // 5.1 National Command
+    {
+      username: 'national_monitor_01',
+      password: 'BHISSM@National#01',
+      fullName: 'National Strategic Stockpile Monitor',
+      role: 'national',
+      facilityKey: 'NATIONAL_STORE',
+      stateCode: 'NA',
+    },
+    {
+      username: 'national_director_01',
+      password: 'BHISSM@National#Dir01',
+      fullName: 'National Health Logistics Directorate',
+      role: 'national',
+      facilityKey: 'NATIONAL_STORE',
+      stateCode: 'NA',
+    },
   ];
+
+  // 5.2 State Command Admin for EVERY single State and UT (36 Admins)
+  for (const s of ALL_STATES) {
+    if (s.code === 'NA') continue;
+    userData.push({
+      username: `state_${s.code.toLowerCase()}_admin`,
+      password: `BHISSM@State#${s.code}`,
+      fullName: `${s.name} ${s.type === 'ut' ? 'UT' : 'State'} Health Command`,
+      role: 'state',
+      facilityKey: null,
+      stateCode: s.code,
+    });
+  }
+
+  // 5.3 Hospital Nodes for Key Testing Facilities Across States
+  const hospitalUserDefs: Array<{
+    username: string;
+    password: string;
+    facilityKey: string;
+    fullName: string;
+    stateCode: string;
+  }> = [
+    // Delhi
+    { username: 'hospital_aiims_01', password: 'BHISSM@Demo#DL01', facilityKey: 'DL_AIIMS', fullName: 'AIIMS New Delhi Command Node', stateCode: 'DL' },
+    { username: 'hospital_sjh_01', password: 'BHISSM@Demo#DL02', facilityKey: 'DL_SJH', fullName: 'Safdarjung Hospital Node', stateCode: 'DL' },
+    // Uttar Pradesh
+    { username: 'hospital_kgmu_01', password: 'BHISSM@Demo#UP01', facilityKey: 'UP_KGMU', fullName: 'KGMU Lucknow Command Node', stateCode: 'UP' },
+    { username: 'hospital_rmlims_01', password: 'BHISSM@Demo#UP02', facilityKey: 'UP_RMLIMS', fullName: 'RMLIMS Lucknow Node', stateCode: 'UP' },
+    // Maharashtra
+    { username: 'hospital_kem_01', password: 'BHISSM@Demo#MH01', facilityKey: 'KEM_MUM', fullName: 'KEM Hospital Mumbai Command Node', stateCode: 'MH' },
+    { username: 'hospital_jj_01', password: 'BHISSM@Demo#MH02', facilityKey: 'MH_JJ_MUM', fullName: 'Sir JJ Hospital Mumbai Node', stateCode: 'MH' },
+    // Puducherry
+    { username: 'hospital_jipmer_01', password: 'BHISSM@Demo#J01', facilityKey: 'JIPMER', fullName: 'JIPMER Apex Hospital Command Node', stateCode: 'PY' },
+    { username: 'hospital_puducherry_01', password: 'BHISSM@Demo#P01', facilityKey: 'GH_PY', fullName: 'Government General Hospital Puducherry Node', stateCode: 'PY' },
+    { username: 'hospital_igmcri_01', password: 'BHISSM@Demo#IGM01', facilityKey: 'IGMCRI_PY', fullName: 'IGMCRI Govt Medical College Node', stateCode: 'PY' },
+    { username: 'hospital_pims_01', password: 'BHISSM@Demo#PIMS01', facilityKey: 'PIMS_PY', fullName: 'PIMS Kalapet Medical College Node', stateCode: 'PY' },
+    { username: 'hospital_smvmch_01', password: 'BHISSM@Demo#SMV01', facilityKey: 'SMVMCH_PY', fullName: 'Sri Manakula Vinayagar SMVMCH Node', stateCode: 'PY' },
+    { username: 'hospital_rggwch_01', password: 'BHISSM@Demo#RGW01', facilityKey: 'RGGWCH_PY', fullName: 'Rajiv Gandhi Govt Women & Children Hospital Node', stateCode: 'PY' },
+    { username: 'hospital_eastcoast_01', password: 'BHISSM@Demo#ECH01', facilityKey: 'EAST_COAST_PY', fullName: 'East Coast Multi-Specialty Hospital Node', stateCode: 'PY' },
+    { username: 'hospital_auroville_01', password: 'BHISSM@Demo#AV01', facilityKey: 'AUROVILLE_HC', fullName: 'Auroville Health Centre Node', stateCode: 'PY' },
+    // Tamil Nadu & Regional Corridor
+    { username: 'hospital_rajivgandhi_01', password: 'BHISSM@Demo#TN02', facilityKey: 'RAJIV_CHN', fullName: 'Rajiv Gandhi Govt General Hospital Node', stateCode: 'TN' },
+    { username: 'hospital_stanley_01', password: 'BHISSM@Demo#TN01', facilityKey: 'STANLEY_CHN', fullName: 'Govt Stanley Medical College Hospital Node', stateCode: 'TN' },
+    { username: 'hospital_mh_chennai_01', password: 'BHISSM@Demo#MH01', facilityKey: 'MILITARY_HOSP_CHN', fullName: 'Military Hospital Chennai (Defence) Command Node', stateCode: 'TN' },
+    { username: 'hospital_railway_perambur_01', password: 'BHISSM@Demo#SR01', facilityKey: 'RAILWAY_HOSP_PER', fullName: 'Southern Railway HQ Hospital Perambur Node', stateCode: 'TN' },
+    { username: 'hospital_apollo_chennai_01', password: 'BHISSM@Demo#APO01', facilityKey: 'APOLLO_MAIN_CHN', fullName: 'Apollo Hospitals Main Greams Road Node', stateCode: 'TN' },
+    { username: 'hospital_miot_chennai_01', password: 'BHISSM@Demo#MIOT01', facilityKey: 'MIOT_INTERNATIONAL', fullName: 'MIOT International Multi-Speciality Node', stateCode: 'TN' },
+    { username: 'hospital_esic_kknagar_01', password: 'BHISSM@Demo#ESI01', facilityKey: 'ESIC_KKNAGAR', fullName: 'ESIC Super Specialty Hospital K.K. Nagar Node', stateCode: 'TN' },
+    { username: 'hospital_villupuram_01', password: 'BHISSM@Demo#V01', facilityKey: 'GH_VLR', fullName: 'Villupuram Govt Medical College Hospital Node', stateCode: 'TN' },
+    { username: 'hospital_slims_01', password: 'BHISSM@Demo#SLM01', facilityKey: 'SLIMS_OSUDU', fullName: 'Sri Lakshmi Narayana SLIMS Medical College Node', stateCode: 'TN' },
+    { username: 'hospital_tindivanam_01', password: 'BHISSM@Demo#TIN01', facilityKey: 'GH_TINDIVANAM', fullName: 'Tindivanam District HQ Hospital Node', stateCode: 'TN' },
+    { username: 'hospital_cuddalore_01', password: 'BHISSM@Demo#C01', facilityKey: 'GH_CDL', fullName: 'Cuddalore District General Hospital Node', stateCode: 'TN' },
+    { username: 'hospital_rmmch_01', password: 'BHISSM@Demo#RMM01', facilityKey: 'RMMCH_CHIDAMBARAM', fullName: 'Rajah Muthiah GMC Chidambaram Node', stateCode: 'TN' },
+    { username: 'hospital_stjoseph_01', password: 'BHISSM@Demo#STJ01', facilityKey: 'ST_JOSEPH_CDL', fullName: "St. Joseph's Multi Speciality Hospital Node", stateCode: 'TN' },
+    { username: 'hospital_panruti_01', password: 'BHISSM@Demo#PAN01', facilityKey: 'GH_PANRUTI', fullName: 'Panruti Government Taluk Hospital Node', stateCode: 'TN' },
+    { username: 'hospital_santigiri_01', password: 'BHISSM@Demo#AV02', facilityKey: 'AUROVILLE_SANTIGIRI', fullName: 'Santigiri Healing Centre Node', stateCode: 'TN' },
+    // Karnataka
+    { username: 'hospital_victoria_01', password: 'BHISSM@Demo#KA01', facilityKey: 'VICTORIA_BLR', fullName: 'Victoria Hospital Bengaluru Command Node', stateCode: 'KA' },
+    { username: 'hospital_bowring_01', password: 'BHISSM@Demo#KA02', facilityKey: 'BOWRING_BLR', fullName: 'Bowring & Lady Curzon Hospital Node', stateCode: 'KA' },
+    // Kerala
+    { username: 'hospital_gmct_01', password: 'BHISSM@Demo#KL01', facilityKey: 'GMC_TVM', fullName: 'Govt Medical College Thiruvananthapuram Node', stateCode: 'KL' },
+    // Andhra Pradesh
+    { username: 'hospital_kgh_01', password: 'BHISSM@Demo#AP01', facilityKey: 'KGH_VSP', fullName: 'King George Hospital Visakhapatnam Node', stateCode: 'AP' },
+    // Telangana
+    { username: 'hospital_osmania_01', password: 'BHISSM@Demo#TG01', facilityKey: 'TG_OSMANIA', fullName: 'Osmania General Hospital Hyderabad Node', stateCode: 'TG' },
+    // Gujarat
+    { username: 'hospital_civil_ahm_01', password: 'BHISSM@Demo#GJ01', facilityKey: 'GJ_CIVIL_AHM', fullName: 'Civil Hospital Ahmedabad Node', stateCode: 'GJ' },
+    // Rajasthan
+    { username: 'hospital_sms_01', password: 'BHISSM@Demo#RJ01', facilityKey: 'RJ_SMS_JAI', fullName: 'SMS Medical College Hospital Jaipur Node', stateCode: 'RJ' },
+    // West Bengal
+    { username: 'hospital_calcutta_mc_01', password: 'BHISSM@Demo#WB01', facilityKey: 'WB_CMC', fullName: 'Calcutta Medical College Hospital Node', stateCode: 'WB' },
+    // Bihar
+    { username: 'hospital_pmch_01', password: 'BHISSM@Demo#BR01', facilityKey: 'BR_PMCH', fullName: 'Patna Medical College Hospital Node', stateCode: 'BR' },
+    // Madhya Pradesh
+    { username: 'hospital_hamidia_01', password: 'BHISSM@Demo#MP01', facilityKey: 'MP_HAMIDIA', fullName: 'Hamidia Hospital Bhopal Node', stateCode: 'MP' },
+    // Odisha
+    { username: 'hospital_scb_01', password: 'BHISSM@Demo#OD01', facilityKey: 'OD_SCB_CTC', fullName: 'SCB Medical College Hospital Cuttack Node', stateCode: 'OD' },
+    // Assam
+    { username: 'hospital_gmch_01', password: 'BHISSM@Demo#AS01', facilityKey: 'AS_GMCH', fullName: 'Gauhati Medical College Hospital Node', stateCode: 'AS' },
+    // Chandigarh
+    { username: 'hospital_pgimer_01', password: 'BHISSM@Demo#CH01', facilityKey: 'CH_PGIMER', fullName: 'PGIMER Chandigarh Apex Node', stateCode: 'CH' },
+    // Jammu & Kashmir
+    { username: 'hospital_gmc_jammu_01', password: 'BHISSM@Demo#JK01', facilityKey: 'JK_GMC_JAM', fullName: 'GMC Hospital Jammu Node', stateCode: 'JK' },
+    // Uttarakhand
+    { username: 'hospital_doon_01', password: 'BHISSM@Demo#UK01', facilityKey: 'UK_DOON', fullName: 'Govt Doon Hospital Dehradun Node', stateCode: 'UK' },
+  ];
+
+  for (const h of hospitalUserDefs) {
+    userData.push({
+      username: h.username,
+      password: h.password,
+      fullName: h.fullName,
+      role: 'hospital',
+      facilityKey: h.facilityKey,
+      stateCode: h.stateCode,
+    });
+  }
 
   for (const u of userData) {
     const hash = defaultPasswordHash(u.password);
+    const facId = u.facilityKey ? facilityMap[u.facilityKey] || null : null;
+    const sId = states[u.stateCode] || null;
+
     await prisma.user.upsert({
       where: { username: u.username },
       update: {
         passwordHash: hash,
         fullName: u.fullName,
         role: u.role,
-        facilityId: u.facilityKey ? facilityMap[u.facilityKey] : null,
-        stateId: states[u.stateCode],
+        facilityId: facId,
+        stateId: sId,
       },
       create: {
         username: u.username,
         passwordHash: hash,
         fullName: u.fullName,
         role: u.role,
-        facilityId: u.facilityKey ? facilityMap[u.facilityKey] : null,
-        stateId: states[u.stateCode],
+        facilityId: facId,
+        stateId: sId,
       },
     });
   }
 
-  // ─── 30 Essential Medicines & Vaccines Catalog ────────────────────────────
+  // ─── 6. 33 Essential Medicines & Vaccines Catalog ──────────────────────────
   const medicineData = [
     // Antibiotics (10)
     { key: 'AZITH500', name: 'Azithromycin 500mg', genericName: 'Azithromycin Dihydrate', strength: '500mg', dosageForm: 'tablet', category: 'antibiotic', unitType: 'tablet', criticality: 'high', storageRequirement: 'room_temperature', isVaccine: 0 },
@@ -213,7 +290,7 @@ export async function seed() {
     { key: 'MEROP1G', name: 'Meropenem 1g IV Injection', genericName: 'Meropenem Trihydrate', strength: '1g/vial', dosageForm: 'injection', category: 'antibiotic', unitType: 'vial', criticality: 'critical', storageRequirement: 'room_temperature', isVaccine: 0 },
     { key: 'VANCO500', name: 'Vancomycin 500mg IV Injection', genericName: 'Vancomycin HCl', strength: '500mg', dosageForm: 'injection', category: 'antibiotic', unitType: 'vial', criticality: 'critical', storageRequirement: 'room_temperature', isVaccine: 0 },
 
-    // Emergency & Critical Care Fluids / Resuscitation (9)
+    // Emergency & Resuscitation Fluids / Critical Care (9)
     { key: 'ORS', name: 'ORS Sachet (WHO Formula)', genericName: 'Oral Rehydration Salts', strength: '20.5g/sachet', dosageForm: 'sachet', category: 'emergency', unitType: 'sachet', criticality: 'critical', storageRequirement: 'room_temperature', isVaccine: 0 },
     { key: 'RINGER', name: "Ringer's Lactate 500ml IV", genericName: 'Compound Sodium Lactate', strength: '500ml', dosageForm: 'infusion', category: 'emergency', unitType: 'bottle', criticality: 'critical', storageRequirement: 'room_temperature', isVaccine: 0 },
     { key: 'SALINE', name: 'Normal Saline 0.9% 500ml IV', genericName: 'Sodium Chloride 0.9%', strength: '500ml', dosageForm: 'infusion', category: 'emergency', unitType: 'bottle', criticality: 'critical', storageRequirement: 'room_temperature', isVaccine: 0 },
@@ -266,84 +343,128 @@ export async function seed() {
     medicineMap[m.key] = med.id;
   }
 
-  // ─── Comprehensive Inventory Seeding Across Major Hospitals (25+ Medicines Each) ───
+  const allMeds = await prisma.medicine.findMany({ where: { isActive: 1 } });
+
+  // ─── 7. Provision ALL 36 State & UT Reserve Depots with Baseline Stockpiles ──
+  console.log('📦 Provisioning State Medical Reserve Depots across all 36 States & UTs...');
+  const now = new Date();
+  const expDate = new Date(now.getTime() + 450 * 86400000);
+
+  for (const [code, depotId] of Object.entries(depotMap)) {
+    const stateObj = ALL_STATES.find((s) => s.code === code);
+    if (!stateObj) continue;
+
+    const existingInvs = await prisma.inventory.findMany({ where: { facilityId: depotId } });
+    const existingMedIds = new Set(existingInvs.map((i) => i.medicineId));
+
+    for (const med of allMeds) {
+      const baseStock = med.criticality === 'critical' ? 12000 : med.criticality === 'high' ? 8000 : 5000;
+
+      if (!existingMedIds.has(med.id)) {
+        const inv = await prisma.inventory.create({
+          data: {
+            facilityId: depotId,
+            medicineId: med.id,
+            currentStock: baseStock,
+            reservedStock: 0,
+            safetyThreshold: 1000,
+            reorderLevel: 1500,
+            avgDailyConsumption: 50,
+            leadTimeDays: 5,
+            emergencyLeadTimeDays: 2,
+            supplier: 'Central Strategic Medical Services Corporation',
+            deliveryReliability: 0.98,
+          },
+        });
+
+        await prisma.inventoryBatch.create({
+          data: {
+            inventoryId: inv.id,
+            facilityId: depotId,
+            medicineId: med.id,
+            batchNumber: `SR-${code}-${med.name.slice(0, 3).toUpperCase()}-01`,
+            manufacturer: `${stateObj.name} State Reserve Stockpile`,
+            receivedDate: now,
+            expiryDate: expDate,
+            quantity: baseStock,
+            reservedQuantity: 0,
+            storageLocation: med.isVaccine ? 'State Cold-Chain Vault (2-8°C)' : 'State Reserve Bay A',
+            status: 'usable',
+          },
+        });
+      } else {
+        const inv = existingInvs.find((i) => i.medicineId === med.id);
+        if (inv && inv.currentStock < 1000) {
+          await prisma.inventory.update({
+            where: { id: inv.id },
+            data: { currentStock: baseStock },
+          });
+        }
+      }
+    }
+  }
+
+  // ─── 8. Provision Hospital Inventories & FEFO Batches Across All Hospitals ──
+  console.log('🏥 Provisioning Essential Inventories, Batches, Capacities & Ambulances across 100+ Hospitals...');
+
   const baselineTemplates = [
-    { key: 'AZITH500', baseStock: 8500, safety: 1500, avgDaily: 110, lead: 7, mfr: 'Cipla Ltd' },
-    { key: 'AZITH250', baseStock: 6200, safety: 1000, avgDaily: 80, lead: 7, mfr: 'Alembic Pharma' },
-    { key: 'AMOX500', baseStock: 12000, safety: 2000, avgDaily: 150, lead: 8, mfr: 'Alkem Labs' },
-    { key: 'AUGM625', baseStock: 5400, safety: 1200, avgDaily: 95, lead: 8, mfr: 'GSK India' },
-    { key: 'CEFTR1G', baseStock: 3200, safety: 800, avgDaily: 65, lead: 5, mfr: 'Lupin Ltd' },
-    { key: 'CIPRO500', baseStock: 7800, safety: 1400, avgDaily: 90, lead: 7, mfr: 'Ranbaxy / Sun' },
-    { key: 'DOXY100', baseStock: 6500, safety: 1000, avgDaily: 70, lead: 7, mfr: 'Dr. Reddys' },
-    { key: 'METRO400', baseStock: 9000, safety: 1500, avgDaily: 120, lead: 6, mfr: 'JB Chemicals' },
-    { key: 'MEROP1G', baseStock: 650, safety: 200, avgDaily: 18, lead: 5, mfr: 'Cipla Criticare' },
-    { key: 'VANCO500', baseStock: 480, safety: 150, avgDaily: 12, lead: 6, mfr: 'Viatris' },
-    { key: 'ORS', baseStock: 14500, safety: 2500, avgDaily: 210, lead: 4, mfr: 'FDC Electral' },
-    { key: 'RINGER', baseStock: 4800, safety: 900, avgDaily: 85, lead: 5, mfr: 'Baxter India' },
-    { key: 'SALINE', baseStock: 6200, safety: 1100, avgDaily: 110, lead: 5, mfr: 'Fresenius Kabi' },
-    { key: 'DNS500', baseStock: 3400, safety: 700, avgDaily: 60, lead: 5, mfr: 'Baxter India' },
-    { key: 'ADRENA', baseStock: 520, safety: 120, avgDaily: 10, lead: 5, mfr: 'Neon Labs' },
-    { key: 'ATROP', baseStock: 450, safety: 100, avgDaily: 8, lead: 5, mfr: 'Neon Labs' },
-    { key: 'DEXMETH', baseStock: 1800, safety: 400, avgDaily: 35, lead: 6, mfr: 'Zydus Cadila' },
-    { key: 'HYDRO100', baseStock: 950, safety: 250, avgDaily: 22, lead: 6, mfr: 'Abbott India' },
-    { key: 'ASV_POLY', baseStock: 180, safety: 60, avgDaily: 4, lead: 10, mfr: 'Bharat Serums' },
-    { key: 'PARA500', baseStock: 25000, safety: 4000, avgDaily: 320, lead: 5, mfr: 'Micro Labs (Dolo)' },
-    { key: 'DICLO50', baseStock: 8200, safety: 1500, avgDaily: 105, lead: 6, mfr: 'Novartis / Torrent' },
-    { key: 'MORPH', baseStock: 320, safety: 100, avgDaily: 6, lead: 12, mfr: 'Verve Healthcare' },
-    { key: 'PANT40', baseStock: 11000, safety: 2000, avgDaily: 140, lead: 6, mfr: 'Alkem (Pan-40)' },
-    { key: 'ONDAN4', baseStock: 4200, safety: 800, avgDaily: 55, lead: 6, mfr: 'Cipla (Emeset)' },
-    { key: 'INS_REG', baseStock: 850, safety: 200, avgDaily: 16, lead: 9, mfr: 'Biocon Insugen' },
-    { key: 'METFOR500', baseStock: 16000, safety: 3000, avgDaily: 190, lead: 7, mfr: 'USV (Glycomet)' },
-    { key: 'AMLOD5', baseStock: 13500, safety: 2500, avgDaily: 160, lead: 7, mfr: 'Pfizer / Cipla' },
-    { key: 'ATORVA20', baseStock: 9800, safety: 1800, avgDaily: 115, lead: 7, mfr: 'Ranbaxy / Lupin' },
-    { key: 'FURO40', baseStock: 4400, safety: 800, avgDaily: 50, lead: 6, mfr: 'Sanofi India' },
-    { key: 'POLIO_VAC', baseStock: 2200, safety: 400, avgDaily: 30, lead: 10, mfr: 'Serum Institute' },
-    { key: 'MEASLES_VAC', baseStock: 1500, safety: 300, avgDaily: 22, lead: 10, mfr: 'Serum Institute' },
-    { key: 'HEPA_VAC', baseStock: 1800, safety: 350, avgDaily: 25, lead: 10, mfr: 'Bharat Biotech' },
-    { key: 'TT_VAC', baseStock: 2600, safety: 500, avgDaily: 35, lead: 8, mfr: 'Biological E' },
+    { key: 'AZITH500', baseStock: 6500, safety: 1200, avgDaily: 90, lead: 7, mfr: 'Cipla Ltd' },
+    { key: 'AMOX500', baseStock: 9000, safety: 1500, avgDaily: 120, lead: 8, mfr: 'Alkem Labs' },
+    { key: 'AUGM625', baseStock: 4500, safety: 1000, avgDaily: 80, lead: 8, mfr: 'GSK India' },
+    { key: 'CEFTR1G', baseStock: 2800, safety: 700, avgDaily: 55, lead: 5, mfr: 'Lupin Ltd' },
+    { key: 'CIPRO500', baseStock: 6200, safety: 1100, avgDaily: 75, lead: 7, mfr: 'Sun Pharma' },
+    { key: 'MEROP1G', baseStock: 500, safety: 150, avgDaily: 14, lead: 5, mfr: 'Cipla Criticare' },
+    { key: 'VANCO500', baseStock: 400, safety: 120, avgDaily: 10, lead: 6, mfr: 'Viatris' },
+    { key: 'ORS', baseStock: 12000, safety: 2000, avgDaily: 180, lead: 4, mfr: 'FDC Electral' },
+    { key: 'RINGER', baseStock: 4200, safety: 800, avgDaily: 75, lead: 5, mfr: 'Baxter India' },
+    { key: 'SALINE', baseStock: 5500, safety: 1000, avgDaily: 95, lead: 5, mfr: 'Fresenius Kabi' },
+    { key: 'DNS500', baseStock: 3000, safety: 600, avgDaily: 50, lead: 5, mfr: 'Baxter India' },
+    { key: 'ADRENA', baseStock: 450, safety: 100, avgDaily: 8, lead: 5, mfr: 'Neon Labs' },
+    { key: 'ATROP', baseStock: 380, safety: 80, avgDaily: 7, lead: 5, mfr: 'Neon Labs' },
+    { key: 'DEXMETH', baseStock: 1500, safety: 350, avgDaily: 30, lead: 6, mfr: 'Zydus Cadila' },
+    { key: 'HYDRO100', baseStock: 800, safety: 200, avgDaily: 18, lead: 6, mfr: 'Abbott India' },
+    { key: 'ASV_POLY', baseStock: 160, safety: 50, avgDaily: 3, lead: 10, mfr: 'Bharat Serums' },
+    { key: 'PARA500', baseStock: 20000, safety: 3500, avgDaily: 280, lead: 5, mfr: 'Micro Labs' },
+    { key: 'DICLO50', baseStock: 7000, safety: 1200, avgDaily: 90, lead: 6, mfr: 'Novartis' },
+    { key: 'MORPH', baseStock: 280, safety: 80, avgDaily: 5, lead: 12, mfr: 'Verve Healthcare' },
+    { key: 'PANT40', baseStock: 9500, safety: 1800, avgDaily: 120, lead: 6, mfr: 'Alkem' },
+    { key: 'ONDAN4', baseStock: 3600, safety: 700, avgDaily: 45, lead: 6, mfr: 'Cipla' },
+    { key: 'INS_REG', baseStock: 750, safety: 180, avgDaily: 14, lead: 9, mfr: 'Biocon' },
+    { key: 'METFOR500', baseStock: 14000, safety: 2500, avgDaily: 170, lead: 7, mfr: 'USV' },
+    { key: 'AMLOD5', baseStock: 11000, safety: 2000, avgDaily: 140, lead: 7, mfr: 'Pfizer' },
+    { key: 'ATORVA20', baseStock: 8500, safety: 1500, avgDaily: 100, lead: 7, mfr: 'Lupin' },
+    { key: 'FURO40', baseStock: 3800, safety: 700, avgDaily: 45, lead: 6, mfr: 'Sanofi' },
+    { key: 'POLIO_VAC', baseStock: 1800, safety: 350, avgDaily: 25, lead: 10, mfr: 'Serum Institute' },
+    { key: 'MEASLES_VAC', baseStock: 1200, safety: 250, avgDaily: 18, lead: 10, mfr: 'Serum Institute' },
+    { key: 'HEPA_VAC', baseStock: 1500, safety: 300, avgDaily: 20, lead: 10, mfr: 'Bharat Biotech' },
+    { key: 'TT_VAC', baseStock: 2200, safety: 400, avgDaily: 30, lead: 8, mfr: 'Biological E' },
   ];
 
-  const hospitalConfigs = [
-    { facKey: 'JIPMER', scale: 1.3, supplier: 'Central Medical Store / TNMSC', lowKeys: ['MEROP1G', 'ASV_POLY'] },
-    { facKey: 'PIMS_PY', scale: 1.15, supplier: 'PIMS Pharmacy & Puducherry Medical Store', lowKeys: ['VANCO500', 'ASV_POLY'] },
-    { facKey: 'RGGWCH_PY', scale: 0.95, supplier: 'DHS Puducherry Maternal & Child Store', lowKeys: ['AZITH250', 'CEFTR1G'] },
-    { facKey: 'EAST_COAST_PY', scale: 0.85, supplier: 'East Coast Critical Care Pharmacy', lowKeys: ['MEROP1G', 'ADRENA'] },
-    { facKey: 'AUROVILLE_HC', scale: 0.6, supplier: 'Auroville Integral Health Pharmacy', lowKeys: ['AZITH500', 'ORS'] },
-    { facKey: 'AUROVILLE_SANTIGIRI', scale: 0.6, supplier: 'TNMSC Villupuram / Auroville Trust', lowKeys: ['RINGER'] },
-    { facKey: 'GH_PY', scale: 0.85, supplier: 'DHS Puducherry Medical Store', lowKeys: ['AZITH500', 'ADRENA', 'CEFTR1G'] },
-    { facKey: 'IGMCRI', scale: 0.75, supplier: 'DHS Puducherry', lowKeys: ['VANCO500'] },
-    { facKey: 'STANLEY_CHN', scale: 1.4, supplier: 'TNMSC Chennai Depot', lowKeys: ['ORS', 'INS_REG'] },
-    { facKey: 'RAJIV_CHN', scale: 1.6, supplier: 'TNMSC Central Warehouse', lowKeys: ['MEROP1G'] },
-    { facKey: 'GH_VLR', scale: 0.65, supplier: 'TNMSC Villupuram', lowKeys: ['AZITH500', 'RINGER'] },
-    { facKey: 'GH_CDL', scale: 0.7, supplier: 'TNMSC Cuddalore', lowKeys: ['AMOX500', 'ORS'] },
-    { facKey: 'VICTORIA_BLR', scale: 1.35, supplier: 'KSMSCL Bengaluru', lowKeys: ['CEFTR1G', 'ASV_POLY'] },
-    { facKey: 'BOWRING_BLR', scale: 0.8, supplier: 'KSMSCL Bengaluru', lowKeys: ['AZITH500', 'AMOX500'] },
-    { facKey: 'KGH_VSP', scale: 1.1, supplier: 'APMSIDC Visakhapatnam', lowKeys: ['RINGER'] },
-    { facKey: 'GMC_TVM', scale: 1.15, supplier: 'KMSCL Thiruvananthapuram', lowKeys: ['INS_REG'] },
-    { facKey: 'KEM_MUM', scale: 1.5, supplier: 'Haffkine / BMSICL Mumbai', lowKeys: ['VANCO500'] },
-  ];
-
-  for (const hc of hospitalConfigs) {
-    const facId = facilityMap[hc.facKey];
+  for (const h of ALL_HOSPITALS) {
+    if (h.key === 'NATIONAL_STORE') continue;
+    const facId = facilityMap[h.key];
     if (!facId) continue;
+
+    const existingInvs = await prisma.inventory.findMany({ where: { facilityId: facId } });
+    const existingMedIds = new Set(existingInvs.map((i) => i.medicineId));
+
+    // Scale inventory based on hospital tier
+    const scale = h.level === 'apex' ? 1.4 : h.level === 'state' ? 1.0 : 0.7;
 
     for (let idx = 0; idx < baselineTemplates.length; idx++) {
       const tpl = baselineTemplates[idx];
       const medId = medicineMap[tpl.key];
       if (!medId) continue;
 
-      const isLow = hc.lowKeys.includes(tpl.key);
-      const safety = Math.round(tpl.safety * hc.scale);
-      const stock = isLow ? Math.round(safety * 0.72) : Math.round(tpl.baseStock * hc.scale);
-      const reorder = Math.round(safety * 2.2);
-      const avgDaily = Math.max(2, Math.round(tpl.avgDaily * hc.scale));
+      if (!existingMedIds.has(medId)) {
+        const safety = Math.round(tpl.safety * scale);
+        // Introduce small deficits on 2 medicines to show active reorder & redistribution alerts
+        const isDeficit = idx === 5 || idx === 15;
+        const stock = isDeficit ? Math.round(safety * 0.65) : Math.round(tpl.baseStock * scale);
+        const reorder = Math.round(safety * 2.2);
+        const avgDaily = Math.max(2, Math.round(tpl.avgDaily * scale));
 
-      let inv = await prisma.inventory.findUnique({
-        where: { facilityId_medicineId: { facilityId: facId, medicineId: medId } },
-      });
-
-      if (!inv) {
-        inv = await prisma.inventory.create({
+        const inv = await prisma.inventory.create({
           data: {
             facilityId: facId,
             medicineId: medId,
@@ -352,35 +473,15 @@ export async function seed() {
             reorderLevel: reorder,
             avgDailyConsumption: avgDaily,
             leadTimeDays: tpl.lead,
-            supplier: hc.supplier,
+            supplier: `${h.state} State Health Logistics`,
           },
         });
-      } else {
-        inv = await prisma.inventory.update({
-          where: { id: inv.id },
-          data: {
-            currentStock: stock,
-            safetyThreshold: safety,
-            reorderLevel: reorder,
-            avgDailyConsumption: avgDaily,
-          },
-        });
-      }
 
-      // Ensure at least 2 FEFO batches exist per medicine for realistic FEFO rotation
-      const batch1Code = `LOT-${tpl.key.slice(0, 5)}-${hc.facKey.slice(0, 4)}-A`;
-      const batch2Code = `LOT-${tpl.key.slice(0, 5)}-${hc.facKey.slice(0, 4)}-B`;
-
-      const existingBatch = await prisma.inventoryBatch.findFirst({
-        where: { inventoryId: inv.id },
-      });
-
-      if (!existingBatch) {
-        const q1 = Math.round(stock * 0.35);
+        // 2 Batches per medicine for realistic FEFO rotation
+        const q1 = Math.round(stock * 0.4);
         const q2 = stock - q1;
-        // Make some batches expire within 25 days to trigger 30-day FEFO warnings
-        const exp1 = idx % 7 === 0 ? new Date(Date.now() + 22 * 86400000) : new Date('2026-12-31');
-        const exp2 = new Date('2027-06-30');
+        const exp1 = idx % 4 === 0 ? new Date(Date.now() + 24 * 86400000) : new Date('2026-11-30');
+        const exp2 = new Date('2027-07-31');
 
         await prisma.inventoryBatch.createMany({
           data: [
@@ -388,9 +489,9 @@ export async function seed() {
               inventoryId: inv.id,
               facilityId: facId,
               medicineId: medId,
-              batchNumber: batch1Code,
+              batchNumber: `LOT-${tpl.key.slice(0, 4)}-${h.key.slice(0, 3)}-A`,
               manufacturer: tpl.mfr,
-              receivedDate: new Date('2025-01-15'),
+              receivedDate: new Date('2025-01-20'),
               expiryDate: exp1,
               quantity: q1,
               status: 'usable',
@@ -399,9 +500,9 @@ export async function seed() {
               inventoryId: inv.id,
               facilityId: facId,
               medicineId: medId,
-              batchNumber: batch2Code,
+              batchNumber: `LOT-${tpl.key.slice(0, 4)}-${h.key.slice(0, 3)}-B`,
               manufacturer: tpl.mfr,
-              receivedDate: new Date('2025-03-10'),
+              receivedDate: new Date('2025-03-01'),
               expiryDate: exp2,
               quantity: q2,
               status: 'usable',
@@ -410,202 +511,97 @@ export async function seed() {
         });
       }
     }
-  }
 
-  // Seed 14-day consumption records so Forecast Engine has rich data across hospitals
-  const forecastFacilities = [
-    'GH_PY',
-    'JIPMER',
-    'PIMS_PY',
-    'RGGWCH_PY',
-    'EAST_COAST_PY',
-    'AUROVILLE_HC',
-    'GH_VLR',
-    'GH_CDL',
-    'VICTORIA_BLR',
-    'STANLEY_CHN',
-  ];
-  for (const fKey of forecastFacilities) {
-    const facId = facilityMap[fKey];
-    if (!facId) continue;
-    const existingCount = await prisma.consumptionRecord.count({ where: { facilityId: facId } });
-    if (existingCount < 50) {
-      const recordsToInsert: any[] = [];
-      for (const tpl of baselineTemplates.slice(0, 18)) {
-        const medId = medicineMap[tpl.key];
-        if (!medId) continue;
-        for (let d = 14; d >= 1; d--) {
-          const dt = new Date(Date.now() - d * 86400000).toISOString().split('T')[0];
-          const variance = 0.85 + ((d * 7) % 30) / 100;
-          recordsToInsert.push({
+    // Hospital Capacity Beds
+    const totalBeds = h.level === 'apex' ? 650 : h.level === 'state' ? 400 : h.level === 'phc' ? 30 : 120;
+    const icuBeds = h.level === 'apex' ? 60 : h.level === 'state' ? 35 : h.level === 'phc' ? 2 : 12;
+    const traumaBeds = h.level === 'apex' ? 40 : h.level === 'state' ? 25 : h.level === 'phc' ? 2 : 8;
+    const ventBeds = h.level === 'apex' ? 30 : h.level === 'state' ? 18 : h.level === 'phc' ? 1 : 6;
+
+    const capacities = [
+      { type: 'general', total: totalBeds, avail: Math.round(totalBeds * 0.18), occ: Math.round(totalBeds * 0.78), res: Math.round(totalBeds * 0.04) },
+      { type: 'icu', total: icuBeds, avail: Math.round(icuBeds * 0.15), occ: Math.round(icuBeds * 0.8), res: Math.round(icuBeds * 0.05) },
+      { type: 'trauma', total: traumaBeds, avail: Math.round(traumaBeds * 0.25), occ: Math.round(traumaBeds * 0.7), res: Math.round(traumaBeds * 0.05) },
+      { type: 'ventilator', total: ventBeds, avail: Math.round(ventBeds * 0.2), occ: Math.round(ventBeds * 0.75), res: Math.round(ventBeds * 0.05) },
+    ];
+
+    for (const c of capacities) {
+      await prisma.hospitalCapacity.upsert({
+        where: { facilityId_careType: { facilityId: facId, careType: c.type } },
+        update: { totalBeds: c.total, availableBeds: c.avail, occupiedBeds: c.occ, reservedBeds: c.res },
+        create: { facilityId: facId, careType: c.type, totalBeds: c.total, availableBeds: c.avail, occupiedBeds: c.occ, reservedBeds: c.res },
+      });
+    }
+
+    // Ambulances
+    const amb1Reg = `${h.state}01${h.key.slice(0, 3)}101`.toUpperCase();
+    const amb2Reg = `${h.state}01${h.key.slice(0, 3)}102`.toUpperCase();
+
+    await prisma.ambulance.upsert({
+      where: { registration: amb1Reg },
+      update: { status: 'available', currentZone: `${h.name.slice(0, 20)} Zone A` },
+      create: { facilityId: facId, registration: amb1Reg, ambulanceType: 'ALS', status: 'available', currentZone: `${h.name.slice(0, 20)} Zone A`, deploymentTimeMinutes: 15 },
+    });
+
+    await prisma.ambulance.upsert({
+      where: { registration: amb2Reg },
+      update: { status: 'available', currentZone: `${h.name.slice(0, 20)} Zone B` },
+      create: { facilityId: facId, registration: amb2Reg, ambulanceType: 'BLS', status: 'available', currentZone: `${h.name.slice(0, 20)} Zone B`, deploymentTimeMinutes: 15 },
+    });
+
+    // Blood Bank
+    if (h.hasBloodBank) {
+      const lic = `${h.state}/BB/${h.key.slice(0, 6)}/2022`;
+      let bb = await prisma.bloodBank.findFirst({ where: { licenseNumber: lic } });
+      if (!bb) {
+        bb = await prisma.bloodBank.create({
+          data: {
             facilityId: facId,
-            medicineId: medId,
-            date: dt,
-            quantity: Math.max(1, Math.round(tpl.avgDaily * variance)),
-          });
-        }
-      }
-      for (const rec of recordsToInsert) {
-        await prisma.consumptionRecord.upsert({
-          where: {
-            facilityId_medicineId_date: {
-              facilityId: rec.facilityId,
-              medicineId: rec.medicineId,
-              date: rec.date,
-            },
+            name: `${h.name} Blood Transfusion Center`,
+            type: 'government',
+            licenseNumber: lic,
+            isActive: 1,
           },
-          update: {},
-          create: rec,
+        });
+      }
+
+      const bloodStocks = [
+        { group: 'A+', comp: 'whole_blood', qty: 18 },
+        { group: 'A+', comp: 'packed_rbc', qty: 25 },
+        { group: 'B+', comp: 'packed_rbc', qty: 22 },
+        { group: 'O+', comp: 'packed_rbc', qty: 35 },
+        { group: 'O-', comp: 'packed_rbc', qty: 8 },
+        { group: 'AB+', comp: 'platelets', qty: 10 },
+      ];
+
+      for (const bs of bloodStocks) {
+        await prisma.bloodInventory.upsert({
+          where: { bloodBankId_bloodGroup_component: { bloodBankId: bb.id, bloodGroup: bs.group, component: bs.comp } },
+          update: { availableUnits: bs.qty },
+          create: {
+            bloodBankId: bb.id,
+            facilityId: facId,
+            bloodGroup: bs.group,
+            component: bs.comp,
+            availableUnits: bs.qty,
+            reservedUnits: 0,
+            status: bs.qty <= 2 ? 'critical' : bs.qty <= 5 ? 'low' : 'available',
+          },
         });
       }
     }
   }
 
-  // ─── Hospital Capacities ──────────────────────────────────────────────────
-  const capacityEntries = [
-    { fac: 'JIPMER', type: 'general', total: 450, avail: 82, occ: 348, res: 20 },
-    { fac: 'JIPMER', type: 'icu', total: 40, avail: 6, occ: 32, res: 2 },
-    { fac: 'JIPMER', type: 'trauma', total: 30, avail: 8, occ: 20, res: 2 },
-    { fac: 'JIPMER', type: 'ventilator', total: 20, avail: 4, occ: 14, res: 2 },
-    { fac: 'PIMS_PY', type: 'general', total: 380, avail: 68, occ: 294, res: 18 },
-    { fac: 'PIMS_PY', type: 'icu', total: 32, avail: 7, occ: 23, res: 2 },
-    { fac: 'PIMS_PY', type: 'trauma', total: 24, avail: 6, occ: 16, res: 2 },
-    { fac: 'PIMS_PY', type: 'ventilator', total: 16, avail: 4, occ: 11, res: 1 },
-    { fac: 'RGGWCH_PY', type: 'general', total: 340, avail: 55, occ: 270, res: 15 },
-    { fac: 'RGGWCH_PY', type: 'icu', total: 25, avail: 5, occ: 18, res: 2 },
-    { fac: 'RGGWCH_PY', type: 'pediatric', total: 120, avail: 22, occ: 92, res: 6 },
-    { fac: 'EAST_COAST_PY', type: 'general', total: 200, avail: 38, occ: 152, res: 10 },
-    { fac: 'EAST_COAST_PY', type: 'icu', total: 22, avail: 5, occ: 15, res: 2 },
-    { fac: 'EAST_COAST_PY', type: 'trauma', total: 16, avail: 4, occ: 11, res: 1 },
-    { fac: 'AUROVILLE_HC', type: 'general', total: 80, avail: 24, occ: 52, res: 4 },
-    { fac: 'AUROVILLE_HC', type: 'trauma', total: 10, avail: 4, occ: 5, res: 1 },
-    { fac: 'AUROVILLE_SANTIGIRI', type: 'general', total: 90, avail: 28, occ: 58, res: 4 },
-    { fac: 'GH_PY', type: 'general', total: 280, avail: 42, occ: 224, res: 14 },
-    { fac: 'GH_PY', type: 'icu', total: 16, avail: 3, occ: 12, res: 1 },
-    { fac: 'GH_PY', type: 'trauma', total: 18, avail: 5, occ: 12, res: 1 },
-    { fac: 'GH_VLR', type: 'general', total: 310, avail: 58, occ: 238, res: 14 },
-    { fac: 'GH_VLR', type: 'icu', total: 20, avail: 4, occ: 15, res: 1 },
-    { fac: 'GH_CDL', type: 'general', total: 290, avail: 50, occ: 226, res: 14 },
-    { fac: 'GH_CDL', type: 'icu', total: 18, avail: 4, occ: 13, res: 1 },
-    { fac: 'VICTORIA_BLR', type: 'general', total: 600, avail: 110, occ: 460, res: 30 },
-    { fac: 'VICTORIA_BLR', type: 'icu', total: 60, avail: 12, occ: 45, res: 3 },
-    { fac: 'VICTORIA_BLR', type: 'trauma', total: 50, avail: 15, occ: 32, res: 3 },
-    { fac: 'VICTORIA_BLR', type: 'ventilator', total: 35, avail: 8, occ: 25, res: 2 },
-    { fac: 'BOWRING_BLR', type: 'general', total: 320, avail: 55, occ: 250, res: 15 },
-    { fac: 'BOWRING_BLR', type: 'icu', total: 24, avail: 5, occ: 18, res: 1 },
-    { fac: 'STANLEY_CHN', type: 'general', total: 550, avail: 95, occ: 425, res: 30 },
-    { fac: 'STANLEY_CHN', type: 'icu', total: 50, avail: 9, occ: 39, res: 2 },
-    { fac: 'STANLEY_CHN', type: 'trauma', total: 40, avail: 11, occ: 27, res: 2 },
-    { fac: 'RAJIV_CHN', type: 'general', total: 750, avail: 135, occ: 580, res: 35 },
-    { fac: 'RAJIV_CHN', type: 'icu', total: 70, avail: 14, occ: 52, res: 4 },
-  ];
-
-  for (const c of capacityEntries) {
-    const facId = facilityMap[c.fac];
-    if (!facId) continue;
-    await prisma.hospitalCapacity.upsert({
-      where: { facilityId_careType: { facilityId: facId, careType: c.type } },
-      update: { totalBeds: c.total, availableBeds: c.avail, occupiedBeds: c.occ, reservedBeds: c.res },
-      create: { facilityId: facId, careType: c.type, totalBeds: c.total, availableBeds: c.avail, occupiedBeds: c.occ, reservedBeds: c.res },
-    });
-  }
-
-  // ─── Ambulances ───────────────────────────────────────────────────────────
-  const ambulanceEntries = [
-    { fac: 'JIPMER', reg: 'PY01AB1234', type: 'ALS', status: 'available', zone: 'Puducherry Central' },
-    { fac: 'JIPMER', reg: 'PY01AB1235', type: 'BLS', status: 'available', zone: 'Puducherry North' },
-    { fac: 'PIMS_PY', reg: 'PY01PM2001', type: 'ALS', status: 'available', zone: 'Kalapet ECR Highway' },
-    { fac: 'PIMS_PY', reg: 'PY01PM2002', type: 'BLS', status: 'available', zone: 'Kalapet - Auroville Link' },
-    { fac: 'RGGWCH_PY', reg: 'PY01RG3001', type: 'ALS', status: 'available', zone: 'Ellaipillaichavady Neonatal' },
-    { fac: 'EAST_COAST_PY', reg: 'PY01EC4001', type: 'ALS', status: 'available', zone: 'Moolakulam - Villianur' },
-    { fac: 'AUROVILLE_HC', reg: 'PY01AV5001', type: 'BLS', status: 'available', zone: 'Auroville Bioregion' },
-    { fac: 'AUROVILLE_SANTIGIRI', reg: 'TN32AV6001', type: 'BLS', status: 'available', zone: 'Auroville - Vanur Border' },
-    { fac: 'GH_PY', reg: 'PY01CD5678', type: 'ALS', status: 'available', zone: 'Puducherry East' },
-    { fac: 'GH_PY', reg: 'PY01CD5679', type: 'BLS', status: 'in_use', zone: 'Puducherry South' },
-    { fac: 'VICTORIA_BLR', reg: 'KA01GA4001', type: 'ALS', status: 'available', zone: 'Bengaluru Central' },
-    { fac: 'VICTORIA_BLR', reg: 'KA01GA4002', type: 'ALS', status: 'available', zone: 'Bengaluru South' },
-    { fac: 'VICTORIA_BLR', reg: 'KA01GA4003', type: 'BLS', status: 'available', zone: 'Bengaluru West' },
-    { fac: 'BOWRING_BLR', reg: 'KA01GB5001', type: 'ALS', status: 'available', zone: 'Bengaluru East' },
-    { fac: 'BOWRING_BLR', reg: 'KA01GB5002', type: 'BLS', status: 'available', zone: 'Bengaluru North' },
-    { fac: 'STANLEY_CHN', reg: 'TN09MN4001', type: 'ALS', status: 'available', zone: 'Chennai North' },
-    { fac: 'RAJIV_CHN', reg: 'TN09OP5001', type: 'ALS', status: 'available', zone: 'Chennai Central' },
-    { fac: 'GH_VLR', reg: 'TN32EF2001', type: 'ALS', status: 'available', zone: 'Villupuram Border' },
-    { fac: 'GH_CDL', reg: 'TN19GH3001', type: 'ALS', status: 'available', zone: 'Cuddalore Border' },
-  ];
-
-  for (const a of ambulanceEntries) {
-    const facId = facilityMap[a.fac];
-    if (!facId) continue;
-    await prisma.ambulance.upsert({
-      where: { registration: a.reg },
-      update: { status: a.status, currentZone: a.zone, ambulanceType: a.type },
-      create: { facilityId: facId, registration: a.reg, ambulanceType: a.type, status: a.status, currentZone: a.zone, deploymentTimeMinutes: 15 },
-    });
-  }
-
-  // ─── Blood Banks ──────────────────────────────────────────────────────────
-  const bloodBankDefs = [
-    { key: 'BB_JIPMER', fac: 'JIPMER', name: 'JIPMER Regional Blood Transfusion Center', license: 'PY/BB/001/2018' },
-    { key: 'BB_PIMS', fac: 'PIMS_PY', name: 'PIMS Kalapet Blood Bank & Component Center', license: 'PY/BB/003/2020' },
-    { key: 'BB_RGGWCH', fac: 'RGGWCH_PY', name: 'Rajiv Gandhi Women & Children Hospital Blood Bank', license: 'PY/BB/004/2020' },
-    { key: 'BB_EASTCOAST', fac: 'EAST_COAST_PY', name: 'East Coast Hospitals Trauma Blood Bank', license: 'PY/BB/005/2021' },
-    { key: 'BB_GHPY', fac: 'GH_PY', name: 'Government General Hospital Puducherry Blood Bank', license: 'PY/BB/002/2019' },
-    { key: 'BB_GHVLR', fac: 'GH_VLR', name: 'Villupuram Medical College Blood Bank', license: 'TN/BB/VLR/001' },
-    { key: 'BB_GHCDL', fac: 'GH_CDL', name: 'Cuddalore Government Hospital Blood Bank', license: 'TN/BB/CDL/001' },
-    { key: 'BB_VIC_BLR', fac: 'VICTORIA_BLR', name: 'Victoria Hospital Blood Bank Bengaluru', license: 'KA/BB/BLR/001' },
-    { key: 'BB_BOW_BLR', fac: 'BOWRING_BLR', name: 'Bowring Hospital Blood Bank Bengaluru', license: 'KA/BB/BLR/002' },
-    { key: 'BB_STN_CHN', fac: 'STANLEY_CHN', name: 'Stanley Medical College Blood Bank Chennai', license: 'TN/BB/CHN/001' },
-    { key: 'BB_RAJ_CHN', fac: 'RAJIV_CHN', name: 'Rajiv Gandhi Hospital Blood Bank Chennai', license: 'TN/BB/CHN/002' },
-  ];
-
-  for (const bb of bloodBankDefs) {
-    const facId = facilityMap[bb.fac];
-    if (!facId) continue;
-    let bank = await prisma.bloodBank.findFirst({ where: { licenseNumber: bb.license } });
-    if (!bank) {
-      bank = await prisma.bloodBank.create({
-        data: { facilityId: facId, name: bb.name, type: 'government', licenseNumber: bb.license, isActive: 1 },
-      });
-    }
-
-    const bloodStocks = [
-      { group: 'A+', comp: 'whole_blood', qty: 15 },
-      { group: 'A+', comp: 'packed_rbc', qty: 22 },
-      { group: 'B+', comp: 'packed_rbc', qty: 18 },
-      { group: 'O+', comp: 'packed_rbc', qty: 30 },
-      { group: 'O-', comp: 'packed_rbc', qty: 6 },
-      { group: 'AB+', comp: 'platelets', qty: 8 },
-      { group: 'B-', comp: 'packed_rbc', qty: 4 },
-      { group: 'A-', comp: 'packed_rbc', qty: 5 },
-    ];
-
-    for (const bs of bloodStocks) {
-      await prisma.bloodInventory.upsert({
-        where: { bloodBankId_bloodGroup_component: { bloodBankId: bank.id, bloodGroup: bs.group, component: bs.comp } },
-        update: { availableUnits: bs.qty },
-        create: {
-          bloodBankId: bank.id,
-          facilityId: facId,
-          bloodGroup: bs.group,
-          component: bs.comp,
-          availableUnits: bs.qty,
-          reservedUnits: 0,
-          status: bs.qty <= 2 ? 'critical' : bs.qty <= 5 ? 'low' : 'available',
-        },
-      });
-    }
-  }
-
-  // ─── National Reserves (Expanded) ─────────────────────────────────────────
+  // ─── 9. National Strategic Reserves Catalog ───────────────────────────────
   const reserveDefs = [
-    { med: 'RINGER', total: 50000, prot: 10000, emg: 35000, alloc: 5000 },
-    { med: 'ORS', total: 80000, prot: 15000, emg: 55000, alloc: 10000 },
-    { med: 'AZITH500', total: 60000, prot: 12000, emg: 42000, alloc: 6000 },
-    { med: 'CEFTR1G', total: 25000, prot: 5000, emg: 18000, alloc: 2000 },
-    { med: 'ADRENA', total: 10000, prot: 2000, emg: 7000, alloc: 1000 },
-    { med: 'SALINE', total: 40000, prot: 8000, emg: 28000, alloc: 4000 },
-    { med: 'PARA500', total: 200000, prot: 30000, emg: 150000, alloc: 20000 },
-    { med: 'ASV_POLY', total: 5000, prot: 1000, emg: 3500, alloc: 500 },
+    { med: 'RINGER', total: 60000, prot: 12000, emg: 42000, alloc: 6000 },
+    { med: 'ORS', total: 100000, prot: 20000, emg: 70000, alloc: 10000 },
+    { med: 'AZITH500', total: 80000, prot: 15000, emg: 55000, alloc: 10000 },
+    { med: 'CEFTR1G', total: 35000, prot: 7000, emg: 25000, alloc: 3000 },
+    { med: 'ADRENA', total: 15000, prot: 3000, emg: 10000, alloc: 2000 },
+    { med: 'SALINE', total: 50000, prot: 10000, emg: 35000, alloc: 5000 },
+    { med: 'PARA500', total: 250000, prot: 40000, emg: 180000, alloc: 30000 },
+    { med: 'ASV_POLY', total: 8000, prot: 1500, emg: 5500, alloc: 1000 },
   ];
 
   for (const r of reserveDefs) {
@@ -618,353 +614,18 @@ export async function seed() {
     });
   }
 
-  // ─── Emergencies Across States (With Designated Primary, Secondary, Supporting & Cross-Border Adjacent Hospitals) ───
-  const emgData = [
-    // Major National Disaster (>500 casualties - National Dashboard Escalation)
-    {
-      title: 'Super Cyclone Fengal Coastal Surge — Severe National Disaster',
-      type: 'natural_disaster',
-      location: 'Coromandel Coastal Corridor (Multi-State: Tamil Nadu & Puducherry Coastline)',
-      primaryKey: 'STANLEY_CHN',
-      secondaryKey: 'RAJIV_CHN',
-      supportingKeys: ['JIPMER', 'PIMS_PY', 'GH_CDL', 'GH_VLR'],
-      stateCode: 'TN',
-      severity: 'critical',
-      status: 'active',
-      cas: 1450,
-      crit: 180,
-      ser: 340,
-      min: 910,
-      dec: 20,
-      descText: 'Catastrophic coastal cyclone landfall causing widespread flooding and trauma across North Tamil Nadu and Puducherry.',
-      requirements: [
-        {
-          resource_type: 'medicine',
-          medicine_key: 'RINGER',
-          desc: "Ringer's Lactate 500ml IV Infusions for Coastal Trauma Resuscitation",
-          qty: 15000,
-          priority: 'critical',
-        },
-        {
-          resource_type: 'medicine',
-          medicine_key: 'AZITH500',
-          desc: 'Azithromycin 500mg for Flood Waterborne Prophylaxis',
-          qty: 12000,
-          priority: 'critical',
-        },
-        {
-          resource_type: 'ambulance',
-          medicine_key: null,
-          desc: 'ALS Ambulances with Ventilator Support for Coastal Evacuation',
-          qty: 25,
-          priority: 'critical',
-        },
-        {
-          resource_type: 'staff',
-          medicine_key: null,
-          desc: 'Trauma Surgeons & Intensivists Medical Team',
-          qty: 30,
-          priority: 'urgent',
-        },
-      ],
-    },
-    // Puducherry Accidents (Visible in Puducherry AND Adjacent Tamil Nadu Districts: Villupuram, Cuddalore, Auroville)
-    {
-      title: 'ECR Highway Multi-Vehicle Collision (Kalapet - Puducherry)',
-      type: 'mass_casualty',
-      location: 'Kalapet Toll Plaza, ECR Highway, Puducherry - Villupuram Border',
-      primaryKey: 'PIMS_PY',
-      secondaryKey: 'JIPMER',
-      supportingKeys: ['GH_PY', 'EAST_COAST_PY', 'RGGWCH_PY', 'AUROVILLE_HC', 'GH_VLR', 'GH_CDL'],
-      stateCode: 'PY',
-      severity: 'critical',
-      status: 'active',
-      cas: 38,
-      crit: 9,
-      ser: 14,
-      min: 13,
-      dec: 2,
-      descText: 'Multi-vehicle highway collision near PIMS Kalapet & Auroville junction. Adjacent Tamil Nadu districts (Villupuram & Cuddalore) mobilized for cross-border mutual aid.',
-      requirements: [
-        {
-          resource_type: 'ambulance',
-          medicine_key: null,
-          desc: 'ALS Ambulance Fleet for Highway Trauma Transport',
-          qty: 6,
-          priority: 'critical',
-        },
-        {
-          resource_type: 'medicine',
-          medicine_key: 'CEFTR1G',
-          desc: 'Ceftriaxone 1g IV Injection for Surgical Trauma Prophylaxis',
-          qty: 600,
-          priority: 'urgent',
-        },
-        {
-          resource_type: 'medicine',
-          medicine_key: 'AZITH500',
-          desc: 'Azithromycin 500mg for Wound & Respiratory Prophylaxis',
-          qty: 500,
-          priority: 'urgent',
-        },
-        {
-          resource_type: 'staff',
-          medicine_key: null,
-          desc: 'Emergency Medicine Physicians & Orthopedic Trauma Surgeons',
-          qty: 6,
-          priority: 'urgent',
-        },
-      ],
-    },
-    {
-      title: 'Auroville - Kottakuppam Cross-Border Bus Rollover Accident',
-      type: 'mass_casualty',
-      location: 'Auroville Radial Road & Kalapet Link, Puducherry',
-      primaryKey: 'JIPMER',
-      secondaryKey: 'EAST_COAST_PY',
-      supportingKeys: ['PIMS_PY', 'RGGWCH_PY', 'AUROVILLE_HC', 'AUROVILLE_SANTIGIRI', 'GH_VLR'],
-      stateCode: 'PY',
-      severity: 'high',
-      status: 'active',
-      cas: 24,
-      crit: 5,
-      ser: 9,
-      min: 10,
-      dec: 0,
-      descText: 'Inter-state passenger bus rollover near Auroville area. Pediatric and maternal passengers routed to RGGWCH; trauma cases routed to JIPMER, PIMS, and East Coast Hospitals with adjacent Villupuram district aid.',
-      requirements: [
-        {
-          resource_type: 'medicine',
-          medicine_key: 'RINGER',
-          desc: "Ringer's Lactate 500ml IV Infusions for Shock Resuscitation",
-          qty: 800,
-          priority: 'critical',
-        },
-        {
-          resource_type: 'ambulance',
-          medicine_key: null,
-          desc: 'BLS & Neonatal Critical Care Ambulances',
-          qty: 4,
-          priority: 'critical',
-        },
-      ],
-    },
-    {
-      title: 'Bengaluru Chemical Plant Vapor Leak',
-      type: 'industrial',
-      location: 'Peenya Industrial Area Stage 2, Bengaluru',
-      primaryKey: 'VICTORIA_BLR',
-      secondaryKey: 'BOWRING_BLR',
-      supportingKeys: ['KC_GEN_BLR'],
-      stateCode: 'KA',
-      severity: 'critical',
-      status: 'active',
-      cas: 45,
-      crit: 10,
-      ser: 18,
-      min: 17,
-      dec: 0,
-      descText: 'Industrial chemical vapor inhalation incident in Peenya industrial corridor.',
-      requirements: [
-        {
-          resource_type: 'medicine',
-          medicine_key: 'ADRENA',
-          desc: 'Adrenaline 1mg/ml for Anaphylaxis and Bronchospasm',
-          qty: 120,
-          priority: 'critical',
-        },
-        {
-          resource_type: 'staff',
-          medicine_key: null,
-          desc: 'Pulmonologists and Critical Care Nurses',
-          qty: 6,
-          priority: 'urgent',
-        },
-      ],
-    },
-    {
-      title: 'Coastal Cuddalore Storm Surge Alert',
-      type: 'natural_disaster',
-      location: 'Coastal Cuddalore Port & PHCs (Adjacent to Puducherry Border)',
-      primaryKey: 'GH_CDL',
-      secondaryKey: 'GH_VLR',
-      supportingKeys: ['GH_PY', 'JIPMER', 'PIMS_PY', 'EAST_COAST_PY'],
-      stateCode: 'TN',
-      severity: 'high',
-      status: 'active',
-      cas: 15,
-      crit: 2,
-      ser: 5,
-      min: 8,
-      dec: 0,
-      descText: 'Coastal flooding alert on Cuddalore-Puducherry border requiring prophylactic ORS and Azithromycin deployment.',
-      requirements: [
-        {
-          resource_type: 'medicine',
-          medicine_key: 'ORS',
-          desc: 'ORS Sachet Replenishment for Waterborne Disease Surge',
-          qty: 2000,
-          priority: 'urgent',
-        },
-      ],
-    },
-  ];
-
-  for (const em of emgData) {
-    const primaryFacId = facilityMap[em.primaryKey];
-    const secondaryFacId = facilityMap[em.secondaryKey];
-    const supportingFacIds = em.supportingKeys.map((k) => facilityMap[k]).filter(Boolean);
-    const stateId = states[em.stateCode];
-
-    const structuredDescription = JSON.stringify({
-      text: em.descText,
-      primary_facility_id: primaryFacId,
-      secondary_facility_id: secondaryFacId,
-      supporting_facility_ids: supportingFacIds,
-    });
-
-    // Also match legacy title if 'ECR Highway Multi-Vehicle Collision' existed without suffix
-    let emergency = await prisma.emergency.findFirst({
-      where: {
-        OR: [
-          { title: em.title },
-          ...(em.title.startsWith('ECR Highway Multi-Vehicle Collision')
-            ? [{ title: 'ECR Highway Multi-Vehicle Collision' }]
-            : []),
-        ],
-      },
-    });
-    if (!emergency) {
-      emergency = await prisma.emergency.create({
-        data: {
-          title: em.title,
-          emergencyType: em.type,
-          location: em.location,
-          facilityId: primaryFacId,
-          stateId: stateId,
-          severity: em.severity,
-          status: em.status,
-          description: structuredDescription,
-          estimatedCasualties: em.cas,
-          loadCritical: em.crit,
-          loadSerious: em.ser,
-          loadMinor: em.min,
-          loadDeceased: em.dec,
-          activatedAt: new Date(),
-          confirmedAt: new Date(),
-        },
-      });
-    } else {
-      emergency = await prisma.emergency.update({
-        where: { id: emergency.id },
-        data: {
-          title: em.title,
-          location: em.location,
-          facilityId: primaryFacId,
-          stateId: stateId,
-          status: em.status,
-          description: structuredDescription,
-          estimatedCasualties: em.cas,
-        },
-      });
-    }
-
-    // Seed sample requirements
-    if (em.requirements && emergency) {
-      for (const req of em.requirements) {
-        const medId = req.medicine_key ? medicineMap[req.medicine_key] : null;
-        const existingReq = await prisma.emergencyRequirement.findFirst({
-          where: { emergencyId: emergency.id, description: req.desc },
-        });
-        if (!existingReq) {
-          await prisma.emergencyRequirement.create({
-            data: {
-              emergencyId: emergency.id,
-              resourceType: req.resource_type,
-              medicineId: req.resource_type === 'medicine' ? medId : null,
-              description: req.desc,
-              quantityRequired: req.qty,
-              quantityConfirmed: 0,
-              priority: req.priority,
-            },
-          });
-        }
-      }
-    }
-  }
-
-  // Repair any user-created emergencies in Puducherry/Auroville/Kalapet that had a missing or 'NA' stateId or 'initiated' status
-  const allExistingEmergencies = await prisma.emergency.findMany({
-    where: { status: { not: 'closed' } },
-    include: { facility: true },
-  });
-  for (const existingEm of allExistingEmergencies) {
-    const locAndTitle = `${existingEm.title} ${existingEm.location}`.toLowerCase();
-    const isPuducherryKeyword =
-      locAndTitle.includes('puducherry') ||
-      locAndTitle.includes('pondicherry') ||
-      locAndTitle.includes('kalapet') ||
-      locAndTitle.includes('auroville') ||
-      locAndTitle.includes('ozhukarai') ||
-      locAndTitle.includes('jipmer') ||
-      locAndTitle.includes('pims');
-
-    let targetStateId = existingEm.stateId;
-    if (existingEm.facility?.stateId && existingEm.stateId === states['NA']) {
-      targetStateId = existingEm.facility.stateId;
-    } else if (isPuducherryKeyword && existingEm.estimatedCasualties < 500) {
-      targetStateId = states['PY'];
-    }
-
-    if (targetStateId !== existingEm.stateId || existingEm.status === 'initiated') {
-      await prisma.emergency.update({
-        where: { id: existingEm.id },
-        data: {
-          stateId: targetStateId,
-          status: 'active',
-        },
-      });
-    }
-  }
-
-  // ─── Alerts ───────────────────────────────────────────────────────────────
-  const alertEntries = [
-    { stateCode: 'PY', type: 'emergency', sev: 'critical', title: 'Puducherry: Mass Casualty Incident Active on ECR Highway (Kalapet)', msg: '38 casualties reported. Primary: PIMS Kalapet, Secondary: JIPMER, Supporting: RGGWCH, East Coast Hospitals, Auroville HC & Adjacent TN Districts.' },
-    { stateCode: 'TN', type: 'emergency', sev: 'critical', title: 'Cross-Border Mutual Aid: Puducherry ECR & Auroville Accidents', msg: 'Adjacent Tamil Nadu districts (Villupuram & Cuddalore) activated to assist Puducherry hospitals with ambulances and trauma supplies.' },
-    { stateCode: 'KA', type: 'emergency', sev: 'critical', title: 'Karnataka: Chemical Vapor Inhalation Alert in Peenya', msg: 'Primary: Victoria Hospital, Secondary: Bowring Hospital.' },
-    { stateCode: 'TN', type: 'supply_disruption', sev: 'warning', title: 'Tamil Nadu: Coastal Cuddalore Monsoon Cyclone Advisory', msg: 'District emergency stores instructed to maintain 14-day IV fluid & Azithromycin reserves.' },
-    { stateCode: 'KA', type: 'stockout_risk', sev: 'warning', title: 'Karnataka: Bowring Hospital Azithromycin 500mg Low Buffer', msg: 'Current stock below safety threshold. Lead time 7 days.' },
-  ];
-
-  for (const al of alertEntries) {
-    const stateId = states[al.stateCode];
-    const existing = await prisma.alert.findFirst({ where: { title: al.title } });
-    if (!existing) {
-      await prisma.alert.create({
-        data: {
-          stateId,
-          alertType: al.type,
-          severity: al.sev,
-          title: al.title,
-          message: al.msg,
-          isRead: 0,
-        },
-      });
-    }
-  }
-
-  // Clean up any existing requirements where resourceType !== 'medicine' had a medicineId attached
-  await prisma.emergencyRequirement.updateMany({
-    where: {
-      resourceType: { not: 'medicine' },
-      medicineId: { not: null },
-    },
-    data: {
-      medicineId: null,
-    },
+  // ─── 10. Strict Manual-Only Command Protocol ──────────────────────────────
+  await prisma.emergency.updateMany({
+    where: { status: { in: ['active', 'initiated'] } },
+    data: { status: 'closed', closedAt: new Date() },
   });
 
-  console.log('✅ BHISSM multi-state demo data (33 medicines, PIMS, RGGWCH, East Coast, Auroville hospitals & cross-border emergency corridors) seeded successfully!');
+  await prisma.alert.deleteMany({
+    where: { alertType: 'emergency' },
+  });
+
+  syncMasterDatabaseFiles();
+  console.log('✅ BHISSM Pan-India Database fully provisioned across all 36 States & UTs and 100+ Hospitals!');
 }
 
 // Run if invoked directly

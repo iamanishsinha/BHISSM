@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   Siren,
   MapPin,
+  Database,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -55,6 +56,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       group: 'COMMAND & DISASTER OPS',
     },
     {
+      to: '/corridor',
+      label: 'Regional Corridor Grid',
+      icon: MapPin,
+      roles: ['hospital', 'state', 'national'],
+      badge: 'TN • PY',
+      group: 'COMMAND & DISASTER OPS',
+    },
+    {
       to: '/inventory',
       label:
         user?.role === 'state'
@@ -93,6 +102,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       roles: ['hospital', 'state', 'national'],
       group: 'GOVERNANCE & AUDIT',
     },
+    {
+      to: '/admin/master-data',
+      label: 'Master Data & Governance',
+      icon: Database,
+      roles: ['state', 'national'],
+      badge: 'SQL Master',
+      group: 'GOVERNANCE & AUDIT',
+    },
   ];
 
   const filteredNav = navItems.filter((item) =>
@@ -112,7 +129,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       )}
 
       <aside
-        className={`fixed lg:static top-0 bottom-0 left-0 z-40 w-64 bg-bhissm-surface border-r-2 border-bhissm-border flex flex-col transition-transform duration-200 ease-in-out ${
+        className={`fixed lg:static inset-y-0 lg:inset-auto h-full left-0 z-40 lg:z-10 w-64 shrink-0 bg-bhissm-surface border-r-2 border-bhissm-border flex flex-col transition-transform duration-200 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >

@@ -9,7 +9,7 @@
     "dev:frontend": "npm run dev --prefix frontend",
     "seed": "npm run seed --prefix backend",
     "postinstall": "prisma generate",
-    "build": "npm install --prefix backend && npm run build --prefix backend && npm install --prefix frontend && npm run build --prefix frontend && node -e \"const fs = require('fs'); fs.cpSync('frontend/dist', 'dist', { recursive: true }); try { fs.copyFileSync('backend/prisma/bhissm.db', 'dist/bhissm.db'); } catch(e){ console.warn('DB copy warning:', e.message); }\"",
+    "build": "npm install --prefix backend && npm run build --prefix backend && npm install --prefix frontend && npm run build --prefix frontend && node -e \"const fs = require('fs'); fs.cpSync('frontend/dist', 'dist', { recursive: true }); try { fs.copyFileSync('backend/prisma/bhissm.db', 'dist/bhissm.db'); } catch(e){ console.warn('DB copy warning:', e.message); } try { fs.copyFileSync('backend/prisma/bhissm.db', 'api/bhissm.db'); } catch(e){ console.warn('API DB copy warning:', e.message); }\"",
     "vercel-build": "npm run build",
     "setup:backend": "npm install --prefix backend && npm run db:push --prefix backend && npm run seed --prefix backend",
     "setup:frontend": "npm install --prefix frontend"

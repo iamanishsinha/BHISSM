@@ -24,6 +24,8 @@ import {
   ShieldCheck,
   FileCheck,
   Siren,
+  Compass,
+  Database,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -182,6 +184,17 @@ export default function DashboardPage() {
             </div>
           )}
 
+          {(user?.role === 'national' || user?.role === 'state') && (
+            <Link
+              to="/admin/master-data"
+              className="flex items-center gap-1.5 text-xs font-mono font-bold py-2 px-3 rounded-lg bg-white border border-bhissm-border hover:bg-[#FDF6ED] text-bhissm-dark transition-colors shadow-2xs"
+              title="Open Master Data & Infrastructure Governance Console"
+            >
+              <Database className="w-3.5 h-3.5 text-[#B65C62]" />
+              <span>Master Governance</span>
+            </Link>
+          )}
+
           {user?.role === 'national' ? (
             <Link
               to="/national-reserve"
@@ -209,6 +222,39 @@ export default function DashboardPage() {
             </>
           )}
         </div>
+      </div>
+
+      {/* Regional Healthcare Corridor Callout Banner (Chennai - Villupuram - Puducherry - Cuddalore) */}
+      <div className="card p-4 bg-gradient-to-r from-stone-900 via-stone-800 to-[#4A2D35] text-white border-2 border-stone-700 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="w-11 h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-amber-300 shrink-0">
+            <Compass className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-mono uppercase tracking-widest font-extrabold bg-amber-400/20 text-amber-300 border border-amber-400/40 px-2 py-0.5 rounded">
+                REGIONAL COMMAND CORRIDOR
+              </span>
+              <span className="text-[10px] font-mono text-stone-300">
+                102 Health Centers • NH-45 &amp; NH-45A
+              </span>
+            </div>
+            <h2 className="text-base font-extrabold text-white mt-1">
+              Chennai • Villupuram • Puducherry • Cuddalore Healthcare Grid
+            </h2>
+            <p className="text-xs text-stone-300 mt-0.5">
+              Live telemetry for Apex Medical Colleges, Military Hospital Chennai, Southern Railway Hospital, Port Trust, ESIC, Private Multi-Specialty, and CHCs/PHCs.
+            </p>
+          </div>
+        </div>
+
+        <Link
+          to="/corridor"
+          className="self-start md:self-auto px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold font-mono text-xs rounded-lg flex items-center gap-2 shadow-sm transition-all shrink-0 cursor-pointer"
+        >
+          <span>Open Corridor Dashboard</span>
+          <ArrowUpRight className="w-4 h-4" />
+        </Link>
       </div>
 
       {/* ──────────────────────────────────────────────────────────────────────
@@ -414,12 +460,15 @@ export default function DashboardPage() {
                       <td className="table-cell text-right text-bhissm-secondary">
                         {res.allocated_quantity?.toLocaleString() || 0}
                       </td>
-                      <td className="table-cell text-center">
+                      <td className="table-cell text-center whitespace-nowrap">
                         <Link
-                          to="/national-reserve"
-                          className="btn-outline text-[11px] py-0.5 px-2 font-mono hover:bg-emerald-50 hover:text-emerald-900"
+                          to={`/national-reserve?release_med=${res.medicine_id || res.id}`}
+                          state={{ releaseMedicineId: res.medicine_id || res.id }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-700 hover:bg-emerald-800 text-white font-sans text-xs font-bold shadow-xs whitespace-nowrap transition-colors"
+                          title={`Authorize central release quota for ${res.medicine_name}`}
                         >
-                          Authorize Release
+                          <Send className="w-3.5 h-3.5 text-emerald-200" />
+                          <span>Authorize Release</span>
                         </Link>
                       </td>
                     </tr>
@@ -435,38 +484,36 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between border-b border-bhissm-border pb-2">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-bhissm-dark font-mono flex items-center gap-1.5">
                   <Globe className="w-4 h-4 text-bhissm-dark" />
-                  State & UT Supply Chain Coverage Index
+                  State & UT Supply Chain Coverage Index ({statesList.filter((s) => s.code !== 'NA').length} Jurisdictions)
                 </h3>
-                <span className="text-[10px] font-mono text-bhissm-secondary">FEDERATED GRID</span>
+                <span className="text-[10px] font-mono text-bhissm-secondary">FEDERATED GRID • CLICK TO FILTER</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 pt-1 text-xs">
-                {[
-                  { name: 'Puducherry UT', code: 'PY', status: 'Stable', nodes: 6, risk: 'Low' },
-                  { name: 'Tamil Nadu', code: 'TN', status: 'Active Surge', nodes: 5, risk: 'Monsoon Alert' },
-                  { name: 'Karnataka', code: 'KA', status: 'Optimal', nodes: 4, risk: 'Normal' },
-                  { name: 'Andhra Pradesh', code: 'AP', status: 'Connected', nodes: 2, risk: 'Normal' },
-                  { name: 'Kerala', code: 'KL', status: 'Connected', nodes: 2, risk: 'Normal' },
-                  { name: 'Maharashtra', code: 'MH', status: 'Connected', nodes: 2, risk: 'Normal' },
-                ].map((st) => (
-                  <div
-                    key={st.code}
-                    onClick={() => {
-                      const found = statesList.find((s) => s.code === st.code);
-                      if (found) setSelectedStateId(found.id);
-                    }}
-                    className="p-2.5 rounded border border-bhissm-border bg-white hover:bg-bhissm-pink/40 cursor-pointer transition-colors space-y-1"
-                  >
-                    <div className="flex justify-between items-center font-bold">
-                      <span className="text-bhissm-dark">{st.name}</span>
-                      <span className="text-[9px] font-mono bg-gray-100 px-1 py-0.2 rounded">{st.code}</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 pt-1 text-xs max-h-[420px] overflow-y-auto pr-1">
+                {statesList
+                  .filter((s) => s.code !== 'NA')
+                  .map((st) => (
+                    <div
+                      key={st.code}
+                      onClick={() => setSelectedStateId(st.id)}
+                      className={`p-2.5 rounded border transition-colors cursor-pointer space-y-1 ${
+                        selectedStateId === st.id
+                          ? 'border-emerald-600 bg-emerald-50/70 shadow-xs'
+                          : 'border-bhissm-border bg-white hover:bg-bhissm-pink/40'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center font-bold">
+                        <span className="text-bhissm-dark truncate">{st.name}</span>
+                        <span className="text-[9px] font-mono bg-gray-100 text-bhissm-dark px-1.5 py-0.5 rounded shrink-0">
+                          {st.code}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-[11px] text-bhissm-secondary font-mono">
+                        <span>{st.type === 'ut' ? 'UT Depot' : 'State Depot'} Active</span>
+                        <span className="text-emerald-800 font-semibold">● Operational</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between text-[11px] text-bhissm-secondary font-mono">
-                      <span>{st.nodes} Hospital Nodes</span>
-                      <span className="text-emerald-800 font-semibold">{st.status}</span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
 
