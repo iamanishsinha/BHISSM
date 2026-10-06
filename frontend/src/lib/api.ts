@@ -14,9 +14,20 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle auth errors safely without disrupting active login flows or bootstrapping
+// Handle responses: prevent SPA HTML fallbacks from being treated as valid JSON data
 API.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    // If an API request received an HTML document (due to SPA catch-all rewrite), reject it
+    if (
+      typeof res.data === 'string' &&
+      (res.data.trim().startsWith('<!DOCTYPE') || res.data.trim().startsWith('<html'))
+    ) {
+      return Promise.reject(
+        new Error(`[BHISSM API] Endpoint ${res.config?.url} returned HTML fallback instead of JSON.`)
+      );
+    }
+    return res;
+  },
   (err) => {
     if (err.response?.status === 401) {
       const hadToken = Boolean(localStorage.getItem('bhissm_token'));
