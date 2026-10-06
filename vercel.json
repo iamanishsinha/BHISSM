@@ -1,17 +1,17 @@
 {
-  "version": 2,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "functions": {
-    "api/index.ts": {
+    "api/*.ts": {
       "memory": 1024,
       "maxDuration": 30,
       "includeFiles": "{backend/prisma/bhissm.db,api/bhissm.db}"
     }
   },
   "rewrites": [
-    { "source": "/api",      "destination": "/api/index" },
-    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/api",      "destination": "/api" },
     { "source": "/(.*)",     "destination": "/index.html" }
   ]
 }

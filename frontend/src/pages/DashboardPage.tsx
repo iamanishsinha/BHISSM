@@ -139,7 +139,7 @@ export default function DashboardPage() {
                 BHISSM
               </span>
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-bhissm-secondary">
-                • {user?.role.toUpperCase()} COMMAND CONSOLE
+                • {user?.role ? user.role.toUpperCase() : 'COMMAND'} COMMAND CONSOLE
               </span>
               <span className="text-[10px] bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full font-mono font-bold">
                 {isNationalScope ? 'APEX STRATEGIC NETWORK OVERVIEW' : 'STATE & REGIONAL TELEMETRY'}
