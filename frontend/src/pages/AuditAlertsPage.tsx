@@ -84,7 +84,7 @@ export default function AuditAlertsPage() {
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-bhissm-secondary">
               TRANSPARENCY & REGULATORY OVERSIGHT
             </span>
-            <span className="text-[10px] bg-gray-100 text-gray-800 border border-gray-300 px-1.5 py-0.2 rounded font-mono font-bold">
+            <span className="text-xs bg-gray-100 text-gray-800 border border-gray-300 px-1.5 py-0.2 rounded font-mono font-bold">
               IMMUTABLE AUDIT TRAIL
             </span>
           </div>
@@ -98,7 +98,7 @@ export default function AuditAlertsPage() {
         </div>
 
         {/* Tab Toggle */}
-        <div className="flex bg-[#F8F1E7] p-1 rounded border border-bhissm-border text-xs font-mono font-bold">
+        <div className="flex bg-[#EFE8E0] p-1 rounded border border-bhissm-border text-xs font-mono font-bold">
           <button
             onClick={() => setActiveTab('alerts')}
             className={`px-3 py-1.5 rounded transition-all flex items-center gap-1.5 ${
@@ -194,7 +194,7 @@ export default function AuditAlertsPage() {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`text-[9px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
+                          className={`text-[11px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
                             alert.severity === 'critical'
                               ? 'bg-red-200 text-red-950'
                               : alert.severity === 'warning'
@@ -207,7 +207,7 @@ export default function AuditAlertsPage() {
                         <h3 className="font-bold text-sm text-bhissm-dark">{alert.title}</h3>
                       </div>
                       <p className="text-bhissm-secondary leading-relaxed">{alert.message}</p>
-                      <div className="text-[10px] text-bhissm-secondary/80 font-mono">
+                      <div className="text-xs text-bhissm-secondary/80 font-mono">
                         {new Date(alert.created_at).toLocaleString()} • Node: {alert.facility_name || 'System Dispatch'}
                       </div>
                     </div>
@@ -215,12 +215,12 @@ export default function AuditAlertsPage() {
                     {!alert.is_read ? (
                       <button
                         onClick={() => markAlertRead(alert.id)}
-                        className="btn-outline text-[11px] py-1 px-2.5 shrink-0 flex items-center gap-1 font-mono hover:bg-emerald-100 hover:text-emerald-800 hover:border-emerald-300"
+                        className="btn-outline text-xs py-1 px-2.5 shrink-0 flex items-center gap-1 font-mono hover:bg-emerald-100 hover:text-emerald-800 hover:border-emerald-300"
                       >
                         <Check className="w-3.5 h-3.5" /> Acknowledge
                       </button>
                     ) : (
-                      <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      <span className="text-xs font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                         Acknowledged
                       </span>
                     )}
@@ -277,7 +277,7 @@ export default function AuditAlertsPage() {
                     <th className="table-header text-right">Client IP</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-bhissm-border/40 font-mono text-[11px]">
+                <tbody className="divide-y divide-bhissm-border/40 font-mono text-xs">
                   {auditLogs.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="text-center py-8 text-bhissm-secondary">
@@ -286,13 +286,13 @@ export default function AuditAlertsPage() {
                     </tr>
                   ) : (
                     auditLogs.map((log) => (
-                      <tr key={log.id} className="hover:bg-[#FDF9F3]">
+                      <tr key={log.id} className="hover:bg-[#F6F0E9]">
                         <td className="table-cell whitespace-nowrap text-bhissm-secondary">
                           {new Date(log.created_at).toLocaleString()}
                         </td>
                         <td className="table-cell">
                           <div className="font-bold text-bhissm-dark font-sans">{log.user_name || 'System'}</div>
-                          <div className="text-[10px] text-bhissm-secondary uppercase">
+                          <div className="text-xs text-bhissm-secondary uppercase">
                             {log.role}
                           </div>
                         </td>

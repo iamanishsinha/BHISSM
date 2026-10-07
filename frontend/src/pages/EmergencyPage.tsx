@@ -478,7 +478,7 @@ export default function EmergencyPage() {
       {/* ──────────────────────────────────────────────────────────────────────
           TOP COMMAND HERO: BHISSM IDENTITY + HIGH-VISIBILITY EMERGENCY SIREN
           ────────────────────────────────────────────────────────────────────── */}
-      <div className="card p-5 bg-gradient-to-r from-[#FFF5F5] via-[#FFF9F1] to-[#FDF3E7] border-2 border-red-400 shadow-md emergency-banner-glow space-y-4">
+      <div className="card p-5 bg-gradient-to-r from-[#F6E3DC] via-[#F6F0E9] to-[#F6F0E9] border-2 border-red-400 shadow-md emergency-banner-glow space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center gap-4">
             {/* Large High-Visibility Emergency Siren & Radar Beacon */}
@@ -486,7 +486,7 @@ export default function EmergencyPage() {
               <span className="absolute -inset-1 rounded-2xl bg-red-500 animate-ping opacity-40"></span>
               <div className="relative z-10 flex flex-col items-center justify-center leading-none">
                 <Siren className="w-7 h-7 text-white drop-shadow" />
-                <span className="text-[8px] font-mono font-black tracking-widest text-red-100 mt-0.5">
+                <span className="text-[10px] font-mono font-black tracking-widest text-red-100 mt-0.5">
                   SOS
                 </span>
               </div>
@@ -495,17 +495,17 @@ export default function EmergencyPage() {
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
                 {/* Dual Alternating Emergency Strobe Pill */}
-                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-700 text-white text-[11px] font-mono font-black uppercase tracking-wider shadow-xs border border-red-400">
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-700 text-white text-xs font-mono font-black uppercase tracking-wider shadow-xs border border-red-400">
                   <span className="w-2.5 h-2.5 rounded-full siren-light-left"></span>
                   <span className="w-2.5 h-2.5 rounded-full siren-light-right"></span>
                   <span>CODE RED • EMERGENCY COMMAND ACTIVE</span>
                 </span>
 
-                <span className="text-[11px] bg-[#2D2926] text-[#FFF9F1] px-2.5 py-0.5 rounded font-mono font-bold tracking-wider border border-[#D4C8BC]">
+                <span className="text-xs bg-[#3A1517] text-[#F6F0E9] px-2.5 py-0.5 rounded font-mono font-bold tracking-wider border border-[#D9C6B6]">
                   BHISSM DISASTER GRID
                 </span>
 
-                <span className="text-[11px] bg-red-100 text-red-900 border border-red-300 px-2.5 py-0.5 rounded font-mono font-bold">
+                <span className="text-xs bg-red-100 text-red-900 border border-red-300 px-2.5 py-0.5 rounded font-mono font-bold">
                   1° PRIMARY • 2° SECONDARY • 3° SUPPORTING
                 </span>
               </div>
@@ -542,7 +542,7 @@ export default function EmergencyPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-red-200/80">
           <div className="bg-white/90 border border-red-200 rounded-lg px-3 py-2 flex items-center justify-between">
             <div>
-              <div className="text-[10px] font-mono uppercase text-red-800 font-bold">
+              <div className="text-xs font-mono uppercase text-red-800 font-bold">
                 Active Incidents
               </div>
               <div className="text-lg font-black text-red-950 font-mono leading-tight">
@@ -554,7 +554,7 @@ export default function EmergencyPage() {
 
           <div className="bg-white/90 border border-amber-200 rounded-lg px-3 py-2 flex items-center justify-between">
             <div>
-              <div className="text-[10px] font-mono uppercase text-amber-900 font-bold">
+              <div className="text-xs font-mono uppercase text-amber-900 font-bold">
                 Total Casualties
               </div>
               <div className="text-lg font-black text-amber-950 font-mono leading-tight">
@@ -566,7 +566,7 @@ export default function EmergencyPage() {
 
           <div className="bg-white/90 border border-blue-200 rounded-lg px-3 py-2 flex items-center justify-between">
             <div>
-              <div className="text-[10px] font-mono uppercase text-blue-900 font-bold">
+              <div className="text-xs font-mono uppercase text-blue-900 font-bold">
                 Adjacent State Corridors
               </div>
               <div className="text-lg font-black text-blue-950 font-mono leading-tight">
@@ -578,7 +578,7 @@ export default function EmergencyPage() {
 
           <div className="bg-white/90 border border-emerald-200 rounded-lg px-3 py-2 flex items-center justify-between">
             <div>
-              <div className="text-[10px] font-mono uppercase text-emerald-900 font-bold">
+              <div className="text-xs font-mono uppercase text-emerald-900 font-bold">
                 Receipt Authority
               </div>
               <div className="text-xs font-black text-emerald-950 font-mono leading-tight mt-0.5 truncate max-w-[145px]">
@@ -610,14 +610,14 @@ export default function EmergencyPage() {
                   Live Incident Queue ({emergencies.length})
                 </h2>
               </div>
-              <span className="text-[10px] font-mono bg-red-100 text-red-900 px-2 py-0.5 rounded font-bold border border-red-200">
+              <span className="text-xs font-mono bg-red-100 text-red-900 px-2 py-0.5 rounded font-bold border border-red-200">
                 REAL-TIME
               </span>
             </div>
 
             {/* Scope Filter Controls */}
             {user?.role === 'national' ? (
-              <div className="grid grid-cols-2 bg-[#F8F1E7] p-1 rounded-lg border border-bhissm-border text-[11px] font-mono font-bold gap-1">
+              <div className="grid grid-cols-2 bg-[#EFE8E0] p-1 rounded-lg border border-bhissm-border text-xs font-mono font-bold gap-1">
                 <button
                   onClick={() => setNationalFilter('disasters_only')}
                   className={`py-1.5 px-2 rounded-md transition-all text-center cursor-pointer ${
@@ -632,7 +632,7 @@ export default function EmergencyPage() {
                   onClick={() => setNationalFilter('all')}
                   className={`py-1.5 px-2 rounded-md transition-all text-center cursor-pointer ${
                     nationalFilter === 'all'
-                      ? 'bg-[#2D2926] text-white shadow-xs'
+                      ? 'bg-[#3A1517] text-white shadow-xs'
                       : 'text-bhissm-secondary hover:text-bhissm-dark'
                   }`}
                 >
@@ -641,11 +641,11 @@ export default function EmergencyPage() {
               </div>
             ) : (
               <div className="space-y-1.5">
-                <div className="text-[10px] font-mono text-bhissm-secondary font-bold uppercase tracking-wide flex items-center gap-1">
+                <div className="text-xs font-mono text-bhissm-secondary font-bold uppercase tracking-wide flex items-center gap-1">
                   <Globe className="w-3 h-3 text-blue-800" />
                   <span>Jurisdiction &amp; Adjacent District Scope:</span>
                 </div>
-                <div className="grid grid-cols-3 bg-[#F8F1E7] p-1 rounded-lg border border-bhissm-border text-[10px] font-mono font-bold gap-1">
+                <div className="grid grid-cols-3 bg-[#EFE8E0] p-1 rounded-lg border border-bhissm-border text-xs font-mono font-bold gap-1">
                   <button
                     onClick={() => setRegionalScope('adjacent_corridor')}
                     className={`py-1.5 px-1.5 rounded-md transition-all text-center cursor-pointer leading-tight ${
@@ -660,7 +660,7 @@ export default function EmergencyPage() {
                     onClick={() => setRegionalScope('local_state')}
                     className={`py-1.5 px-1.5 rounded-md transition-all text-center cursor-pointer leading-tight ${
                       regionalScope === 'local_state'
-                        ? 'bg-[#2D2926] text-white shadow-xs'
+                        ? 'bg-[#3A1517] text-white shadow-xs'
                         : 'text-bhissm-secondary hover:text-bhissm-dark'
                     }`}
                   >
@@ -670,7 +670,7 @@ export default function EmergencyPage() {
                     onClick={() => setRegionalScope('all_india')}
                     className={`py-1.5 px-1.5 rounded-md transition-all text-center cursor-pointer leading-tight ${
                       regionalScope === 'all_india'
-                        ? 'bg-[#2D2926] text-white shadow-xs'
+                        ? 'bg-[#3A1517] text-white shadow-xs'
                         : 'text-bhissm-secondary hover:text-bhissm-dark'
                     }`}
                   >
@@ -682,7 +682,7 @@ export default function EmergencyPage() {
           </div>
 
           {emergencies.length === 0 ? (
-            <div className="text-center py-10 px-3 text-xs text-bhissm-secondary font-mono bg-[#F8F1E7]/50 rounded-lg border border-bhissm-border">
+            <div className="text-center py-10 px-3 text-xs text-bhissm-secondary font-mono bg-[#EFE8E0]/50 rounded-lg border border-bhissm-border">
               {user?.role === 'national' && nationalFilter === 'disasters_only'
                 ? 'No active national-scale disasters (>500 casualties). Switch to All Regional Incidents to inspect state-level events.'
                 : 'No active emergency operations in this filter. Click "Step 1: Declare Emergency" above to initiate.'}
@@ -701,16 +701,16 @@ export default function EmergencyPage() {
                     onClick={() => fetchEmergencyDetail(e.id)}
                     className={`p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
                       isSelected
-                        ? 'bg-gradient-to-r from-red-50 via-[#FFF9F1] to-red-50/40 border-red-600 shadow-md'
+                        ? 'bg-gradient-to-r from-red-50 via-[#F6F0E9] to-red-50/40 border-red-600 shadow-md'
                         : isNatDisaster
                         ? 'bg-red-50/40 border-red-300 hover:border-red-500'
-                        : 'bg-white border-bhissm-border hover:border-red-300 hover:bg-[#FDF9F3]'
+                        : 'bg-white border-bhissm-border hover:border-red-300 hover:bg-[#F6F0E9]'
                     }`}
                   >
                     {/* Card Top Status Row */}
                     <div className="flex items-center justify-between gap-2 mb-1.5">
                       <span
-                        className={`inline-flex items-center gap-1.5 text-[10px] font-mono uppercase px-2 py-0.5 rounded-md font-bold ${
+                        className={`inline-flex items-center gap-1.5 text-xs font-mono uppercase px-2 py-0.5 rounded-md font-bold ${
                           isNatDisaster
                             ? 'bg-red-700 text-white'
                             : isCrossBorder
@@ -732,7 +732,7 @@ export default function EmergencyPage() {
                         </span>
                       </span>
 
-                      <span className="text-[11px] font-mono font-black text-red-800 bg-red-100 border border-red-200 px-2 py-0.5 rounded">
+                      <span className="text-xs font-mono font-black text-red-800 bg-red-100 border border-red-200 px-2 py-0.5 rounded">
                         {casualties} Casualties
                       </span>
                     </div>
@@ -741,13 +741,13 @@ export default function EmergencyPage() {
                     <div className="font-extrabold text-sm text-bhissm-dark leading-snug">
                       {e.title}
                     </div>
-                    <div className="text-[11px] text-bhissm-secondary mt-1 flex items-center gap-1">
+                    <div className="text-xs text-bhissm-secondary mt-1 flex items-center gap-1">
                       <MapPin className="w-3 h-3 text-red-700 shrink-0" />
                       <span className="truncate">{e.location}</span>
                     </div>
 
                     {/* Designated 1° and 2° Hospitals */}
-                    <div className="mt-2.5 text-[10px] font-mono text-bhissm-dark space-y-1 bg-[#F8F1E7]/80 p-2 rounded-lg border border-bhissm-border/70">
+                    <div className="mt-2.5 text-xs font-mono text-bhissm-dark space-y-1 bg-[#EFE8E0]/80 p-2 rounded-lg border border-bhissm-border/70">
                       <div className="truncate flex items-center gap-1">
                         <span className="font-bold text-red-800 shrink-0">1° Primary:</span>
                         <span className="truncate font-semibold">
@@ -762,7 +762,7 @@ export default function EmergencyPage() {
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between text-[10px] font-mono text-bhissm-secondary mt-2 pt-1.5 border-t border-bhissm-border/40">
+                    <div className="flex items-center justify-between text-xs font-mono text-bhissm-secondary mt-2 pt-1.5 border-t border-bhissm-border/40">
                       <span className="font-bold text-bhissm-dark">
                         {e.state_name || 'Active Zone'}
                       </span>
@@ -787,7 +787,7 @@ export default function EmergencyPage() {
               <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-4 border-b-2 border-bhissm-border pb-4">
                 <div className="space-y-1.5">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 bg-red-600 text-white px-2.5 py-0.5 rounded-md font-mono font-bold text-[11px] uppercase shadow-2xs">
+                    <span className="inline-flex items-center gap-1.5 bg-red-600 text-white px-2.5 py-0.5 rounded-md font-mono font-bold text-xs uppercase shadow-2xs">
                       <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
                       <Siren className="w-3.5 h-3.5" />
                       <span>{selectedEmergency.severity} EMERGENCY</span>
@@ -795,18 +795,18 @@ export default function EmergencyPage() {
 
                     {(selectedEmergency.estimated_casualties ??
                       selectedEmergency.estimatedCasualties) >= 500 && (
-                      <span className="bg-red-900 text-white px-2.5 py-0.5 rounded-md font-mono font-bold text-[10px] tracking-wide">
+                      <span className="bg-red-900 text-white px-2.5 py-0.5 rounded-md font-mono font-bold text-xs tracking-wide">
                         NATIONAL DISASTER (&gt;500 CASUALTIES)
                       </span>
                     )}
 
                     {selectedEmergency.is_cross_border_aid && (
-                      <span className="bg-blue-700 text-white px-2.5 py-0.5 rounded-md font-mono font-bold text-[10px] tracking-wide">
+                      <span className="bg-blue-700 text-white px-2.5 py-0.5 rounded-md font-mono font-bold text-xs tracking-wide">
                         🤝 ADJACENT STATE MUTUAL AID
                       </span>
                     )}
 
-                    <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-[#F8F1E7] border border-bhissm-border text-bhissm-dark uppercase">
+                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#EFE8E0] border border-bhissm-border text-bhissm-dark uppercase">
                       STATUS: {selectedEmergency.status}
                     </span>
                   </div>
@@ -830,7 +830,7 @@ export default function EmergencyPage() {
                   </div>
 
                   {selectedEmergency.description && (
-                    <p className="text-xs text-bhissm-dark mt-1.5 bg-[#F8F1E7]/70 p-2.5 rounded-lg border border-bhissm-border/70 leading-relaxed">
+                    <p className="text-xs text-bhissm-dark mt-1.5 bg-[#EFE8E0]/70 p-2.5 rounded-lg border border-bhissm-border/70 leading-relaxed">
                       {selectedEmergency.description}
                     </p>
                   )}
@@ -862,7 +862,7 @@ export default function EmergencyPage() {
               </div>
 
               {/* 2. CASUALTY TRIAGE LIVE DISTRIBUTION MATRIX (Top Situational Bar) */}
-              <div className="p-3.5 bg-[#F8F1E7]/80 rounded-xl border border-bhissm-border space-y-2.5">
+              <div className="p-3.5 bg-[#EFE8E0]/80 rounded-xl border border-bhissm-border space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-black text-bhissm-dark uppercase font-mono tracking-wider flex items-center gap-1.5">
                     <Activity className="w-4 h-4 text-red-700" />
@@ -875,13 +875,13 @@ export default function EmergencyPage() {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-center text-xs font-mono">
                   <div className="bg-red-100/90 border-2 border-red-300 p-2.5 rounded-lg">
-                    <div className="text-[10px] uppercase font-bold text-red-900">Critical (Red)</div>
+                    <div className="text-xs uppercase font-bold text-red-900">Critical (Red)</div>
                     <div className="text-lg font-black text-red-950 mt-0.5">
                       {selectedEmergency.loadCritical || 0}
                     </div>
                   </div>
                   <div className="bg-amber-100/90 border-2 border-amber-300 p-2.5 rounded-lg">
-                    <div className="text-[10px] uppercase font-bold text-amber-900">
+                    <div className="text-xs uppercase font-bold text-amber-900">
                       Serious (Yellow)
                     </div>
                     <div className="text-lg font-black text-amber-950 mt-0.5">
@@ -889,7 +889,7 @@ export default function EmergencyPage() {
                     </div>
                   </div>
                   <div className="bg-emerald-100/90 border-2 border-emerald-300 p-2.5 rounded-lg">
-                    <div className="text-[10px] uppercase font-bold text-emerald-900">
+                    <div className="text-xs uppercase font-bold text-emerald-900">
                       Minor (Green)
                     </div>
                     <div className="text-lg font-black text-emerald-950 mt-0.5">
@@ -897,7 +897,7 @@ export default function EmergencyPage() {
                     </div>
                   </div>
                   <div className="bg-gray-100 border-2 border-gray-300 p-2.5 rounded-lg">
-                    <div className="text-[10px] uppercase font-bold text-gray-800">
+                    <div className="text-xs uppercase font-bold text-gray-800">
                       Deceased (Black)
                     </div>
                     <div className="text-lg font-black text-gray-950 mt-0.5">
@@ -905,7 +905,7 @@ export default function EmergencyPage() {
                     </div>
                   </div>
                   <div className="bg-blue-50 border-2 border-blue-300 p-2.5 rounded-lg col-span-2 sm:col-span-1">
-                    <div className="text-[10px] uppercase font-bold text-blue-900">Unassessed</div>
+                    <div className="text-xs uppercase font-bold text-blue-900">Unassessed</div>
                     <div className="text-lg font-black text-blue-950 mt-0.5">
                       {selectedEmergency.loadUnassessed || 0}
                     </div>
@@ -925,13 +925,13 @@ export default function EmergencyPage() {
                       <h3 className="font-mono font-black text-xs sm:text-sm uppercase tracking-wide text-blue-950 leading-tight">
                         Inter-State &amp; Adjacent District Mutual Aid Corridor Active
                       </h3>
-                      <p className="text-[11px] text-blue-900/80 font-medium">
+                      <p className="text-xs text-blue-900/80 font-medium">
                         Cross-border emergency visibility &amp; rapid resource sharing across neighbouring state districts
                       </p>
                     </div>
                   </div>
 
-                  <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full bg-blue-700 text-white shrink-0 w-fit">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase px-2.5 py-1 rounded-full bg-blue-700 text-white shrink-0 w-fit">
                     <Radio className="w-3 h-3 animate-pulse" />
                     <span>CORRIDOR LINKED</span>
                   </span>
@@ -947,14 +947,14 @@ export default function EmergencyPage() {
                 {Array.isArray(selectedEmergency.adjacent_districts_notified) &&
                   selectedEmergency.adjacent_districts_notified.length > 0 && (
                     <div className="pt-1 flex flex-col sm:flex-row sm:items-center gap-2">
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-900 shrink-0">
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-900 shrink-0">
                         Notified Adjacent Districts:
                       </span>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 flex-1">
                         {selectedEmergency.adjacent_districts_notified.map((dist: string) => (
                           <div
                             key={dist}
-                            className="flex items-center gap-1.5 text-[11px] font-mono bg-white text-blue-950 border border-blue-300 px-2.5 py-1.5 rounded-lg font-semibold shadow-2xs"
+                            className="flex items-center gap-1.5 text-xs font-mono bg-white text-blue-950 border border-blue-300 px-2.5 py-1.5 rounded-lg font-semibold shadow-2xs"
                           >
                             <MapPin className="w-3.5 h-3.5 text-blue-700 shrink-0" />
                             <span className="truncate" title={dist}>
@@ -968,7 +968,7 @@ export default function EmergencyPage() {
               </div>
 
               {/* 4. DESIGNATED DISASTER RESPONSE HOSPITALS (Primary, Secondary, Supporting) */}
-              <div className="p-4 rounded-xl border-2 border-red-200 bg-gradient-to-r from-red-50/60 via-[#FDF9F3] to-amber-50/40 space-y-3.5">
+              <div className="p-4 rounded-xl border-2 border-red-200 bg-gradient-to-r from-red-50/60 via-[#F6F0E9] to-amber-50/40 space-y-3.5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-red-200/80 pb-2.5">
                   <div className="flex items-center gap-2">
                     <Building className="w-4 h-4 text-red-800" />
@@ -976,7 +976,7 @@ export default function EmergencyPage() {
                       Designated Disaster Response Hospital Hierarchy
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono bg-emerald-100 text-emerald-900 border border-emerald-300 px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit">
+                  <span className="text-xs font-mono bg-emerald-100 text-emerald-900 border border-emerald-300 px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
                     ONLY DESIGNATED HOSPITALS AUTHORIZED TO CONFIRM &amp; RECEIVE
                   </span>
@@ -987,13 +987,13 @@ export default function EmergencyPage() {
                   <div className="p-3 rounded-lg bg-white border-l-4 border-l-red-600 border border-bhissm-border shadow-2xs flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between gap-1">
-                        <span className="text-[10px] font-mono font-bold uppercase text-red-800">
+                        <span className="text-xs font-mono font-bold uppercase text-red-800">
                           1. Primary Hospital (Command)
                         </span>
                         {user?.facility_id &&
                           (selectedEmergency.primary_facility_id || selectedEmergency.facilityId) ===
                             user.facility_id && (
-                            <span className="text-[9px] font-mono bg-red-600 text-white px-1.5 py-0.5 rounded font-bold">
+                            <span className="text-[11px] font-mono bg-red-600 text-white px-1.5 py-0.5 rounded font-bold">
                               YOUR HOSPITAL
                             </span>
                           )}
@@ -1004,7 +1004,7 @@ export default function EmergencyPage() {
                           'Primary Command Hospital'}
                       </div>
                     </div>
-                    <div className="text-[10px] text-emerald-800 font-mono font-semibold mt-2 pt-1.5 border-t border-gray-100">
+                    <div className="text-xs text-emerald-800 font-mono font-semibold mt-2 pt-1.5 border-t border-gray-100">
                       ✓ Authorized to Confirm &amp; Receive
                     </div>
                   </div>
@@ -1013,12 +1013,12 @@ export default function EmergencyPage() {
                   <div className="p-3 rounded-lg bg-white border-l-4 border-l-amber-600 border border-bhissm-border shadow-2xs flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between gap-1">
-                        <span className="text-[10px] font-mono font-bold uppercase text-amber-900">
+                        <span className="text-xs font-mono font-bold uppercase text-amber-900">
                           2. Secondary Hospital (Backup)
                         </span>
                         {user?.facility_id &&
                           selectedEmergency.secondary_facility_id === user.facility_id && (
-                            <span className="text-[9px] font-mono bg-amber-600 text-white px-1.5 py-0.5 rounded font-bold">
+                            <span className="text-[11px] font-mono bg-amber-600 text-white px-1.5 py-0.5 rounded font-bold">
                               YOUR HOSPITAL
                             </span>
                           )}
@@ -1031,7 +1031,7 @@ export default function EmergencyPage() {
                         )}
                       </div>
                     </div>
-                    <div className="text-[10px] text-emerald-800 font-mono font-semibold mt-2 pt-1.5 border-t border-gray-100">
+                    <div className="text-xs text-emerald-800 font-mono font-semibold mt-2 pt-1.5 border-t border-gray-100">
                       {selectedEmergency.secondary_facility_name
                         ? '✓ Authorized to Confirm & Receive'
                         : 'Assign backup hospital'}
@@ -1042,7 +1042,7 @@ export default function EmergencyPage() {
                   <div className="p-3 rounded-lg bg-white border-l-4 border-l-blue-700 border border-bhissm-border shadow-2xs flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between gap-1">
-                        <span className="text-[10px] font-mono font-bold uppercase text-blue-900">
+                        <span className="text-xs font-mono font-bold uppercase text-blue-900">
                           3. Supporting Hospitals (
                           {selectedEmergency.supporting_facilities?.length || 0})
                         </span>
@@ -1050,7 +1050,7 @@ export default function EmergencyPage() {
                           (selectedEmergency.supporting_facility_ids || []).includes(
                             user.facility_id
                           ) && (
-                            <span className="text-[9px] font-mono bg-blue-700 text-white px-1.5 py-0.5 rounded font-bold">
+                            <span className="text-[11px] font-mono bg-blue-700 text-white px-1.5 py-0.5 rounded font-bold">
                               YOUR HOSPITAL
                             </span>
                           )}
@@ -1061,7 +1061,7 @@ export default function EmergencyPage() {
                           {selectedEmergency.supporting_facilities.map((sf: any) => (
                             <span
                               key={sf.id}
-                              className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${
+                              className={`text-xs px-1.5 py-0.5 rounded border font-medium ${
                                 sf.id === user?.facility_id
                                   ? 'bg-blue-100 text-blue-950 border-blue-400 font-bold'
                                   : 'bg-gray-50 text-bhissm-dark border-gray-200'
@@ -1072,12 +1072,12 @@ export default function EmergencyPage() {
                           ))}
                         </div>
                       ) : (
-                        <div className="text-bhissm-secondary italic text-[11px] mt-1.5">
+                        <div className="text-bhissm-secondary italic text-xs mt-1.5">
                           No supporting hospitals assigned yet
                         </div>
                       )}
                     </div>
-                    <div className="text-[10px] text-emerald-800 font-mono font-semibold mt-2 pt-1.5 border-t border-gray-100">
+                    <div className="text-xs text-emerald-800 font-mono font-semibold mt-2 pt-1.5 border-t border-gray-100">
                       ✓ Authorized to Confirm &amp; Receive
                     </div>
                   </div>
@@ -1122,7 +1122,7 @@ export default function EmergencyPage() {
                     <h3 className="text-xs font-black uppercase tracking-wider text-bhissm-dark font-mono">
                       Resource Requisitions &amp; Mutual Aid Fulfillment
                     </h3>
-                    <p className="text-[11px] text-bhissm-secondary">
+                    <p className="text-xs text-bhissm-secondary">
                       {isAuthorizedReceiver
                         ? `Your hospital (${userDesignationBadge}) can requisition supplies and Confirm & Receive deliveries below.`
                         : 'Neighbouring and cross-border hospitals can offer surplus stock, ambulances, or specialist teams.'}
@@ -1152,7 +1152,7 @@ export default function EmergencyPage() {
                 </div>
 
                 {selectedEmergency.requirements?.length === 0 ? (
-                  <div className="text-center py-8 text-xs text-bhissm-secondary font-mono bg-[#F8F1E7]/40 rounded-lg border border-bhissm-border">
+                  <div className="text-center py-8 text-xs text-bhissm-secondary font-mono bg-[#EFE8E0]/40 rounded-lg border border-bhissm-border">
                     No resource requisition items filed yet. Click "Requisition Resource" to request medicines, ambulances, blood, or specialists.
                   </div>
                 ) : (
@@ -1175,12 +1175,12 @@ export default function EmergencyPage() {
                                 <span className="font-extrabold text-bhissm-dark text-sm">
                                   {display.title}
                                 </span>
-                                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#F8F1E7] border border-bhissm-border text-bhissm-dark font-semibold">
+                                <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#EFE8E0] border border-bhissm-border text-bhissm-dark font-semibold">
                                   {display.badge}
                                 </span>
                               </div>
                               {req.description && req.description !== display.title && (
-                                <div className="text-[11px] text-bhissm-secondary mt-0.5">
+                                <div className="text-xs text-bhissm-secondary mt-0.5">
                                   {req.description}
                                 </div>
                               )}
@@ -1188,7 +1188,7 @@ export default function EmergencyPage() {
 
                             <div className="sm:text-right flex sm:flex-col items-center sm:items-end justify-between gap-2">
                               <span
-                                className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded-full font-bold ${
+                                className={`text-xs font-mono uppercase px-2 py-0.5 rounded-full font-bold ${
                                   req.status === 'fulfilled'
                                     ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                                     : 'bg-amber-100 text-amber-900 border border-amber-300'
@@ -1215,7 +1215,7 @@ export default function EmergencyPage() {
                           {/* Incoming Offers submitted for this requirement */}
                           {req.offers && req.offers.length > 0 && (
                             <div className="pt-2 border-t border-gray-100 space-y-2">
-                              <div className="text-[10px] font-mono font-bold text-bhissm-secondary uppercase">
+                              <div className="text-xs font-mono font-bold text-bhissm-secondary uppercase">
                                 External Facility Mutual Aid Offers ({req.offers.length}):
                               </div>
                               {req.offers.map((offer: any) => {
@@ -1229,7 +1229,7 @@ export default function EmergencyPage() {
                                 return (
                                   <div
                                     key={offer.id}
-                                    className="p-2.5 bg-[#F8F1E7]/60 rounded-lg border border-bhissm-border/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px]"
+                                    className="p-2.5 bg-[#EFE8E0]/60 rounded-lg border border-bhissm-border/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
                                   >
                                     <div>
                                       <span className="font-bold text-bhissm-dark">
@@ -1247,7 +1247,7 @@ export default function EmergencyPage() {
                                     {/* STRICT AUTHORIZATION CONTROLS */}
                                     <div className="flex flex-wrap items-center gap-1.5">
                                       {offer.status === 'received' ? (
-                                        <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 px-2.5 py-0.5 rounded font-mono font-bold text-[10px] flex items-center gap-1">
+                                        <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 px-2.5 py-0.5 rounded font-mono font-bold text-xs flex items-center gap-1">
                                           <CheckCircle className="w-3 h-3 text-emerald-700" />
                                           CONFIRMED &amp; RECEIVED
                                         </span>
@@ -1256,14 +1256,14 @@ export default function EmergencyPage() {
                                           {offer.status === 'offered' && (
                                             <button
                                               onClick={() => handleAcceptOffer(offer.id)}
-                                              className="btn-outline text-[10px] py-1 px-2.5 font-mono font-bold bg-white"
+                                              className="btn-outline text-xs py-1 px-2.5 font-mono font-bold bg-white"
                                             >
                                               Reserve Offer
                                             </button>
                                           )}
                                           <button
                                             onClick={() => handleConfirmAndReceive(offer.id)}
-                                            className="bg-emerald-700 hover:bg-emerald-800 text-white rounded text-[10px] py-1 px-2.5 font-mono font-bold flex items-center gap-1 shadow-xs transition-colors cursor-pointer"
+                                            className="bg-emerald-700 hover:bg-emerald-800 text-white rounded text-xs py-1 px-2.5 font-mono font-bold flex items-center gap-1 shadow-xs transition-colors cursor-pointer"
                                           >
                                             <Check className="w-3 h-3" />
                                             Confirm &amp; Receive
@@ -1274,12 +1274,12 @@ export default function EmergencyPage() {
                                           {isDonorOfThisOffer && offer.status === 'reserved' && (
                                             <button
                                               onClick={() => handleDispatchOffer(offer.id)}
-                                              className="btn-danger text-[10px] py-0.5 px-2 font-mono"
+                                              className="btn-danger text-xs py-0.5 px-2 font-mono"
                                             >
                                               Dispatch Transit
                                             </button>
                                           )}
-                                          <span className="text-[10px] font-mono text-amber-900 bg-amber-100/80 border border-amber-300 px-2 py-0.5 rounded flex items-center gap-1">
+                                          <span className="text-xs font-mono text-amber-900 bg-amber-100/80 border border-amber-300 px-2 py-0.5 rounded flex items-center gap-1">
                                             <Lock className="w-3 h-3" />
                                             Only Designated Hospitals Can Confirm &amp; Receive
                                           </span>
@@ -1295,7 +1295,7 @@ export default function EmergencyPage() {
                           {/* Action Footer */}
                           <div className="pt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-2">
                             {isAuthorizedReceiver ? (
-                              <div className="text-[11px] font-mono text-emerald-900 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200 flex items-center gap-1.5">
+                              <div className="text-xs font-mono text-emerald-900 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200 flex items-center gap-1.5">
                                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                                 <span>
                                   Your hospital is a designated{' '}
@@ -1312,7 +1312,7 @@ export default function EmergencyPage() {
                                     setOfferQty(Math.max(1, Math.min(100, qtyReq - qtyConf)));
                                     setShowOfferModal(true);
                                   }}
-                                  className="btn-outline text-[11px] py-1 px-3 flex items-center gap-1.5 font-mono font-bold bg-white hover:bg-emerald-50 hover:text-emerald-900 hover:border-emerald-300 cursor-pointer"
+                                  className="btn-outline text-xs py-1 px-3 flex items-center gap-1.5 font-mono font-bold bg-white hover:bg-emerald-50 hover:text-emerald-900 hover:border-emerald-300 cursor-pointer"
                                 >
                                   <Send className="w-3 h-3" /> Offer Mutual Aid from Local Stock
                                 </button>
@@ -1320,7 +1320,7 @@ export default function EmergencyPage() {
                             )}
 
                             {qtyConf < qtyReq && (
-                              <span className="text-[11px] font-mono text-red-700 font-bold ml-auto">
+                              <span className="text-xs font-mono text-red-700 font-bold ml-auto">
                                 Deficit: {qtyReq - qtyConf} {display.unitLabel}
                               </span>
                             )}
@@ -1424,7 +1424,7 @@ export default function EmergencyPage() {
                     }
                     required
                   />
-                  <span className="text-[10px] text-bhissm-secondary">
+                  <span className="text-xs text-bhissm-secondary">
                     Note: Emergencies with &gt;500 casualties escalate to National Command.
                   </span>
                 </div>
@@ -1444,9 +1444,9 @@ export default function EmergencyPage() {
 
               {/* HOSPITAL HIERARCHY DESIGNATION SECTION */}
               <div className="p-3 bg-red-50/50 border border-red-200 rounded space-y-3">
-                <div className="text-[11px] font-mono font-bold uppercase text-red-900 flex items-center justify-between">
+                <div className="text-xs font-mono font-bold uppercase text-red-900 flex items-center justify-between">
                   <span>Declare Designated Response Hospitals</span>
-                  <span className="text-[10px] text-emerald-900 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300">
+                  <span className="text-xs text-emerald-900 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300">
                     Authorized to Confirm &amp; Receive
                   </span>
                 </div>
@@ -1525,7 +1525,7 @@ export default function EmergencyPage() {
                         return (
                           <label
                             key={f.id}
-                            className={`flex items-center gap-2 p-1.5 rounded cursor-pointer border text-[11px] ${
+                            className={`flex items-center gap-2 p-1.5 rounded cursor-pointer border text-xs ${
                               checked
                                 ? 'bg-blue-50 border-blue-400 font-bold text-blue-950'
                                 : 'border-transparent hover:bg-gray-50'
@@ -1582,7 +1582,7 @@ export default function EmergencyPage() {
                 <h3 className="font-bold text-base text-red-950 font-mono">
                   FINAL VERIFICATION REQUIRED (STEP 2)
                 </h3>
-                <div className="text-[11px] text-red-800 font-mono">PROTOCOL SAFETY CHECK</div>
+                <div className="text-xs text-red-800 font-mono">PROTOCOL SAFETY CHECK</div>
               </div>
             </div>
 
@@ -1720,7 +1720,7 @@ export default function EmergencyPage() {
                 <label className="block font-bold text-blue-900 mb-1">
                   3. Supporting Hospitals (Auxiliary Triage &amp; Receiving Hospitals)
                 </label>
-                <div className="grid grid-cols-1 gap-1.5 max-h-44 overflow-y-auto p-2 bg-[#FDF9F3] border border-bhissm-border rounded">
+                <div className="grid grid-cols-1 gap-1.5 max-h-44 overflow-y-auto p-2 bg-[#F6F0E9] border border-bhissm-border rounded">
                   {facilities
                     .filter(
                       (f) =>
@@ -1732,7 +1732,7 @@ export default function EmergencyPage() {
                       return (
                         <label
                           key={f.id}
-                          className={`flex items-center gap-2 p-1.5 rounded cursor-pointer border text-[11px] ${
+                          className={`flex items-center gap-2 p-1.5 rounded cursor-pointer border text-xs ${
                             checked
                               ? 'bg-blue-50 border-blue-400 font-bold text-blue-950'
                               : 'bg-white border-gray-200 hover:bg-gray-50'

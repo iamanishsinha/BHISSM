@@ -258,14 +258,14 @@ export default function NationalReservePage() {
   return (
     <div className="space-y-6">
       {/* Top 2-Tier Supply Flow Banner: Central -> State Reserve -> Hospital */}
-      <div className="card p-5 bg-gradient-to-r from-[#FFF9F1] via-[#F2FBF6] to-[#FFF9F1] border-2 border-emerald-300 space-y-4">
+      <div className="card p-5 bg-gradient-to-r from-[#F6F0E9] via-[#F2FBF6] to-[#F6F0E9] border-2 border-emerald-300 space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-mono font-black uppercase tracking-wider text-emerald-950 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded">
                 2-TIER STRATEGIC DISTRIBUTION PIPELINE
               </span>
-              <span className="text-[11px] font-mono font-bold text-bhissm-dark bg-white border border-bhissm-border px-2.5 py-0.5 rounded flex items-center gap-1.5">
+              <span className="text-xs font-mono font-bold text-bhissm-dark bg-white border border-bhissm-border px-2.5 py-0.5 rounded flex items-center gap-1.5">
                 <span>1. CENTRAL RELEASE</span>
                 <ArrowRight className="w-3 h-3 text-emerald-700" />
                 <span>2. STATE RESERVE STOCK</span>
@@ -302,7 +302,7 @@ export default function NationalReservePage() {
 
         {/* Mode Switcher Tabs */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-emerald-200/80">
-          <div className="flex bg-[#F8F1E7] p-1 rounded-lg border border-bhissm-border text-xs font-mono font-bold gap-1">
+          <div className="flex bg-[#EFE8E0] p-1 rounded-lg border border-bhissm-border text-xs font-mono font-bold gap-1">
             <button
               onClick={() => setActiveTab('state_reserve')}
               className={`px-3.5 py-1.5 rounded-md transition-all flex items-center gap-2 cursor-pointer ${
@@ -351,10 +351,10 @@ export default function NationalReservePage() {
 
           <Link
             to="/admin/master-data"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-bhissm-border hover:bg-[#FDF6ED] text-xs font-mono font-bold text-bhissm-dark transition-colors shadow-2xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-bhissm-border hover:bg-[#F6F0E9] text-xs font-mono font-bold text-bhissm-dark transition-colors shadow-2xs"
             title="Open Master Data & Infrastructure Governance Console"
           >
-            <Database className="w-3.5 h-3.5 text-[#B65C62]" />
+            <Database className="w-3.5 h-3.5 text-[#8A0F1A]" />
             <span>Master Data Console</span>
           </Link>
         </div>
@@ -369,7 +369,7 @@ export default function NationalReservePage() {
           <div className="card p-4 bg-blue-50/70 border-2 border-blue-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-blue-700 text-white">
+                <span className="text-xs font-mono font-bold uppercase px-2 py-0.5 rounded bg-blue-700 text-white">
                   STATE RESERVE DEPOT
                 </span>
                 <span className="text-xs font-mono font-bold text-blue-950">
@@ -385,7 +385,7 @@ export default function NationalReservePage() {
 
             <div className="flex items-center gap-3 shrink-0">
               <div className="bg-white px-3 py-2 rounded-lg border border-blue-200 text-right font-mono">
-                <div className="text-[10px] text-blue-800 uppercase font-bold">
+                <div className="text-xs text-blue-800 uppercase font-bold">
                   Total State Reserve Units
                 </div>
                 <div className="text-lg font-black text-blue-950">
@@ -410,13 +410,13 @@ export default function NationalReservePage() {
 
           {/* State Reserve Medicine Stock Grid */}
           <div className="card p-0 overflow-hidden border border-bhissm-border">
-            <div className="p-3.5 bg-[#F8F1E7] border-b border-bhissm-border flex items-center justify-between">
+            <div className="p-3.5 bg-[#EFE8E0] border-b border-bhissm-border flex items-center justify-between">
               <h2 className="text-xs font-black uppercase tracking-wider text-bhissm-dark font-mono flex items-center gap-2">
                 <Boxes className="w-4 h-4 text-blue-800" />
                 {stateReserveData?.state?.name || 'State'} Reserve Stockpile Inventory (
                 {stateReserveData?.stock?.length || 0} Formulations)
               </h2>
-              <span className="text-[10px] font-mono text-bhissm-secondary font-bold">
+              <span className="text-xs font-mono text-bhissm-secondary font-bold">
                 FEFO BATCH TRACKED • READY FOR HOSPITAL REDISTRIBUTION
               </span>
             </div>
@@ -434,10 +434,10 @@ export default function NationalReservePage() {
                 </thead>
                 <tbody className="divide-y divide-bhissm-border/40">
                   {stateReserveData?.stock?.map((item: any) => (
-                    <tr key={item.id} className="hover:bg-[#FDF9F3]">
+                    <tr key={item.id} className="hover:bg-[#F6F0E9]">
                       <td className="table-cell">
                         <div className="font-bold text-bhissm-dark">{item.medicine_name}</div>
-                        <div className="text-[11px] text-bhissm-secondary font-mono">
+                        <div className="text-xs text-bhissm-secondary font-mono">
                           {item.generic_name} ({item.unit_type})
                         </div>
                       </td>
@@ -446,7 +446,7 @@ export default function NationalReservePage() {
                           {item.category}
                         </span>
                         <span
-                          className={`ml-2 text-[10px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
+                          className={`ml-2 text-xs font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
                             item.criticality === 'critical'
                               ? 'bg-red-100 text-red-800'
                               : item.criticality === 'high'
@@ -466,7 +466,7 @@ export default function NationalReservePage() {
                       <td className="table-cell text-center">
                         <button
                           onClick={() => handleOpenRedistributeModal(item)}
-                          className="bg-blue-700 hover:bg-blue-800 text-white text-[11px] font-mono font-bold py-1 px-3 rounded inline-flex items-center gap-1 shadow-2xs cursor-pointer"
+                          className="bg-blue-700 hover:bg-blue-800 text-white text-xs font-mono font-bold py-1 px-3 rounded inline-flex items-center gap-1 shadow-2xs cursor-pointer"
                         >
                           <Send className="w-3 h-3" />
                           <span>Redistribute to Hospital</span>
@@ -486,7 +486,7 @@ export default function NationalReservePage() {
                 <History className="w-4 h-4 text-bhissm-dark" />
                 State Reserve Receipt &amp; Hospital Redistribution Ledger
               </h3>
-              <span className="text-[10px] font-mono text-bhissm-secondary">
+              <span className="text-xs font-mono text-bhissm-secondary">
                 CENTRAL INFLOWS &amp; HOSPITAL OUTFLOWS
               </span>
             </div>
@@ -507,7 +507,7 @@ export default function NationalReservePage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <span
-                            className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-bold ${
+                            className={`text-xs font-mono uppercase px-2 py-0.5 rounded font-bold ${
                               isCentralReceipt
                                 ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
                                 : 'bg-blue-100 text-blue-900 border border-blue-300'
@@ -520,7 +520,7 @@ export default function NationalReservePage() {
                           <span className="font-bold text-bhissm-dark">{tx.medicine_name}</span>
                         </div>
                         <div className="text-bhissm-secondary mt-0.5">{tx.notes}</div>
-                        <div className="text-[10px] font-mono text-bhissm-secondary/80">
+                        <div className="text-xs font-mono text-bhissm-secondary/80">
                           {new Date(tx.created_at).toLocaleString()}
                         </div>
                       </div>
@@ -556,10 +556,10 @@ export default function NationalReservePage() {
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-bhissm-secondary uppercase font-bold">
+                    <span className="text-xs font-mono text-bhissm-secondary uppercase font-bold">
                       {res.category}
                     </span>
-                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-900 border border-emerald-200 font-bold">
+                    <span className="text-[11px] font-mono uppercase px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-900 border border-emerald-200 font-bold">
                       CENTRAL DEPOT
                     </span>
                   </div>
@@ -608,7 +608,7 @@ export default function NationalReservePage() {
                 <History className="w-4 h-4 text-bhissm-dark" />
                 Central-to-State Reserve Release Ledger ({releases.length})
               </h2>
-              <span className="text-[10px] font-mono text-bhissm-secondary">
+              <span className="text-xs font-mono text-bhissm-secondary">
                 CREDITED DIRECTLY TO STATE RESERVE DEPOTS
               </span>
             </div>
@@ -632,7 +632,7 @@ export default function NationalReservePage() {
                         <span className="font-mono font-bold text-emerald-800 text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                           +{rel.quantity?.toLocaleString()} Units → {rel.destination_state_name} State Reserve
                         </span>
-                        <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded font-bold bg-blue-100 text-blue-900">
+                        <span className="text-xs font-mono uppercase px-2 py-0.5 rounded font-bold bg-blue-100 text-blue-900">
                           {rel.status.replace(/_/g, ' ')}
                         </span>
                       </div>
@@ -641,7 +641,7 @@ export default function NationalReservePage() {
                         <br />
                         <strong>Justification:</strong> {rel.reason}
                       </div>
-                      <div className="text-[10px] text-bhissm-secondary font-mono mt-0.5">
+                      <div className="text-xs text-bhissm-secondary font-mono mt-0.5">
                         Authorized by {rel.released_by_name || 'National Reserve Officer'} •{' '}
                         {new Date(rel.created_at).toLocaleString()}
                       </div>
@@ -665,7 +665,7 @@ export default function NationalReservePage() {
                   <h3 className="font-bold text-sm text-bhissm-dark uppercase font-mono">
                     Release Central Stock to State Reserve
                   </h3>
-                  <p className="text-[10px] text-bhissm-secondary">
+                  <p className="text-xs text-bhissm-secondary">
                     Credits the selected State's Medical Reserve Depot for hospital redistribution
                   </p>
                 </div>
@@ -785,7 +785,7 @@ export default function NationalReservePage() {
                   <h3 className="font-bold text-sm text-bhissm-dark uppercase font-mono">
                     Redistribute State Reserve to Hospital
                   </h3>
-                  <p className="text-[10px] text-bhissm-secondary">
+                  <p className="text-xs text-bhissm-secondary">
                     Source: {stateReserveData?.depot?.name || 'State Reserve Depot'}
                   </p>
                 </div>
@@ -877,7 +877,7 @@ export default function NationalReservePage() {
                   }
                   required
                 />
-                <div className="text-[10px] font-mono text-blue-800 mt-1">
+                <div className="text-xs font-mono text-blue-800 mt-1">
                   Available in State Reserve: {redistributeForm.available_in_state?.toLocaleString()} units
                 </div>
               </div>

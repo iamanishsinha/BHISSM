@@ -741,62 +741,56 @@ export default function LoginPage() {
   });
 
   return (
-    <div className="min-h-screen bg-bhissm-bg py-8 px-4 flex flex-col items-center justify-center font-sans antialiased text-bhissm-dark">
-      {/* Flagship BHISSM Identity Hero */}
-      <div className="w-full max-w-6xl mb-6 card p-6 bg-gradient-to-r from-[#FFF9F1] via-[#FDF3E7] to-[#FAE8EB]/75 border-2 border-bhissm-border shadow-md">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bhissm-emblem-box text-[#FFF9F1] flex flex-col items-center justify-center border-2 border-[#E8A7B5] shadow-md shrink-0">
-              <span className="font-black text-2xl tracking-tighter leading-none">BH</span>
-              <span className="text-[9px] font-mono uppercase tracking-widest text-[#F4D5DC] mt-0.5 font-bold">
-                INDIA
+    <div className="min-h-screen bg-bhissm-bg py-8 sm:py-12 px-4 sm:px-6 md:px-10 flex flex-col items-center justify-center font-sans antialiased text-bhissm-dark">
+      {/* ── EDITORIAL RETRO HERO HEADER ───────────────────────────────────────── */}
+      <div className="w-full max-w-6xl mb-8 card p-6 sm:p-8 bg-bhissm-surface border border-bhissm-maroon/25 shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="font-display text-5xl sm:text-6xl md:text-7xl text-bhissm-maroon leading-none tracking-tight">
+                BHISSM
+              </span>
+              <span className="text-bhissm-gold text-2xl font-bold">✳</span>
+              <span className="text-xs bg-bhissm-maroon text-[#F6E9DC] px-2.5 py-1 rounded-full font-mono font-bold tracking-wider">
+                PAN-INDIA COMMAND GRID
               </span>
             </div>
 
-            <div className="text-left">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <h1 className="text-3xl sm:text-4xl font-black tracking-tight bhissm-brand-title leading-none">
-                  BHISSM
-                </h1>
-                <span className="text-[11px] bg-[#2D2926] text-[#FFF9F1] px-2.5 py-1 rounded-md font-mono font-bold tracking-wider border border-[#D4C8BC]">
-                  PAN-INDIA COMMAND GRID
-                </span>
-                <span className="text-[11px] bg-[#F4D5DC] text-[#2D2926] px-2.5 py-1 rounded-md font-mono font-bold border border-[#E8A7B5]">
-                  v2.0
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-bhissm-dark font-bold tracking-wide uppercase mt-1.5">
-                Bharat Health Initiative for SupplyChain Sourcing &amp; Management
-              </p>
-              <p className="text-xs text-bhissm-secondary mt-0.5">
-                Fully operational portal covering <strong>36 States &amp; Union Territories</strong>, <strong>36 State Reserve Depots</strong>, and <strong>100+ Hospitals</strong> with live FEFO tracking, 2-step disaster mobilization, and interstate mutual aid.
-              </p>
+            <div className="text-xs sm:text-sm font-bold uppercase tracking-wider text-bhissm-maroon mt-2">
+              Bharat Health Initiative for SupplyChain Sourcing &amp; Management
             </div>
+
+            <p className="text-xs sm:text-sm text-bhissm-secondary mt-1 max-w-2xl leading-relaxed">
+              Fully operational healthcare logistics architecture covering <strong>36 States &amp; Union Territories</strong>, <strong>36 State Reserve Depots</strong>, and <strong>100+ Hospitals</strong> with live FEFO tracking, two-step disaster mobilization, and interstate mutual aid.
+            </p>
           </div>
 
-          <div className="flex flex-wrap md:flex-col items-end gap-1.5 shrink-0">
-            <span className="demo-badge">FEDERATED NATIONAL HEALTH GRID</span>
-            <span className="text-[10px] font-mono bg-emerald-100 text-emerald-900 border border-emerald-300 px-2.5 py-0.5 rounded-full font-bold">
-              🟢 36 STATES &amp; UTs CONNECTED
+          <div className="flex flex-wrap md:flex-col items-start md:items-end gap-2 shrink-0">
+            <span className="badge-warning font-mono">
+              FEDERATED NATIONAL HEALTH GRID
+            </span>
+            <span className="badge-success font-mono flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-bhissm-success" />
+              <span>36 STATES &amp; UTs CONNECTED</span>
             </span>
           </div>
         </div>
       </div>
 
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Direct Login Card (4 cols) */}
-        <div className="lg:col-span-4 card space-y-4 shadow-sm border border-bhissm-border">
-          <div className="border-b border-bhissm-border pb-2 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-bhissm-dark uppercase font-mono tracking-wider flex items-center gap-1.5">
-              <KeyRound className="w-4 h-4 text-bhissm-dark" />
+        {/* ── LEFT COLUMN: DIRECT LOGIN (4 COLS) ─────────────────────────────── */}
+        <div className="lg:col-span-4 card space-y-5 border border-bhissm-maroon/25">
+          <div className="border-b border-bhissm-border pb-3 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-bhissm-maroon uppercase font-mono tracking-wider flex items-center gap-2">
+              <KeyRound className="w-4 h-4 text-bhissm-maroon" />
               Direct Sign In
             </h2>
-            <span className="text-[10px] font-mono text-bhissm-secondary">SECURE JWT</span>
+            <span className="text-xs font-mono text-bhissm-secondary">SECURE JWT</span>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
+          <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             <div>
-              <label className="block text-xs font-semibold text-bhissm-secondary mb-1 uppercase font-mono">
+              <label className="block text-xs font-semibold text-bhissm-secondary mb-1.5 uppercase font-mono">
                 Username Identifier
               </label>
               <input
@@ -810,7 +804,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-bhissm-secondary mb-1 uppercase font-mono">
+              <label className="block text-xs font-semibold text-bhissm-secondary mb-1.5 uppercase font-mono">
                 Security Password
               </label>
               <input
@@ -840,53 +834,49 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="pt-2 border-t border-bhissm-border text-[11px] text-bhissm-secondary space-y-1 font-mono">
+          <div className="pt-3 border-t border-bhissm-border text-xs text-bhissm-secondary space-y-1.5 font-mono">
             <div>• <strong>Hospital Node:</strong> Single facility pharmacy, ICU beds &amp; ambulances</div>
             <div>• <strong>State Command:</strong> All hospitals in state, State Reserve Depot &amp; redistribution</div>
             <div>• <strong>National Grid:</strong> Apex strategic medical stockpile &amp; interstate disaster relief</div>
           </div>
         </div>
 
-        {/* Right Column: Multi-State Interactive Credentials Directory (8 cols) */}
-        <div className="lg:col-span-8 card space-y-3 shadow-sm border border-bhissm-border">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-bhissm-border pb-2.5">
+        {/* ── RIGHT COLUMN: INTERACTIVE CREDENTIALS DIRECTORY (8 COLS) ───────── */}
+        <div className="lg:col-span-8 card space-y-4 border border-bhissm-maroon/25">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-bhissm-border pb-3">
             <div>
-              <h2 className="text-sm font-bold text-bhissm-dark uppercase font-mono tracking-wider flex items-center gap-1.5">
+              <h2 className="text-sm font-bold text-bhissm-maroon uppercase font-mono tracking-wider flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-bhissm-accent" />
                 Select Jurisdiction or Hospital Node
               </h2>
-              <p className="text-[11px] text-bhissm-secondary">
-                Click <strong>"Quick Login"</strong> to instantly enter as that role, or click the card to copy credentials.
+              <p className="text-xs text-bhissm-secondary mt-0.5">
+                Click <strong>"Quick Login"</strong> to instantly authenticate, or click any card to auto-fill.
               </p>
             </div>
-            <span className="text-[10px] font-mono bg-[#F8F1E7] border border-bhissm-border px-2 py-0.5 rounded font-bold">
+            <span className="text-xs font-mono bg-bhissm-bg border border-bhissm-border px-2.5 py-1 rounded-full font-bold text-bhissm-secondary">
               {filteredCredentials.length} Nodes Available
             </span>
           </div>
 
           {/* Search Bar & Role Filter */}
-          <div className="flex flex-col sm:flex-row items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-center gap-2.5">
             <div className="relative flex-1 w-full">
-              <Search className="w-3.5 h-3.5 text-bhissm-secondary absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-bhissm-secondary absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                className="input-field pl-8 py-1.5 text-xs font-mono"
+                className="input-field pl-8.5 py-2 text-xs font-mono"
                 placeholder="Search by state, hospital, city or username..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
 
-            <div className="flex items-center gap-1 w-full sm:w-auto">
+            <div className="flex items-center gap-1.5 w-full sm:w-auto">
               {(['all', 'national', 'state', 'hospital'] as const).map((r) => (
                 <button
                   key={r}
                   onClick={() => setRoleFilter(r)}
-                  className={`px-2.5 py-1 text-[11px] font-mono rounded uppercase font-bold transition-colors ${
-                    roleFilter === r
-                      ? 'bg-bhissm-dark text-[#FFF9F1]'
-                      : 'bg-[#F8F1E7] text-bhissm-secondary hover:text-bhissm-dark border border-bhissm-border/60'
-                  }`}
+                  className={`tab-pill uppercase ${roleFilter === r ? 'tab-pill-active' : ''}`}
                 >
                   {r}
                 </button>
@@ -895,15 +885,15 @@ export default function LoginPage() {
           </div>
 
           {/* Region Tabs */}
-          <div className="flex flex-wrap gap-1 p-1 bg-[#F8F1E7] rounded border border-bhissm-border text-xs font-mono font-semibold">
+          <div className="flex flex-wrap gap-1.5 p-1.5 bg-[#EFE8E0] rounded-xl border border-bhissm-border text-xs font-mono">
             {regions.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveRegion(tab)}
-                className={`px-2.5 py-1 rounded transition-colors ${
+                className={`px-3 py-1 rounded-lg transition-colors font-semibold ${
                   activeRegion === tab
-                    ? 'bg-bhissm-surface text-bhissm-dark font-bold shadow-xs border border-bhissm-border/60'
-                    : 'text-bhissm-secondary hover:text-bhissm-dark hover:bg-bhissm-pink/40'
+                    ? 'bg-bhissm-maroon text-[#F6E9DC] shadow-xs'
+                    : 'text-bhissm-secondary hover:text-bhissm-dark hover:bg-bhissm-maroon/10'
                 }`}
               >
                 {tab}
@@ -912,7 +902,7 @@ export default function LoginPage() {
           </div>
 
           {/* Credentials Cards List */}
-          <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
+          <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
             {filteredCredentials.length === 0 ? (
               <div className="p-8 text-center text-xs text-bhissm-secondary font-mono">
                 No matching logins found. Try clearing your search term.
@@ -921,7 +911,7 @@ export default function LoginPage() {
               filteredCredentials.map((c) => (
                 <div
                   key={c.user}
-                  className="p-2.5 border border-bhissm-border rounded bg-white hover:bg-[#FDF9F3] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                  className="p-3 border border-bhissm-border/70 rounded-xl bg-white hover:bg-bhissm-surface transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs"
                 >
                   <div
                     className="cursor-pointer flex-1"
@@ -931,37 +921,37 @@ export default function LoginPage() {
                     }}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-bhissm-dark">{c.label}</span>
+                      <span className="font-bold text-bhissm-dark text-sm">{c.label}</span>
                       <span
-                        className={`text-[9px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
+                        className={`text-[11px] font-mono uppercase px-2 py-0.5 rounded-full font-bold ${
                           c.role === 'National'
-                            ? 'bg-black text-white'
+                            ? 'bg-bhissm-maroon text-[#F6E9DC]'
                             : c.role === 'State'
-                            ? 'bg-emerald-100 text-emerald-950 border border-emerald-300'
-                            : 'bg-blue-100 text-blue-950 border border-blue-300'
+                            ? 'bg-[#DCE3C6] text-[#4B5A22]'
+                            : 'bg-[#D6E8E5] text-[#26605C]'
                         }`}
                       >
                         {c.role}
                       </span>
-                      <span className="text-[10px] text-bhissm-secondary font-mono">
+                      <span className="text-xs text-bhissm-secondary font-mono">
                         ({c.stateName})
                       </span>
                     </div>
-                    <div className="text-[11px] text-bhissm-secondary mt-0.5 line-clamp-1">
+                    <div className="text-xs text-bhissm-secondary mt-0.5 line-clamp-1">
                       {c.jurisdiction}
                     </div>
-                    <div className="text-[10px] font-mono text-bhissm-secondary/80 mt-1 flex items-center gap-2">
+                    <div className="text-xs font-mono text-bhissm-secondary/80 mt-1 flex items-center gap-2">
                       <span>User: <strong className="text-bhissm-dark">{c.user}</strong></span>
                       <span>•</span>
                       <span>Pass: <strong className="text-bhissm-dark">{c.pass}</strong></span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
                       onClick={() => handlePerformLogin(c.user, c.pass)}
-                      className="px-2.5 py-1.5 bg-bhissm-accent hover:bg-bhissm-accent/80 text-white rounded font-mono font-bold text-[11px] cursor-pointer transition-colors shadow-2xs"
+                      className="btn-primary text-xs py-1.5 px-3"
                     >
                       Quick Login →
                     </button>

@@ -185,7 +185,7 @@ export default function BloodBankPage() {
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-bhissm-secondary">
               REGIONAL BLOOD COLD CHAIN &amp; TRANSFUSION NETWORK
             </span>
-            <span className="text-[10px] bg-red-100 text-red-900 border border-red-300 px-1.5 py-0.2 rounded font-mono font-bold">
+            <span className="text-xs bg-red-100 text-red-900 border border-red-300 px-1.5 py-0.2 rounded font-mono font-bold">
               CROSS-MATCH &amp; LOGISTICS
             </span>
           </div>
@@ -221,7 +221,7 @@ export default function BloodBankPage() {
       <div className="card space-y-3">
         <h2 className="text-xs font-bold uppercase tracking-wider text-bhissm-dark font-mono border-b border-bhissm-border pb-1.5 flex items-center justify-between">
           <span>Regional Availability Matrix (By Blood Group)</span>
-          <span className="text-[10px] text-bhissm-secondary font-normal font-sans">
+          <span className="text-xs text-bhissm-secondary font-normal font-sans">
             Units Ready for Transfusion Dispatch
           </span>
         </h2>
@@ -244,7 +244,7 @@ export default function BloodBankPage() {
               >
                 <div className="text-sm font-bold">{group}</div>
                 <div className="text-lg font-bold mt-0.5">{totalAvail}</div>
-                <div className="text-[9px] uppercase tracking-wider text-bhissm-secondary mt-0.5">
+                <div className="text-[11px] uppercase tracking-wider text-bhissm-secondary mt-0.5">
                   {totalAvail === 0 ? 'Exhausted' : isDeficit ? 'Deficit' : 'Units'}
                 </div>
               </div>
@@ -259,7 +259,7 @@ export default function BloodBankPage() {
           <h2 className="text-xs font-bold uppercase tracking-wider text-bhissm-dark font-mono">
             Active Blood Requests &amp; Mutual Aid Dispatches ({requests.length})
           </h2>
-          <span className="text-[10px] font-mono text-bhissm-secondary">
+          <span className="text-xs font-mono text-bhissm-secondary">
             STATEWIDE REQUISITION PIPELINE
           </span>
         </div>
@@ -278,7 +278,7 @@ export default function BloodBankPage() {
                       {req.blood_group} • {req.component.replace('_', ' ').toUpperCase()}
                     </span>
                     <span
-                      className={`text-[9px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
+                      className={`text-[11px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
                         req.priority === 'urgent'
                           ? 'bg-red-100 text-red-800'
                           : 'bg-blue-100 text-blue-800'
@@ -287,7 +287,7 @@ export default function BloodBankPage() {
                       {req.priority}
                     </span>
                     <span
-                      className={`text-[9px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
+                      className={`text-[11px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
                         req.status === 'completed'
                           ? 'bg-emerald-100 text-emerald-800'
                           : req.status === 'source_identified'
@@ -301,7 +301,7 @@ export default function BloodBankPage() {
                   <div className="text-bhissm-secondary mt-1">
                     <strong>Requesting Hospital:</strong> {req.facility_name} • Reason: {req.reason || 'Surgical requirement'}
                   </div>
-                  <div className="text-[10px] text-bhissm-secondary font-mono mt-0.5">
+                  <div className="text-xs text-bhissm-secondary font-mono mt-0.5">
                     Filed by {req.requested_by_name || 'Resident Medical Officer'} • {new Date(req.created_at).toLocaleString()}
                   </div>
                 </div>
@@ -311,7 +311,7 @@ export default function BloodBankPage() {
                     <div className="font-bold text-sm text-bhissm-dark">
                       {req.units_confirmed} / {req.units_required} Units
                     </div>
-                    <div className="text-[10px] text-bhissm-secondary">
+                    <div className="text-xs text-bhissm-secondary">
                       {req.units_required - req.units_confirmed > 0
                         ? `Deficit: ${req.units_required - req.units_confirmed} units`
                         : 'Fulfilled'}
@@ -335,7 +335,7 @@ export default function BloodBankPage() {
 
       {/* Detailed Blood Inventory Table */}
       <div className="card p-0 overflow-hidden">
-        <div className="p-3 border-b border-bhissm-border bg-[#F8F1E7]/50 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="p-3 border-b border-bhissm-border bg-[#EFE8E0]/50 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="font-bold uppercase tracking-wider text-bhissm-dark font-mono">
             Facility Blood Bank Stock Inventory
           </div>
@@ -392,10 +392,10 @@ export default function BloodBankPage() {
             </thead>
             <tbody className="divide-y divide-bhissm-border/40">
               {bloodInventory.map((item) => (
-                <tr key={item.id} className="hover:bg-[#FDF9F3]">
+                <tr key={item.id} className="hover:bg-[#F6F0E9]">
                   <td className="table-cell">
                     <div className="font-semibold text-bhissm-dark">{item.blood_bank_name}</div>
-                    <div className="text-[10px] text-bhissm-secondary font-mono">
+                    <div className="text-xs text-bhissm-secondary font-mono">
                       {item.facility_name} ({item.state_name})
                     </div>
                   </td>
@@ -438,7 +438,7 @@ export default function BloodBankPage() {
           <div className="card bg-white max-w-lg w-full p-5 shadow-2xl border-2 border-red-700 space-y-4">
             <div className="flex items-center justify-between border-b border-bhissm-border pb-2.5">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-red-100 text-red-900 font-bold">
+                <span className="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-red-100 text-red-900 font-bold">
                   MANUAL BLOOD BANK INWARD STOCK ENTRY
                 </span>
                 <h3 className="font-bold text-base text-bhissm-dark mt-1 flex items-center gap-2">

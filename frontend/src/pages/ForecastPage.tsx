@@ -103,7 +103,7 @@ export default function ForecastPage() {
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-bhissm-secondary">
               PREDICTIVE INTELLIGENCE & SAFETY DYNAMICS
             </span>
-            <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-1.5 py-0.2 rounded font-mono font-bold">
+            <span className="text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 px-1.5 py-0.2 rounded font-mono font-bold">
               WEIGHTED MOVING AVG + SEASONAL FACTOR
             </span>
           </div>
@@ -118,7 +118,7 @@ export default function ForecastPage() {
       </div>
 
       {/* Model Transparency Formula Banner */}
-      <div className="card bg-[#F4D5DC]/30 border-bhissm-border p-4 text-xs space-y-2">
+      <div className="card bg-[#EFD3C2]/30 border-bhissm-border p-4 text-xs space-y-2">
         <div className="flex items-center gap-2 text-bhissm-dark font-bold font-mono">
           <Sparkles className="w-4 h-4 text-bhissm-accent" />
           MATHEMATICAL AUDIT LOG: DYNAMIC SAFETY STOCK FORMULA
@@ -126,19 +126,19 @@ export default function ForecastPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
           <div className="bg-white p-2.5 rounded border border-bhissm-border/60">
             <div className="font-bold text-bhissm-dark">1. Protected Stock Formula</div>
-            <code className="text-[11px] text-bhissm-secondary block mt-1">
+            <code className="text-xs text-bhissm-secondary block mt-1">
               Protected = (DailyForecast × LeadTime) + (SafetyBuffer 50%) + ActiveReservations
             </code>
           </div>
           <div className="bg-white p-2.5 rounded border border-bhissm-border/60">
             <div className="font-bold text-bhissm-dark">2. Safe Transferable Quota</div>
-            <code className="text-[11px] text-bhissm-secondary block mt-1">
+            <code className="text-xs text-bhissm-secondary block mt-1">
               SafeTransferable = Max(0, CurrentStock - ProtectedStock)
             </code>
           </div>
           <div className="bg-white p-2.5 rounded border border-bhissm-border/60">
             <div className="font-bold text-bhissm-dark">3. Donor Protection Invariant</div>
-            <code className="text-[11px] text-bhissm-secondary block mt-1">
+            <code className="text-xs text-bhissm-secondary block mt-1">
               No hospital is ever permitted to offer stock exceeding SafeTransferable.
             </code>
           </div>
@@ -147,11 +147,11 @@ export default function ForecastPage() {
 
       {/* Forecast & Stockout Prediction Table */}
       <div className="card p-0 overflow-hidden">
-        <div className="p-3 border-b border-bhissm-border bg-[#F8F1E7]/50 flex items-center justify-between">
+        <div className="p-3 border-b border-bhissm-border bg-[#EFE8E0]/50 flex items-center justify-between">
           <h2 className="text-xs font-bold uppercase tracking-wider text-bhissm-dark font-mono">
             Facility Predictive Stockout Horizon (90-Day History Analysis)
           </h2>
-          <span className="text-[11px] text-bhissm-secondary font-mono">
+          <span className="text-xs text-bhissm-secondary font-mono">
             Showing {forecasts.length} Formulations
           </span>
         </div>
@@ -173,10 +173,10 @@ export default function ForecastPage() {
             </thead>
             <tbody className="divide-y divide-bhissm-border/40">
               {forecasts.map((item) => (
-                <tr key={item.medicine_id} className="hover:bg-[#FDF9F3]">
+                <tr key={item.medicine_id} className="hover:bg-[#F6F0E9]">
                   <td className="table-cell">
                     <div className="font-semibold text-bhissm-dark">{item.medicine_name}</div>
-                    <div className="text-[10px] text-bhissm-secondary font-mono capitalize">
+                    <div className="text-xs text-bhissm-secondary font-mono capitalize">
                       {item.category} • {item.criticality}
                     </div>
                   </td>
@@ -187,7 +187,7 @@ export default function ForecastPage() {
 
                   <td className="table-cell text-right font-mono">
                     <div>{item.forecast?.daily} /day</div>
-                    <div className="text-[10px] text-bhissm-secondary">
+                    <div className="text-xs text-bhissm-secondary">
                       {item.forecast?.monthly.toLocaleString()} /mo (×{item.forecast?.seasonal_factor} season)
                     </div>
                   </td>
@@ -210,7 +210,7 @@ export default function ForecastPage() {
                     </span>
                   </td>
 
-                  <td className="table-cell text-center font-mono text-[11px]">
+                  <td className="table-cell text-center font-mono text-xs">
                     {item.predicted_stockout_date ? (
                       <span
                         className={`px-1.5 py-0.5 rounded border ${
@@ -265,7 +265,7 @@ export default function ForecastPage() {
               <Calculator className="w-4 h-4 text-bhissm-dark" />
               Donor Safe Transfer Calculator
             </h2>
-            <span className="text-[10px] font-mono text-bhissm-secondary">REAL-TIME CHECK</span>
+            <span className="text-xs font-mono text-bhissm-secondary">REAL-TIME CHECK</span>
           </div>
 
           <p className="text-xs text-bhissm-secondary">
@@ -311,7 +311,7 @@ export default function ForecastPage() {
 
           {/* Calculator Output Display */}
           {calcResult && (
-            <div className="p-3 bg-[#FFF9F1] border border-bhissm-border rounded text-xs space-y-3">
+            <div className="p-3 bg-[#F6F0E9] border border-bhissm-border rounded text-xs space-y-3">
               <div className="flex justify-between items-center pb-2 border-b border-bhissm-border/60">
                 <span className="font-bold text-bhissm-dark">Verification Outcome:</span>
                 {calcResult.can_offer ? (
@@ -327,7 +327,7 @@ export default function ForecastPage() {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono">
                 <div>
                   <span className="text-bhissm-secondary">Current Stock:</span>
                   <div className="font-bold text-bhissm-dark">{calcResult.current_stock?.toLocaleString()}</div>
@@ -360,7 +360,7 @@ export default function ForecastPage() {
               <Layers className="w-4 h-4 text-bhissm-dark" />
               Multi-Source Network Fulfillment Planner
             </h2>
-            <span className="text-[10px] font-mono text-bhissm-secondary">AGGREGATION</span>
+            <span className="text-xs font-mono text-bhissm-secondary">AGGREGATION</span>
           </div>
 
           <p className="text-xs text-bhissm-secondary">
@@ -407,7 +407,7 @@ export default function ForecastPage() {
 
           {/* Multi-Source Output */}
           {multiResult && (
-            <div className="p-3 bg-[#FFF9F1] border border-bhissm-border rounded text-xs space-y-3">
+            <div className="p-3 bg-[#F6F0E9] border border-bhissm-border rounded text-xs space-y-3">
               <div className="flex justify-between items-center pb-2 border-b border-bhissm-border/60 font-mono">
                 <span className="font-bold text-bhissm-dark">
                   Fulfilled: {multiResult.fulfillment_percentage}% ({multiResult.quantity_planned?.toLocaleString()} / {multiResult.quantity_required?.toLocaleString()})
@@ -422,17 +422,17 @@ export default function ForecastPage() {
               </div>
 
               <div className="space-y-2">
-                <div className="text-[11px] font-semibold text-bhissm-secondary uppercase">
+                <div className="text-xs font-semibold text-bhissm-secondary uppercase">
                   Donor Facilities Allocation Matrix:
                 </div>
                 {multiResult.fulfillment_plan?.map((donor: any) => (
                   <div
                     key={donor.facility_id}
-                    className="p-2 border border-bhissm-border/80 rounded bg-white flex justify-between items-center text-[11px]"
+                    className="p-2 border border-bhissm-border/80 rounded bg-white flex justify-between items-center text-xs"
                   >
                     <div>
                       <div className="font-bold text-bhissm-dark">{donor.facility_name}</div>
-                      <div className="text-[10px] text-bhissm-secondary font-mono">
+                      <div className="text-xs text-bhissm-secondary font-mono">
                         Safe Quota: {donor.safe_transferable?.toLocaleString()} • {donor.state_name}
                       </div>
                     </div>
@@ -441,7 +441,7 @@ export default function ForecastPage() {
                         +{donor.quantity_can_offer?.toLocaleString()} units
                       </span>
                       {donor.needs_donor_replenishment && (
-                        <span className="block text-[9px] text-amber-700 font-mono">
+                        <span className="block text-[11px] text-amber-700 font-mono">
                           Requires Backfill Replenishment
                         </span>
                       )}

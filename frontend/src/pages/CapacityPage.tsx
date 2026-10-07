@@ -326,7 +326,7 @@ export default function CapacityPage() {
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-bhissm-secondary">
               HEALTHCARE INFRASTRUCTURE, AMBULANCE FLEET &amp; DOCTOR ROSTER
             </span>
-            <span className="text-[10px] bg-blue-100 text-blue-900 border border-blue-300 px-1.5 py-0.2 rounded font-mono font-bold">
+            <span className="text-xs bg-blue-100 text-blue-900 border border-blue-300 px-1.5 py-0.2 rounded font-mono font-bold">
               MANUAL ONBOARDING &amp; LIVE READINESS
             </span>
           </div>
@@ -387,7 +387,7 @@ export default function CapacityPage() {
             <Bed className="w-4 h-4 text-bhissm-dark" />
             Live Bed Census &amp; Care Type Availability
           </h2>
-          <span className="text-[11px] font-mono text-bhissm-secondary">
+          <span className="text-xs font-mono text-bhissm-secondary">
             {facilities.find((f) => f.id === selectedFacilityId)?.name || 'Facility'}
           </span>
         </div>
@@ -413,7 +413,7 @@ export default function CapacityPage() {
                       {item.careType.replace('_', ' ')} Care
                     </span>
                     <span
-                      className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded ${
+                      className={`text-xs font-mono font-bold px-1.5 py-0.2 rounded ${
                         occRate > 90
                           ? 'bg-red-100 text-red-900'
                           : occRate > 75
@@ -427,7 +427,7 @@ export default function CapacityPage() {
 
                   {isEditing ? (
                     <div className="space-y-2 pt-1 font-mono">
-                      <div className="text-[10px] text-stone-700 font-bold flex items-center justify-between pb-1 border-b border-gray-100">
+                      <div className="text-xs text-stone-700 font-bold flex items-center justify-between pb-1 border-b border-gray-100">
                         <span className="flex items-center gap-1">
                           <Lock className="w-2.5 h-2.5 text-stone-500" />
                           Sanctioned Quota: <strong>{item.totalBeds}</strong>
@@ -439,7 +439,7 @@ export default function CapacityPage() {
 
                       <div className="grid grid-cols-2 gap-2 text-center">
                         <div>
-                          <label className="text-[10px] text-gray-700 font-bold block">Occupied Beds</label>
+                          <label className="text-xs text-gray-700 font-bold block">Occupied Beds</label>
                           <input
                             type="number"
                             min="0"
@@ -452,7 +452,7 @@ export default function CapacityPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-[10px] text-amber-800 font-bold block">Reserved Beds</label>
+                          <label className="text-xs text-amber-800 font-bold block">Reserved Beds</label>
                           <input
                             type="number"
                             min="0"
@@ -469,13 +469,13 @@ export default function CapacityPage() {
                       <div className="flex justify-end gap-1.5 pt-1">
                         <button
                           onClick={() => setEditingCareType(null)}
-                          className="btn-outline text-[10px] py-1 px-2"
+                          className="btn-outline text-xs py-1 px-2"
                         >
                           Cancel
                         </button>
                         <button
                           onClick={() => handleSaveBed(item.careType)}
-                          className="btn-primary text-[10px] py-1 px-2.5 flex items-center gap-1"
+                          className="btn-primary text-xs py-1 px-2.5 flex items-center gap-1"
                         >
                           <Save className="w-3 h-3" /> Save Census
                         </button>
@@ -487,12 +487,12 @@ export default function CapacityPage() {
                         <div className="text-2xl font-bold text-emerald-800">
                           {item.availableBeds}
                         </div>
-                        <div className="text-[10px] text-bhissm-secondary">
+                        <div className="text-xs text-bhissm-secondary">
                           Vacant of {item.totalBeds} Sanctioned
                         </div>
                       </div>
 
-                      <div className="text-right text-[11px] text-bhissm-secondary space-y-0.5">
+                      <div className="text-right text-xs text-bhissm-secondary space-y-0.5">
                         <div>Occupied: <strong>{item.occupiedBeds}</strong></div>
                         <div>Reserved: <strong>{item.reservedBeds}</strong></div>
                         <div className="flex items-center justify-end gap-2 pt-1">
@@ -533,7 +533,7 @@ export default function CapacityPage() {
             </h2>
             <button
               onClick={handleOpenAmbModal}
-              className="text-[11px] font-mono font-bold text-blue-800 hover:underline flex items-center gap-1"
+              className="text-xs font-mono font-bold text-blue-800 hover:underline flex items-center gap-1"
             >
               <PlusCircle className="w-3.5 h-3.5" /> + Add Ambulance
             </button>
@@ -551,7 +551,7 @@ export default function CapacityPage() {
                       {amb.registration}
                     </span>
                     <span
-                      className={`text-[10px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
+                      className={`text-xs font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
                         amb.ambulanceType === 'ALS'
                           ? 'bg-purple-100 text-purple-900 border border-purple-200'
                           : 'bg-blue-100 text-blue-900 border border-blue-200'
@@ -560,7 +560,7 @@ export default function CapacityPage() {
                       {amb.ambulanceType}
                     </span>
                     <span
-                      className={`text-[9px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
+                      className={`text-[11px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
                         amb.status === 'available'
                           ? 'bg-emerald-100 text-emerald-800'
                           : amb.status === 'in_use' || amb.status === 'dispatched'
@@ -571,7 +571,7 @@ export default function CapacityPage() {
                       {amb.status.replace('_', ' ')}
                     </span>
                   </div>
-                  <div className="text-[11px] text-bhissm-secondary mt-1">
+                  <div className="text-xs text-bhissm-secondary mt-1">
                     Base Facility: <strong>{amb.facility_name}</strong> ({amb.state_name}) • Zone: {amb.currentZone || 'Central'}
                   </div>
                 </div>
@@ -580,14 +580,14 @@ export default function CapacityPage() {
                   {amb.status === 'available' ? (
                     <button
                       onClick={() => handleToggleAmbulance(amb, 'in_use')}
-                      className="btn-outline text-[10px] py-1 px-2 font-mono"
+                      className="btn-outline text-xs py-1 px-2 font-mono"
                     >
                       Deploy
                     </button>
                   ) : amb.status === 'in_use' ? (
                     <button
                       onClick={() => handleToggleAmbulance(amb, 'available')}
-                      className="btn-primary text-[10px] py-1 px-2 font-mono"
+                      className="btn-primary text-xs py-1 px-2 font-mono"
                     >
                       Return
                     </button>
@@ -607,7 +607,7 @@ export default function CapacityPage() {
             </h2>
             <button
               onClick={handleOpenStaffModal}
-              className="text-[11px] font-mono font-bold text-emerald-800 hover:underline flex items-center gap-1"
+              className="text-xs font-mono font-bold text-emerald-800 hover:underline flex items-center gap-1"
             >
               <UserPlus className="w-3.5 h-3.5" /> + Add Doctor / Staff
             </button>
@@ -622,11 +622,11 @@ export default function CapacityPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-bhissm-dark">{s.name}</span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-gray-100 text-gray-700 capitalize">
+                    <span className="text-xs font-mono px-1.5 py-0.2 rounded bg-gray-100 text-gray-700 capitalize">
                       {s.staffType} • {s.specialty || 'General'}
                     </span>
                   </div>
-                  <div className="text-[11px] text-bhissm-secondary mt-0.5">
+                  <div className="text-xs text-bhissm-secondary mt-0.5">
                     Attached: <strong>{s.facility_name}</strong> • Rapid Deploy: {s.deploymentTimeMinutes}m
                     {s.contactPhone ? ` • ${s.contactPhone}` : ''}
                   </div>
@@ -634,7 +634,7 @@ export default function CapacityPage() {
 
                 <div className="flex items-center gap-2">
                   <span
-                    className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-bold ${
+                    className={`text-xs font-mono uppercase px-2 py-0.5 rounded font-bold ${
                       s.status === 'available'
                         ? 'bg-emerald-100 text-emerald-800'
                         : 'bg-amber-100 text-amber-800'
@@ -644,7 +644,7 @@ export default function CapacityPage() {
                   </span>
                   <button
                     onClick={() => handleToggleStaff(s)}
-                    className="btn-outline text-[10px] py-1 px-2 font-mono"
+                    className="btn-outline text-xs py-1 px-2 font-mono"
                   >
                     {s.status === 'available' ? 'Deploy' : 'Standby'}
                   </button>
@@ -661,7 +661,7 @@ export default function CapacityPage() {
           <div className="card bg-white max-w-md w-full p-5 shadow-2xl border-2 border-bhissm-dark space-y-4">
             <div className="flex items-center justify-between border-b border-bhissm-border pb-2">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-bold">
+                <span className="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-blue-100 text-blue-900 font-bold">
                   MANUAL FLEET REGISTRATION
                 </span>
                 <h3 className="font-bold text-sm text-bhissm-dark mt-1 flex items-center gap-1.5">
@@ -787,7 +787,7 @@ export default function CapacityPage() {
           <div className="card bg-white max-w-md w-full p-5 shadow-2xl border-2 border-emerald-800 space-y-4">
             <div className="flex items-center justify-between border-b border-bhissm-border pb-2">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 font-bold">
+                <span className="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 font-bold">
                   MANUAL MEDICAL PERSONNEL ONBOARDING
                 </span>
                 <h3 className="font-bold text-sm text-bhissm-dark mt-1 flex items-center gap-1.5">
@@ -1037,14 +1037,14 @@ export default function CapacityPage() {
             </div>
 
             <form onSubmit={handleSubmitSanction} className="space-y-3 text-xs font-mono">
-              <div className="p-3 bg-[#FAF6F0] rounded-xl border border-bhissm-border space-y-1">
-                <div className="text-bhissm-secondary font-bold uppercase text-[10px]">
+              <div className="p-3 bg-[#F6F0E9] rounded-xl border border-bhissm-border space-y-1">
+                <div className="text-bhissm-secondary font-bold uppercase text-xs">
                   Target Ward Capacity
                 </div>
-                <div className="text-[11px] font-mono text-purple-900 font-bold uppercase">
+                <div className="text-xs font-mono text-purple-900 font-bold uppercase">
                   {sanctionTarget.careType.replace('_', ' ')} Care Ward
                 </div>
-                <div className="text-[10px] text-bhissm-secondary pt-1 flex justify-between">
+                <div className="text-xs text-bhissm-secondary pt-1 flex justify-between">
                   <span>Current Sanctioned: <strong>{sanctionTarget.totalBeds}</strong></span>
                   <span>Occupied: <strong>{sanctionTarget.occupiedBeds}</strong></span>
                   <span>Vacant: <strong className="text-emerald-700">{sanctionTarget.availableBeds}</strong></span>
@@ -1063,9 +1063,9 @@ export default function CapacityPage() {
                   onChange={(e) =>
                     setSanctionForm({ ...sanctionForm, new_total_beds: Number(e.target.value) })
                   }
-                  className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg text-sm font-bold"
+                  className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg text-sm font-bold"
                 />
-                <span className="text-[10px] text-bhissm-secondary block mt-1">
+                <span className="text-xs text-bhissm-secondary block mt-1">
                   Recalculated Vacant: <strong>{Math.max(0, sanctionForm.new_total_beds - sanctionTarget.occupiedBeds - sanctionTarget.reservedBeds)}</strong> beds
                 </span>
               </div>
@@ -1082,7 +1082,7 @@ export default function CapacityPage() {
                   onChange={(e) =>
                     setSanctionForm({ ...sanctionForm, order_reference: e.target.value })
                   }
-                  className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                  className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                 />
               </div>
 
@@ -1097,7 +1097,7 @@ export default function CapacityPage() {
                   onChange={(e) =>
                     setSanctionForm({ ...sanctionForm, reason: e.target.value })
                   }
-                  className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                  className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                 />
               </div>
 

@@ -369,7 +369,7 @@ export default function InventoryPage() {
       <div className="card flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-bhissm-dark text-white">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-bhissm-dark text-white">
               {user?.role === 'state'
                 ? 'STATE JURISDICTION HOSPITAL STOCK & VENDOR AUDIT'
                 : 'FACILITY PHARMACY, VACCINE COLD-CHAIN & VENDOR ENTRY'}
@@ -458,14 +458,14 @@ export default function InventoryPage() {
 
       {/* STATE LOGIN: HOSPITAL-WISE MEDICINE STOCK CHECKING DASHBOARD */}
       {(user?.role === 'state' || user?.role === 'national') && hospitalSummaries.length > 0 && (
-        <div className="card space-y-3 border-2 border-bhissm-dark/20 bg-gradient-to-br from-white to-[#FBF7F0]">
+        <div className="card space-y-3 border-2 border-bhissm-dark/20 bg-gradient-to-br from-white to-[#F6F0E9]">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-bhissm-border pb-2.5">
             <div>
               <h2 className="text-xs font-bold uppercase tracking-wider text-bhissm-dark font-mono flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-bhissm-dark" />
                 Hospital-Wise Medicine & Vaccine Stock Checking Matrix ({hospitalSummaries.length} Hospitals)
               </h2>
-              <p className="text-[11px] text-bhissm-secondary">
+              <p className="text-xs text-bhissm-secondary">
                 Click any hospital card below to inspect its complete medicine & vaccine inventory or dispatch stock from State Reserve.
               </p>
             </div>
@@ -506,7 +506,7 @@ export default function InventoryPage() {
                   }
                   className={`cursor-pointer rounded-lg p-3 border transition-all ${
                     isSelected
-                      ? 'bg-[#FDF6EC] border-2 border-bhissm-dark shadow-md'
+                      ? 'bg-[#F6F0E9] border-2 border-bhissm-dark shadow-md'
                       : 'bg-white border-bhissm-border hover:border-bhissm-dark/50 hover:shadow-sm'
                   }`}
                 >
@@ -515,56 +515,56 @@ export default function InventoryPage() {
                       <div className="font-bold text-xs text-bhissm-dark leading-snug">
                         {hosp.facility_name}
                       </div>
-                      <div className="text-[10px] font-mono text-bhissm-secondary uppercase mt-0.5">
+                      <div className="text-xs font-mono text-bhissm-secondary uppercase mt-0.5">
                         {hosp.facility_type} • {hosp.ownership || 'Public'}
                       </div>
                     </div>
                     {hosp.stockout_count > 0 ? (
-                      <span className="badge-critical text-[9px] font-mono shrink-0">
+                      <span className="badge-critical text-[11px] font-mono shrink-0">
                         {hosp.stockout_count} STOCKOUT
                       </span>
                     ) : hosp.low_stock_count > 0 ? (
-                      <span className="badge-warning text-[9px] font-mono shrink-0">
+                      <span className="badge-warning text-[11px] font-mono shrink-0">
                         {hosp.low_stock_count} LOW
                       </span>
                     ) : (
-                      <span className="badge-success text-[9px] font-mono shrink-0">
+                      <span className="badge-success text-[11px] font-mono shrink-0">
                         ADEQUATE
                       </span>
                     )}
                   </div>
 
                   <div className="grid grid-cols-3 gap-1.5 mt-2.5 pt-2 border-t border-gray-100 text-center font-mono">
-                    <div className="bg-[#F8F1E7]/60 rounded p-1">
+                    <div className="bg-[#EFE8E0]/60 rounded p-1">
                       <div className="text-xs font-bold text-bhissm-dark">
                         {hosp.total_medicines}
                       </div>
-                      <div className="text-[9px] text-bhissm-secondary">Medicines</div>
+                      <div className="text-[11px] text-bhissm-secondary">Medicines</div>
                     </div>
                     <div className="bg-emerald-50/70 rounded p-1">
                       <div className="text-xs font-bold text-emerald-800">
                         {hosp.total_vaccines}
                       </div>
-                      <div className="text-[9px] text-emerald-700">Vaccines</div>
+                      <div className="text-[11px] text-emerald-700">Vaccines</div>
                     </div>
                     <div className="bg-blue-50/70 rounded p-1">
                       <div className="text-xs font-bold text-blue-900">
                         {hosp.total_stock_units.toLocaleString()}
                       </div>
-                      <div className="text-[9px] text-blue-700">Total Units</div>
+                      <div className="text-[11px] text-blue-700">Total Units</div>
                     </div>
                   </div>
 
                   {hosp.critical_deficit_items && hosp.critical_deficit_items.length > 0 && (
                     <div className="mt-2 pt-1.5 border-t border-red-100">
-                      <div className="text-[9px] font-mono uppercase text-red-700 font-bold mb-1">
+                      <div className="text-[11px] font-mono uppercase text-red-700 font-bold mb-1">
                         Deficit Formulations:
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {hosp.critical_deficit_items.slice(0, 3).map((d: any) => (
                           <span
                             key={d.medicine_id}
-                            className="text-[9px] bg-red-50 text-red-800 border border-red-200 px-1.5 py-0.5 rounded font-mono"
+                            className="text-[11px] bg-red-50 text-red-800 border border-red-200 px-1.5 py-0.5 rounded font-mono"
                           >
                             {d.medicine_name.split(' ')[0]} ({d.current_stock}/{d.safety_threshold})
                           </span>
@@ -700,13 +700,13 @@ export default function InventoryPage() {
                 </tr>
               ) : (
                 filteredInventory.map((item) => (
-                  <tr key={item.id} className="hover:bg-[#FDF9F3] transition-colors">
+                  <tr key={item.id} className="hover:bg-[#F6F0E9] transition-colors">
                     {user?.role !== 'hospital' && (
                       <td className="table-cell">
                         <div className="font-semibold text-xs text-bhissm-dark">
                           {item.facility_name}
                         </div>
-                        <div className="text-[10px] font-mono text-bhissm-secondary uppercase">
+                        <div className="text-xs font-mono text-bhissm-secondary uppercase">
                           {item.facility_type}
                         </div>
                       </td>
@@ -721,7 +721,7 @@ export default function InventoryPage() {
                         )}
                         <span>{item.medicine_name}</span>
                       </div>
-                      <div className="text-[11px] text-bhissm-secondary font-mono">
+                      <div className="text-xs text-bhissm-secondary font-mono">
                         {item.generic_name} • {item.dosage_form} ({item.unit_type})
                       </div>
                     </td>
@@ -731,7 +731,7 @@ export default function InventoryPage() {
                         {item.category}
                       </div>
                       <span
-                        className={`inline-block text-[10px] font-mono uppercase px-1.5 py-0.2 rounded mt-0.5 ${
+                        className={`inline-block text-xs font-mono uppercase px-1.5 py-0.2 rounded mt-0.5 ${
                           item.criticality === 'critical'
                             ? 'bg-red-100 text-red-800 border border-red-200'
                             : item.criticality === 'high'
@@ -748,7 +748,7 @@ export default function InventoryPage() {
                         {item.current_stock.toLocaleString()}
                       </div>
                       {item.reserved_stock > 0 && (
-                        <div className="text-[10px] text-amber-700 font-mono">
+                        <div className="text-xs text-amber-700 font-mono">
                           {item.reserved_stock} reserved
                         </div>
                       )}
@@ -786,7 +786,7 @@ export default function InventoryPage() {
                       {user?.role === 'state' && (
                         <button
                           onClick={() => handleOpenRedistributeModal(item)}
-                          className="px-2 py-1 rounded bg-emerald-700 hover:bg-emerald-800 text-white text-[10px] font-mono font-semibold"
+                          className="px-2 py-1 rounded bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-mono font-semibold"
                           title="Redistribute this medicine from State Reserve to this Hospital"
                         >
                           + Allocate
@@ -794,14 +794,14 @@ export default function InventoryPage() {
                       )}
                       <button
                         onClick={() => handleOpenBatches(item)}
-                        className="btn-outline text-[11px] py-1 px-2 font-mono"
+                        className="btn-outline text-xs py-1 px-2 font-mono"
                         title="View FEFO Batches"
                       >
                         Batches
                       </button>
                       <button
                         onClick={() => handleOpenTransactions(item)}
-                        className="btn-outline text-[11px] py-1 px-2 font-mono"
+                        className="btn-outline text-xs py-1 px-2 font-mono"
                         title="View Audit Transactions"
                       >
                         Logs
@@ -821,7 +821,7 @@ export default function InventoryPage() {
           <div className="card bg-white max-w-xl w-full max-h-[90vh] overflow-y-auto p-5 shadow-2xl border-2 border-bhissm-dark space-y-4">
             <div className="flex items-center justify-between border-b border-bhissm-border pb-2.5">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 font-bold">
+                <span className="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 font-bold">
                   DIRECT VENDOR PROCUREMENT &amp; FEFO BATCH INWARD ENTRY
                 </span>
                 <h3 className="font-bold text-base text-bhissm-dark mt-1 flex items-center gap-2">
@@ -841,7 +841,7 @@ export default function InventoryPage() {
             </div>
 
             {/* Mode Switcher Tabs */}
-            <div className="grid grid-cols-2 gap-2 p-1 bg-[#F8F1E7] rounded border border-bhissm-border text-xs">
+            <div className="grid grid-cols-2 gap-2 p-1 bg-[#EFE8E0] rounded border border-bhissm-border text-xs">
               <button
                 type="button"
                 onClick={() => handleOpenVendorModal('medicine')}
@@ -906,7 +906,7 @@ export default function InventoryPage() {
                 <button
                   type="button"
                   onClick={() => setIsCustomMedicine(!isCustomMedicine)}
-                  className="text-[11px] font-mono text-blue-700 hover:underline"
+                  className="text-xs font-mono text-blue-700 hover:underline"
                 >
                   {isCustomMedicine
                     ? '← Select from Existing Master Catalog'
@@ -930,7 +930,7 @@ export default function InventoryPage() {
                   </select>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3 rounded bg-[#F8F1E7]/70 border border-bhissm-border">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3 rounded bg-[#EFE8E0]/70 border border-bhissm-border">
                   <div>
                     <label className="block font-medium mb-1">Brand / Formulation Name *</label>
                     <input
@@ -1137,7 +1137,7 @@ export default function InventoryPage() {
           <div className="card bg-white max-w-lg w-full p-5 shadow-2xl border-2 border-bhissm-dark space-y-4">
             <div className="flex items-center justify-between border-b border-bhissm-border pb-2.5">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-bold">
+                <span className="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-bold">
                   TIER-2 STATE RESERVE TO HOSPITAL REDISTRIBUTION
                 </span>
                 <h3 className="font-bold text-base text-bhissm-dark mt-1 flex items-center gap-2">
@@ -1278,7 +1278,7 @@ export default function InventoryPage() {
           <div className="card bg-white max-w-2xl w-full max-h-[85vh] flex flex-col p-4 shadow-xl border border-bhissm-dark">
             <div className="flex items-center justify-between border-b border-bhissm-border pb-2.5">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-bhissm-secondary font-bold">
+                <span className="text-xs font-mono uppercase tracking-wider text-bhissm-secondary font-bold">
                   FEFO Batch Expiry Schedule • {selectedMedForBatches.facility_name}
                 </span>
                 <h3 className="font-bold text-base text-bhissm-dark">
@@ -1304,7 +1304,7 @@ export default function InventoryPage() {
                 </div>
               ) : (
                 <table className="w-full text-left text-xs border border-bhissm-border">
-                  <thead className="bg-[#F8F1E7]">
+                  <thead className="bg-[#EFE8E0]">
                     <tr>
                       <th className="p-2 border-b">Batch / Lot #</th>
                       <th className="p-2 border-b">Vendor / Source</th>
@@ -1323,7 +1323,7 @@ export default function InventoryPage() {
                         <td className="p-2 text-bhissm-secondary">{b.manufacturer || 'TNMSC'}</td>
                         <td className="p-2 font-mono">
                           {new Date(b.expiry_date).toISOString().split('T')[0]}
-                          <span className="text-[10px] block text-bhissm-secondary">
+                          <span className="text-xs block text-bhissm-secondary">
                             ({b.days_to_expiry} days remaining)
                           </span>
                         </td>
@@ -1364,7 +1364,7 @@ export default function InventoryPage() {
           <div className="card bg-white max-w-2xl w-full max-h-[85vh] flex flex-col p-4 shadow-xl border border-bhissm-dark">
             <div className="flex items-center justify-between border-b border-bhissm-border pb-2.5">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-bhissm-secondary font-bold">
+                <span className="text-xs font-mono uppercase tracking-wider text-bhissm-secondary font-bold">
                   Immutable Transaction Audit Ledger
                 </span>
                 <h3 className="font-bold text-base text-bhissm-dark">
@@ -1398,10 +1398,10 @@ export default function InventoryPage() {
                         <div className="font-bold text-bhissm-dark capitalize">
                           {tx.transaction_type.replace('_', ' ')}
                         </div>
-                        <div className="text-[11px] text-bhissm-secondary">
+                        <div className="text-xs text-bhissm-secondary">
                           {tx.notes || 'Routine dispensary record'}
                         </div>
-                        <div className="text-[10px] font-mono text-bhissm-secondary/80">
+                        <div className="text-xs font-mono text-bhissm-secondary/80">
                           {new Date(tx.created_at).toLocaleString()}
                         </div>
                       </div>

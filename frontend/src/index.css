@@ -3,130 +3,218 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    background-color: #F8F1E7;
-    color: #2D2926;
-    font-family: 'Inter', system-ui, sans-serif;
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  
+
+  body {
+    background-color: #EFE8E0;
+    color: #3A1517;
+    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+  }
+
   * {
     scrollbar-width: thin;
-    scrollbar-color: #D4C8BC #F8F1E7;
+    scrollbar-color: #D9C6B6 #EFE8E0;
   }
-  
+
   *::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
-  
+
   *::-webkit-scrollbar-track {
-    background: #F8F1E7;
+    background: #EFE8E0;
   }
-  
+
   *::-webkit-scrollbar-thumb {
-    background-color: #D4C8BC;
-    border-radius: 3px;
+    background-color: #D9C6B6;
+    border-radius: 4px;
+  }
+
+  :focus-visible {
+    outline: 2px solid #8A0F1A;
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: #F0B84A;
+    color: #3A1517;
   }
 }
 
 @layer components {
+  /* ── Surfaces ─────────────────────────────────────────────── */
   .card {
-    @apply bg-bhissm-surface border border-bhissm-border rounded-lg shadow-sm p-4;
+    @apply bg-bhissm-surface border border-bhissm-border rounded-xl p-4;
+    box-shadow: 0 1px 2px rgba(90, 20, 25, 0.05), 0 10px 22px -16px rgba(90, 20, 25, 0.3);
   }
-  
+
+  /* ── Buttons ──────────────────────────────────────────────── */
   .btn-primary {
-    @apply bg-bhissm-dark text-white px-4 py-2 rounded text-sm font-medium hover:bg-bhissm-secondary transition-colors;
+    @apply inline-flex items-center justify-center gap-1.5 bg-bhissm-maroon text-[#F8EDE0] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-bhissm-maroon-dark transition-colors;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
-  
+
   .btn-accent {
-    @apply bg-bhissm-accent text-bhissm-dark px-4 py-2 rounded text-sm font-medium hover:opacity-90 transition-opacity;
+    @apply inline-flex items-center justify-center gap-1.5 bg-bhissm-gold text-bhissm-dark px-4 py-2 rounded-lg text-sm font-semibold hover:brightness-95 transition;
   }
-  
+
   .btn-danger {
-    @apply bg-bhissm-critical text-white px-4 py-2 rounded text-sm font-medium hover:opacity-90 transition-opacity;
+    @apply inline-flex items-center justify-center gap-1.5 bg-bhissm-critical text-white px-4 py-2 rounded-lg text-sm font-semibold hover:brightness-90 transition;
   }
-  
+
   .btn-outline {
-    @apply border border-bhissm-border text-bhissm-secondary px-4 py-2 rounded text-sm font-medium hover:bg-bhissm-pink transition-colors;
+    @apply inline-flex items-center justify-center gap-1.5 border border-bhissm-maroon/40 text-bhissm-maroon bg-transparent px-4 py-2 rounded-lg text-sm font-semibold hover:bg-bhissm-maroon/10 transition-colors;
   }
-  
+
+  .btn-primary:disabled,
+  .btn-accent:disabled,
+  .btn-danger:disabled,
+  .btn-outline:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  /* ── Badges ───────────────────────────────────────────────── */
   .badge-critical {
-    @apply bg-red-100 text-red-700 border border-red-200 text-xs px-2 py-0.5 rounded-full font-medium;
+    @apply bg-[#F2C9C0] text-[#8A1E12] border border-[#E7A99C] text-xs px-2 py-0.5 rounded-full font-semibold;
   }
-  
+
   .badge-warning {
-    @apply bg-amber-100 text-amber-700 border border-amber-200 text-xs px-2 py-0.5 rounded-full font-medium;
+    @apply bg-[#F8DFA8] text-[#7A4A06] border border-[#EBC675] text-xs px-2 py-0.5 rounded-full font-semibold;
   }
-  
+
   .badge-success {
-    @apply bg-green-100 text-green-700 border border-green-200 text-xs px-2 py-0.5 rounded-full font-medium;
+    @apply bg-[#DCE3C6] text-[#4B5A22] border border-[#C4CFA0] text-xs px-2 py-0.5 rounded-full font-semibold;
   }
-  
+
   .badge-info {
-    @apply bg-blue-100 text-blue-700 border border-blue-200 text-xs px-2 py-0.5 rounded-full font-medium;
+    @apply bg-[#D6E8E5] text-[#26605C] border border-[#B2D3CE] text-xs px-2 py-0.5 rounded-full font-semibold;
   }
-  
+
   .badge-neutral {
-    @apply bg-gray-100 text-gray-600 border border-gray-200 text-xs px-2 py-0.5 rounded-full font-medium;
+    @apply bg-[#EADFD3] text-bhissm-secondary border border-bhissm-border text-xs px-2 py-0.5 rounded-full font-semibold;
   }
 
+  /* ── Forms ────────────────────────────────────────────────── */
   .input-field {
-    @apply border border-bhissm-border rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-bhissm-accent/50 w-full;
-  }
-  
-  .select-field {
-    @apply border border-bhissm-border rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-bhissm-accent/50 w-full;
-  }
-  
-  .table-header {
-    @apply text-xs font-semibold text-bhissm-secondary uppercase tracking-wide bg-bhissm-bg px-3 py-2;
-  }
-  
-  .table-cell {
-    @apply px-3 py-2.5 text-sm border-b border-bhissm-border/50;
-  }
-  
-  .nav-item {
-    @apply flex items-center gap-2 px-3 py-2 rounded text-sm text-bhissm-secondary hover:bg-bhissm-pink hover:text-bhissm-dark transition-colors cursor-pointer;
-  }
-  
-  .nav-item-active {
-    @apply flex items-center gap-2 px-3 py-2 rounded text-sm bg-bhissm-accent/30 text-bhissm-dark font-medium;
+    @apply border border-bhissm-border rounded-lg px-3 py-2 text-sm bg-[#FBF8F4] text-bhissm-dark placeholder:text-bhissm-secondary/50 focus:outline-none focus:ring-2 focus:ring-bhissm-maroon/25 focus:border-bhissm-maroon w-full;
   }
 
+  .select-field {
+    @apply border border-bhissm-border rounded-lg px-3 py-2 text-sm bg-[#FBF8F4] text-bhissm-dark focus:outline-none focus:ring-2 focus:ring-bhissm-maroon/25 focus:border-bhissm-maroon w-full;
+  }
+
+  /* ── Tables ───────────────────────────────────────────────── */
+  .table-header {
+    @apply text-xs font-semibold text-bhissm-maroon uppercase tracking-wider bg-[#F1E8DE] px-3 py-2.5 border-b border-bhissm-border;
+  }
+
+  .table-cell {
+    @apply px-3 py-3 text-sm border-b border-bhissm-border/60;
+  }
+
+  /* ── Navigation (legacy helpers) ──────────────────────────── */
+  .nav-item {
+    @apply flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-bhissm-secondary hover:bg-bhissm-pink hover:text-bhissm-dark transition-colors cursor-pointer;
+  }
+
+  .nav-item-active {
+    @apply flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-bhissm-maroon text-[#F8EDE0] font-semibold;
+  }
+
+  /* ── Typography blocks ────────────────────────────────────── */
   .section-title {
-    @apply text-base font-semibold text-bhissm-dark border-b border-bhissm-border pb-2 mb-4;
+    @apply text-lg font-bold text-bhissm-dark border-b border-bhissm-border pb-2 mb-4;
   }
 
   .stat-card {
     @apply card flex flex-col gap-1;
   }
-  
+
   .stat-value {
-    @apply text-2xl font-bold text-bhissm-dark;
+    @apply font-display text-3xl text-bhissm-dark leading-none tracking-tight;
   }
-  
+
   .stat-label {
-    @apply text-xs text-bhissm-secondary uppercase tracking-wide;
+    @apply text-xs text-bhissm-secondary uppercase tracking-wider font-semibold;
   }
 
   .demo-badge {
-    @apply text-xs bg-amber-100 text-amber-800 border border-amber-300 px-2.5 py-0.5 rounded-full font-mono font-semibold;
+    @apply text-xs bg-[#F8DFA8] text-[#7A4A06] border border-bhissm-warning/50 px-2.5 py-0.5 rounded-full font-mono font-semibold;
   }
 
-  /* BHISSM Flagship Hackathon Brand Identity */
+  /* ── BHISSM editorial identity ────────────────────────────── */
   .bhissm-brand-title {
-    background: linear-gradient(135deg, #2D2926 0%, #7A2832 55%, #2D2926 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.03em;
+    font-family: 'Anton', 'Bebas Neue', 'Impact', 'Haettenschweiler', 'Arial Narrow', sans-serif;
+    font-weight: 400 !important;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    color: #8A0F1A;
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    line-height: 0.95;
   }
 
   .bhissm-emblem-box {
-    background: linear-gradient(145deg, #2D2926 0%, #463733 55%, #692B32 100%);
-    box-shadow: 0 4px 14px rgba(45, 41, 38, 0.22), inset 0 1px 0 rgba(255, 249, 241, 0.25);
+    background: #8A0F1A;
+    box-shadow: 0 2px 6px rgba(90, 15, 25, 0.3);
   }
+
+  .hero-title {
+    font-family: 'Anton', 'Bebas Neue', 'Impact', 'Haettenschweiler', 'Arial Narrow', sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    color: #8A0F1A;
+  }
+
+  .page-title {
+    font-family: 'Anton', 'Bebas Neue', 'Impact', 'Haettenschweiler', 'Arial Narrow', sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    line-height: 1;
+    color: #8A0F1A;
+  }
+
+  .tab-pill {
+    @apply text-xs font-semibold px-3.5 py-1.5 rounded-full border border-bhissm-maroon/40 text-bhissm-maroon bg-transparent hover:bg-bhissm-maroon/10 transition-colors cursor-pointer;
+  }
+
+  .tab-pill-active {
+    @apply bg-bhissm-maroon text-[#F8EDE0] border-bhissm-maroon;
+  }
+
+  /* Live ticker strip */
+  .ticker {
+    @apply bg-bhissm-maroon text-[#F3E3D3] overflow-hidden whitespace-nowrap;
+  }
+
+  .ticker-track {
+    display: inline-flex;
+    gap: 40px;
+    padding: 11px 0;
+    font-size: 13px;
+    font-weight: 500;
+    width: max-content;
+    animation: tickerSlide 40s linear infinite;
+  }
+
+  .ticker:hover .ticker-track {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes tickerSlide {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
 }
 
 /* High-Visibility Emergency Siren & Strobe Animations */
@@ -191,8 +279,7 @@
 }
 
 /* Risk colors */
-.risk-critical { color: #B65C62; }
-.risk-high { color: #C59655; }
-.risk-medium { color: #8B8038; }
-.risk-low { color: #6F8B72; }
-
+.risk-critical { color: #B3261E; }
+.risk-high { color: #D2601F; }
+.risk-medium { color: #B8872A; }
+.risk-low { color: #6F8040; }

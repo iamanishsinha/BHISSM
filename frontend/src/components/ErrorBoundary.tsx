@@ -69,13 +69,13 @@ export default class ErrorBoundary extends Component<Props, State> {
                 <AlertTriangle className="w-4 h-4 text-red-700 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold">A client rendering interruption was intercepted.</p>
-                  <p className="text-[11px] text-red-800/90 mt-0.5">
+                  <p className="text-xs text-red-800/90 mt-0.5">
                     {this.state.error?.message || 'An unexpected state discrepancy occurred while rendering the console.'}
                   </p>
                 </div>
               </div>
 
-              <p className="text-[11px] text-bhissm-secondary leading-relaxed">
+              <p className="text-xs text-bhissm-secondary leading-relaxed">
                 The session state has been preserved. You can refresh the dashboard or reset your authentication cache to restore full operational telemetry.
               </p>
             </div>
@@ -101,11 +101,11 @@ export default class ErrorBoundary extends Component<Props, State> {
 
             {/* Technical Trace Toggle */}
             {this.state.errorInfo && (
-              <details className="text-[10px] font-mono text-bhissm-secondary/80 pt-1">
+              <details className="text-xs font-mono text-bhissm-secondary/80 pt-1">
                 <summary className="cursor-pointer hover:underline text-bhissm-secondary">
                   Technical Stack Trace
                 </summary>
-                <pre className="p-2 mt-1.5 rounded bg-stone-100 overflow-x-auto max-h-32 text-[9px] text-stone-800">
+                <pre className="p-2 mt-1.5 rounded bg-stone-100 overflow-x-auto max-h-32 text-[11px] text-stone-800">
                   {this.state.error?.stack || this.state.errorInfo.componentStack}
                 </pre>
               </details>

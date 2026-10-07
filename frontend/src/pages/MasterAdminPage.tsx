@@ -438,12 +438,12 @@ export default function MasterAdminPage() {
   return (
     <div className="space-y-6">
       {/* ─── 1. Hero Governance Command Banner ──────────────────────────────── */}
-      <div className="card p-5 bg-gradient-to-r from-[#FFF8EE] via-[#FCF4E8] to-[#FCEEEF] border-2 border-bhissm-border shadow-sm">
+      <div className="card p-5 bg-gradient-to-r from-[#F6F0E9] via-[#F6F0E9] to-[#F6E3DC] border-2 border-bhissm-border shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center gap-4">
-            <div className="w-13 h-13 rounded-2xl bhissm-emblem-box text-[#FFF9F1] flex flex-col items-center justify-center border-2 border-[#E8A7B5] shrink-0">
+            <div className="w-13 h-13 rounded-2xl bhissm-emblem-box text-[#F6F0E9] flex flex-col items-center justify-center border-2 border-[#D9A78A] shrink-0">
               <span className="font-black text-lg tracking-tighter leading-none">MDB</span>
-              <span className="text-[7px] font-mono uppercase tracking-widest text-[#F4D5DC] mt-0.5 font-bold">
+              <span className="text-[7px] font-mono uppercase tracking-widest text-[#EFD3C2] mt-0.5 font-bold">
                 ROOT
               </span>
             </div>
@@ -456,7 +456,7 @@ export default function MasterAdminPage() {
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-bhissm-secondary">
                   • MASTER DATA &amp; INFRASTRUCTURE GOVERNANCE CONSOLE
                 </span>
-                <span className="text-[10px] bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-full font-mono font-bold">
+                <span className="text-xs bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-full font-mono font-bold">
                   SINGLE SOURCE OF TRUTH (SQL MASTER)
                 </span>
               </div>
@@ -471,16 +471,16 @@ export default function MasterAdminPage() {
 
           {/* Right Live Date/Time & Sync */}
           <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end gap-2 shrink-0">
-            <div className="flex items-center gap-2 px-3 py-1 bg-white/95 border border-bhissm-border rounded-lg text-[10px] font-mono shadow-2xs">
+            <div className="flex items-center gap-2 px-3 py-1 bg-white/95 border border-bhissm-border rounded-lg text-xs font-mono shadow-2xs">
               <Clock className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
               <span className="text-bhissm-secondary font-medium">SYS CLOCK:</span>
               <span className="font-black text-bhissm-dark">{formattedDate}</span>
               <span className="font-black text-emerald-700">{formattedTime}</span>
-              <span className="bg-emerald-100 text-emerald-900 text-[9px] font-bold px-1 rounded">IST</span>
+              <span className="bg-emerald-100 text-emerald-900 text-[11px] font-bold px-1 rounded">IST</span>
             </div>
 
-            <div className="flex items-center gap-2 text-[10px] font-mono text-bhissm-secondary">
-              <span className="bg-[#F4E7D7]/80 px-2 py-0.5 rounded border border-bhissm-border/60">
+            <div className="flex items-center gap-2 text-xs font-mono text-bhissm-secondary">
+              <span className="bg-[#E7CDB8]/80 px-2 py-0.5 rounded border border-bhissm-border/60">
                 JURISDICTION: <strong className="text-bhissm-dark">{overview?.jurisdiction || 'GOVERNANCE'}</strong>
               </span>
               <button
@@ -502,54 +502,54 @@ export default function MasterAdminPage() {
 
       {/* ─── 2. Top Metric KPI Counters Ribbon ──────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono">
-        <div className="card p-3.5 bg-gradient-to-br from-white to-[#FDF8EE] border border-bhissm-border shadow-2xs">
+        <div className="card p-3.5 bg-gradient-to-br from-white to-[#F6F0E9] border border-bhissm-border shadow-2xs">
           <div className="flex items-center justify-between text-bhissm-secondary mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Hospitals &amp; Centers</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Hospitals &amp; Centers</span>
             <Building2 className="w-4 h-4 text-amber-700" />
           </div>
           <div className="text-2xl font-black text-bhissm-dark">
             {overview?.facilities.total || 0}
           </div>
-          <div className="text-[10px] text-bhissm-secondary font-medium mt-1 truncate">
+          <div className="text-xs text-bhissm-secondary font-medium mt-1 truncate">
             {overview?.facilities.sectors.government || 0} Govt • {overview?.facilities.sectors.defence_railway || 0} Def/Rly • {overview?.facilities.sectors.private || 0} Pvt • {overview?.facilities.sectors.health_centre || 0} CHC
           </div>
         </div>
 
         <div className="card p-3.5 bg-gradient-to-br from-white to-[#F6FBF7] border border-bhissm-border shadow-2xs">
           <div className="flex items-center justify-between text-bhissm-secondary mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Master Drug Catalog</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Master Drug Catalog</span>
             <Boxes className="w-4 h-4 text-emerald-700" />
           </div>
           <div className="text-2xl font-black text-emerald-900">
             {overview?.catalog.total_medicines || 0}
           </div>
-          <div className="text-[10px] text-bhissm-secondary font-medium mt-1 truncate">
+          <div className="text-xs text-bhissm-secondary font-medium mt-1 truncate">
             {overview?.catalog.active_medicines || 0} Formulations • {overview?.catalog.vaccines || 0} Vaccines
           </div>
         </div>
 
-        <div className="card p-3.5 bg-gradient-to-br from-white to-[#FDF4F5] border border-bhissm-border shadow-2xs">
+        <div className="card p-3.5 bg-gradient-to-br from-white to-[#F6E3DC] border border-bhissm-border shadow-2xs">
           <div className="flex items-center justify-between text-bhissm-secondary mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Bed Census &amp; Vacancy</span>
-            <Bed className="w-4 h-4 text-[#B65C62]" />
+            <span className="text-xs font-bold uppercase tracking-wider">Bed Census &amp; Vacancy</span>
+            <Bed className="w-4 h-4 text-[#8A0F1A]" />
           </div>
           <div className="text-2xl font-black text-bhissm-dark">
             {overview?.beds.sanctioned || 0}
           </div>
-          <div className="text-[10px] text-bhissm-secondary font-medium mt-1 truncate">
+          <div className="text-xs text-bhissm-secondary font-medium mt-1 truncate">
             <span className="text-emerald-700 font-bold">{overview?.beds.available_vacant || 0} Vacant</span> • {overview?.beds.occupied || 0} Occupied ({overview?.beds.occupancy_rate || 0}%)
           </div>
         </div>
 
         <div className="card p-3.5 bg-gradient-to-br from-white to-[#F7F5FE] border border-bhissm-border shadow-2xs">
           <div className="flex items-center justify-between text-bhissm-secondary mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Command Node Logins</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Command Node Logins</span>
             <Users className="w-4 h-4 text-purple-700" />
           </div>
           <div className="text-2xl font-black text-purple-950">
             {overview?.command_nodes.total_users || 0}
           </div>
-          <div className="text-[10px] text-bhissm-secondary font-medium mt-1 truncate">
+          <div className="text-xs text-bhissm-secondary font-medium mt-1 truncate">
             {overview?.command_nodes.hospital_nodes || 0} Hospital Nodes • Provisioned
           </div>
         </div>
@@ -564,7 +564,7 @@ export default function MasterAdminPage() {
 
       {/* ─── 3. Navigation Switcher Tabs (4 Pillars) ─────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-bhissm-border pb-2">
-        <div className="flex bg-[#F5EBE1] p-1 rounded-xl border border-bhissm-border font-mono text-xs font-bold gap-1">
+        <div className="flex bg-[#EFE3D6] p-1 rounded-xl border border-bhissm-border font-mono text-xs font-bold gap-1">
           <button
             onClick={() => setActiveTab('facilities')}
             className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
@@ -657,7 +657,7 @@ export default function MasterAdminPage() {
                 placeholder="Search facility name..."
                 value={facSearch}
                 onChange={(e) => setFacSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 bg-[#FAF6F0] border border-bhissm-border rounded-lg text-xs"
+                className="w-full pl-8 pr-3 py-1.5 bg-[#F6F0E9] border border-bhissm-border rounded-lg text-xs"
               />
             </div>
 
@@ -666,7 +666,7 @@ export default function MasterAdminPage() {
               <select
                 value={facSector}
                 onChange={(e) => setFacSector(e.target.value)}
-                className="p-1.5 bg-[#FAF6F0] border border-bhissm-border rounded-lg text-xs"
+                className="p-1.5 bg-[#F6F0E9] border border-bhissm-border rounded-lg text-xs"
               >
                 <option value="all">All Sectors</option>
                 <option value="government">Government Civil &amp; Apex</option>
@@ -681,7 +681,7 @@ export default function MasterAdminPage() {
               <select
                 value={facLevel}
                 onChange={(e) => setFacLevel(e.target.value)}
-                className="p-1.5 bg-[#FAF6F0] border border-bhissm-border rounded-lg text-xs"
+                className="p-1.5 bg-[#F6F0E9] border border-bhissm-border rounded-lg text-xs"
               >
                 <option value="all">All Levels</option>
                 <option value="apex">Apex Tertiary</option>
@@ -697,7 +697,7 @@ export default function MasterAdminPage() {
                 <select
                   value={facState}
                   onChange={(e) => setFacState(e.target.value)}
-                  className="p-1.5 bg-[#FAF6F0] border border-bhissm-border rounded-lg text-xs"
+                  className="p-1.5 bg-[#F6F0E9] border border-bhissm-border rounded-lg text-xs"
                 >
                   <option value="all">All States &amp; UTs</option>
                   {statesList.map((st) => (
@@ -714,7 +714,7 @@ export default function MasterAdminPage() {
           <div className="card overflow-hidden p-0 border border-bhissm-border">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs font-mono">
-                <thead className="bg-[#FAF3EA] text-bhissm-dark font-bold uppercase tracking-wider text-[11px] border-b border-bhissm-border">
+                <thead className="bg-[#F6F0E9] text-bhissm-dark font-bold uppercase tracking-wider text-xs border-b border-bhissm-border">
                   <tr>
                     <th className="p-3">Hospital / Facility</th>
                     <th className="p-3">Sector</th>
@@ -733,19 +733,19 @@ export default function MasterAdminPage() {
                     <tr key={fac.id} className="hover:bg-amber-50/40 transition-colors">
                       <td className="p-3 font-sans font-bold text-bhissm-dark">
                         <div>{fac.name}</div>
-                        {fac.address && <div className="text-[10px] font-mono text-bhissm-secondary font-normal">{fac.address}</div>}
+                        {fac.address && <div className="text-xs font-mono text-bhissm-secondary font-normal">{fac.address}</div>}
                       </td>
                       <td className="p-3">
-                        <span className="text-[10px] px-2 py-0.5 rounded font-bold uppercase border bg-stone-100 text-stone-800 border-stone-300">
+                        <span className="text-xs px-2 py-0.5 rounded font-bold uppercase border bg-stone-100 text-stone-800 border-stone-300">
                           {fac.sector.replace('_', ' ')}
                         </span>
                       </td>
                       <td className="p-3">
-                        <span className="uppercase text-[10px] font-bold text-bhissm-secondary">{fac.level}</span>
+                        <span className="uppercase text-xs font-bold text-bhissm-secondary">{fac.level}</span>
                       </td>
                       <td className="p-3">
                         <span className="font-bold text-bhissm-dark">{fac.district_name || 'District'}</span>
-                        <span className="text-bhissm-secondary text-[10px] block">({fac.state_code})</span>
+                        <span className="text-bhissm-secondary text-xs block">({fac.state_code})</span>
                       </td>
                       <td className="p-3 text-center font-bold text-bhissm-dark">
                         {fac.beds.sanctioned}
@@ -758,12 +758,12 @@ export default function MasterAdminPage() {
                       <td className="p-3 text-center font-bold">
                         {fac.ambulances_count}
                       </td>
-                      <td className="p-3 text-[11px] text-blue-900 font-bold">
+                      <td className="p-3 text-xs text-blue-900 font-bold">
                         {fac.command_username || '—'}
                       </td>
                       <td className="p-3">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                          className={`px-2 py-0.5 rounded text-xs font-bold ${
                             fac.isActive === 1
                               ? 'bg-emerald-100 text-emerald-900'
                               : 'bg-red-100 text-red-900'
@@ -775,7 +775,7 @@ export default function MasterAdminPage() {
                       <td className="p-3 text-right">
                         <button
                           onClick={() => handleToggleFacilityStatus(fac)}
-                          className="px-2 py-1 rounded text-[10px] border border-bhissm-border bg-white hover:bg-stone-50 cursor-pointer"
+                          className="px-2 py-1 rounded text-xs border border-bhissm-border bg-white hover:bg-stone-50 cursor-pointer"
                         >
                           {fac.isActive === 1 ? 'Decommission' : 'Activate'}
                         </button>
@@ -807,7 +807,7 @@ export default function MasterAdminPage() {
                 placeholder="Search drug or generic chemical name..."
                 value={medSearch}
                 onChange={(e) => setMedSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 bg-[#FAF6F0] border border-bhissm-border rounded-lg text-xs"
+                className="w-full pl-8 pr-3 py-1.5 bg-[#F6F0E9] border border-bhissm-border rounded-lg text-xs"
               />
             </div>
 
@@ -816,7 +816,7 @@ export default function MasterAdminPage() {
               <select
                 value={medCriticality}
                 onChange={(e) => setMedCriticality(e.target.value)}
-                className="p-1.5 bg-[#FAF6F0] border border-bhissm-border rounded-lg text-xs"
+                className="p-1.5 bg-[#F6F0E9] border border-bhissm-border rounded-lg text-xs"
               >
                 <option value="all">All Criticalities</option>
                 <option value="critical">Critical Code Red</option>
@@ -829,7 +829,7 @@ export default function MasterAdminPage() {
           <div className="card overflow-hidden p-0 border border-bhissm-border">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs font-mono">
-                <thead className="bg-[#FAF3EA] text-bhissm-dark font-bold uppercase tracking-wider text-[11px] border-b border-bhissm-border">
+                <thead className="bg-[#F6F0E9] text-bhissm-dark font-bold uppercase tracking-wider text-xs border-b border-bhissm-border">
                   <tr>
                     <th className="p-3">Medicine / Formulation</th>
                     <th className="p-3">Generic Name</th>
@@ -847,7 +847,7 @@ export default function MasterAdminPage() {
                       <td className="p-3 font-sans font-bold text-bhissm-dark">
                         <div className="flex items-center gap-1.5">
                           {med.isVaccine === 1 && (
-                            <span className="px-1.5 py-0.2 rounded bg-purple-100 text-purple-900 border border-purple-300 text-[9px] font-mono font-bold">
+                            <span className="px-1.5 py-0.2 rounded bg-purple-100 text-purple-900 border border-purple-300 text-[11px] font-mono font-bold">
                               VACCINE
                             </span>
                           )}
@@ -856,15 +856,15 @@ export default function MasterAdminPage() {
                       </td>
                       <td className="p-3 text-bhissm-secondary italic font-sans">{med.genericName}</td>
                       <td className="p-3">{med.dosageForm} ({med.unitType})</td>
-                      <td className="p-3 text-[11px]">{med.category}</td>
-                      <td className="p-3 text-[10px]">
+                      <td className="p-3 text-xs">{med.category}</td>
+                      <td className="p-3 text-xs">
                         <span className="px-2 py-0.5 rounded bg-stone-100 border border-stone-300 font-bold uppercase">
                           {med.storageRequirement.replace('_', ' ')}
                         </span>
                       </td>
                       <td className="p-3">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                          className={`px-2 py-0.5 rounded text-xs font-bold ${
                             med.criticality === 'critical'
                               ? 'bg-red-100 text-red-900 border border-red-300'
                               : med.criticality === 'high'
@@ -913,14 +913,14 @@ export default function MasterAdminPage() {
                 <Bed className="w-4 h-4 text-bhissm-dark" />
                 Sanctioned Bed Capacities &amp; Dynamic Vacancies per Ward
               </h3>
-              <span className="text-[11px] font-mono text-bhissm-secondary">
+              <span className="text-xs font-mono text-bhissm-secondary">
                 {bedCapacities.length} Monitored Wards
               </span>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs font-mono">
-                <thead className="bg-[#FAF3EA] text-bhissm-dark font-bold uppercase tracking-wider text-[11px] border-b border-bhissm-border">
+                <thead className="bg-[#F6F0E9] text-bhissm-dark font-bold uppercase tracking-wider text-xs border-b border-bhissm-border">
                   <tr>
                     <th className="p-3">Hospital</th>
                     <th className="p-3">Ward / Care Type</th>
@@ -936,11 +936,11 @@ export default function MasterAdminPage() {
                     <tr key={cap.id} className="hover:bg-amber-50/40 transition-colors">
                       <td className="p-3 font-sans font-bold text-bhissm-dark">
                         <div>{cap.facility?.name}</div>
-                        <div className="text-[10px] font-mono text-bhissm-secondary font-normal">
+                        <div className="text-xs font-mono text-bhissm-secondary font-normal">
                           {cap.facility?.district?.name} ({cap.facility?.state?.code})
                         </div>
                       </td>
-                      <td className="p-3 font-bold uppercase text-[11px]">
+                      <td className="p-3 font-bold uppercase text-xs">
                         {cap.careType.replace('_', ' ')}
                       </td>
                       <td className="p-3 text-center font-bold text-bhissm-dark">
@@ -959,7 +959,7 @@ export default function MasterAdminPage() {
                       <td className="p-3 text-right">
                         <button
                           onClick={() => handleOpenSanctionModal(cap)}
-                          className="btn btn-secondary text-[11px] font-mono py-1 px-2.5 flex items-center gap-1 ml-auto cursor-pointer"
+                          className="btn btn-secondary text-xs font-mono py-1 px-2.5 flex items-center gap-1 ml-auto cursor-pointer"
                         >
                           <Edit2 className="w-3 h-3 text-bhissm-dark" />
                           <span>Revise Sanction</span>
@@ -985,7 +985,7 @@ export default function MasterAdminPage() {
                 placeholder="Search username or display node title..."
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 bg-[#FAF6F0] border border-bhissm-border rounded-lg text-xs"
+                className="w-full pl-8 pr-3 py-1.5 bg-[#F6F0E9] border border-bhissm-border rounded-lg text-xs"
               />
             </div>
 
@@ -994,7 +994,7 @@ export default function MasterAdminPage() {
               <select
                 value={userRoleFilter}
                 onChange={(e) => setUserRoleFilter(e.target.value)}
-                className="p-1.5 bg-[#FAF6F0] border border-bhissm-border rounded-lg text-xs"
+                className="p-1.5 bg-[#F6F0E9] border border-bhissm-border rounded-lg text-xs"
               >
                 <option value="all">All Roles</option>
                 <option value="hospital">Hospital Command Node</option>
@@ -1007,7 +1007,7 @@ export default function MasterAdminPage() {
           <div className="card overflow-hidden p-0 border border-bhissm-border">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs font-mono">
-                <thead className="bg-[#FAF3EA] text-bhissm-dark font-bold uppercase tracking-wider text-[11px] border-b border-bhissm-border">
+                <thead className="bg-[#F6F0E9] text-bhissm-dark font-bold uppercase tracking-wider text-xs border-b border-bhissm-border">
                   <tr>
                     <th className="p-3">Node Username</th>
                     <th className="p-3">Display Name</th>
@@ -1024,7 +1024,7 @@ export default function MasterAdminPage() {
                       <td className="p-3 font-sans font-semibold text-bhissm-dark">{u.fullName}</td>
                       <td className="p-3">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                          className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${
                             u.role === 'national'
                               ? 'bg-black text-white'
                               : u.role === 'state'
@@ -1045,14 +1045,14 @@ export default function MasterAdminPage() {
                         )}
                       </td>
                       <td className="p-3">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-900">
+                        <span className="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-900">
                           ACTIVE
                         </span>
                       </td>
                       <td className="p-3 text-right">
                         <button
                           onClick={() => handleResetUserPassword(u)}
-                          className="px-2.5 py-1 rounded text-[10px] border border-bhissm-border bg-white hover:bg-stone-50 cursor-pointer font-bold text-bhissm-dark"
+                          className="px-2.5 py-1 rounded text-xs border border-bhissm-border bg-white hover:bg-stone-50 cursor-pointer font-bold text-bhissm-dark"
                         >
                           Reset Password
                         </button>
@@ -1103,7 +1103,7 @@ export default function MasterAdminPage() {
                   placeholder="e.g. Tambaram Railway Divisional Hospital"
                   value={newFacForm.name}
                   onChange={(e) => setNewFacForm({ ...newFacForm, name: e.target.value })}
-                  className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                  className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                 />
               </div>
 
@@ -1116,7 +1116,7 @@ export default function MasterAdminPage() {
                     value={newFacForm.state_id}
                     disabled={user?.role === 'state'}
                     onChange={(e) => setNewFacForm({ ...newFacForm, state_id: e.target.value })}
-                    className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                    className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                   >
                     {statesList.map((st) => (
                       <option key={st.id} value={st.id}>
@@ -1133,7 +1133,7 @@ export default function MasterAdminPage() {
                   <select
                     value={newFacForm.district_id}
                     onChange={(e) => setNewFacForm({ ...newFacForm, district_id: e.target.value })}
-                    className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                    className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                   >
                     <option value="">Select District</option>
                     {districtsList
@@ -1155,7 +1155,7 @@ export default function MasterAdminPage() {
                   <select
                     value={newFacForm.sector}
                     onChange={(e) => setNewFacForm({ ...newFacForm, sector: e.target.value })}
-                    className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                    className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                   >
                     <option value="government">Government Civil &amp; Apex</option>
                     <option value="defence_railway">Defence &amp; Railway</option>
@@ -1171,7 +1171,7 @@ export default function MasterAdminPage() {
                   <select
                     value={newFacForm.level}
                     onChange={(e) => setNewFacForm({ ...newFacForm, level: e.target.value })}
-                    className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                    className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                   >
                     <option value="district">District General Hospital</option>
                     <option value="apex">Apex Tertiary / Medical College</option>
@@ -1190,17 +1190,17 @@ export default function MasterAdminPage() {
                   placeholder="Grand Southern Trunk Rd, Tambaram Sanatorium"
                   value={newFacForm.address}
                   onChange={(e) => setNewFacForm({ ...newFacForm, address: e.target.value })}
-                  className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                  className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                 />
               </div>
 
-              <div className="p-3 bg-[#FAF6F0] rounded-xl border border-bhissm-border space-y-2">
-                <span className="font-bold text-[11px] uppercase tracking-wider text-bhissm-dark block">
+              <div className="p-3 bg-[#F6F0E9] rounded-xl border border-bhissm-border space-y-2">
+                <span className="font-bold text-xs uppercase tracking-wider text-bhissm-dark block">
                   Smart Capacity Defaults (Customizable)
                 </span>
                 <div className="grid grid-cols-4 gap-2 text-center">
                   <div>
-                    <label className="text-[10px] text-bhissm-secondary block font-bold">General</label>
+                    <label className="text-xs text-bhissm-secondary block font-bold">General</label>
                     <input
                       type="number"
                       min="0"
@@ -1210,7 +1210,7 @@ export default function MasterAdminPage() {
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-bhissm-secondary block font-bold">ICU</label>
+                    <label className="text-xs text-bhissm-secondary block font-bold">ICU</label>
                     <input
                       type="number"
                       min="0"
@@ -1220,7 +1220,7 @@ export default function MasterAdminPage() {
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-bhissm-secondary block font-bold">Trauma</label>
+                    <label className="text-xs text-bhissm-secondary block font-bold">Trauma</label>
                     <input
                       type="number"
                       min="0"
@@ -1230,7 +1230,7 @@ export default function MasterAdminPage() {
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-bhissm-secondary block font-bold">Ventilator</label>
+                    <label className="text-xs text-bhissm-secondary block font-bold">Ventilator</label>
                     <input
                       type="number"
                       min="0"
@@ -1313,7 +1313,7 @@ export default function MasterAdminPage() {
                   placeholder="e.g. Fentanyl 50mcg/ml Injection"
                   value={newMedForm.name}
                   onChange={(e) => setNewMedForm({ ...newMedForm, name: e.target.value })}
-                  className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                  className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                 />
               </div>
 
@@ -1327,7 +1327,7 @@ export default function MasterAdminPage() {
                   placeholder="e.g. Fentanyl Citrate"
                   value={newMedForm.generic_name}
                   onChange={(e) => setNewMedForm({ ...newMedForm, generic_name: e.target.value })}
-                  className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                  className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                 />
               </div>
 
@@ -1340,7 +1340,7 @@ export default function MasterAdminPage() {
                     type="text"
                     value={newMedForm.category}
                     onChange={(e) => setNewMedForm({ ...newMedForm, category: e.target.value })}
-                    className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                    className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                   />
                 </div>
 
@@ -1351,7 +1351,7 @@ export default function MasterAdminPage() {
                   <select
                     value={newMedForm.criticality}
                     onChange={(e) => setNewMedForm({ ...newMedForm, criticality: e.target.value })}
-                    className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                    className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                   >
                     <option value="critical">Critical Code Red</option>
                     <option value="high">High Priority</option>
@@ -1368,7 +1368,7 @@ export default function MasterAdminPage() {
                   <select
                     value={newMedForm.storage_requirement}
                     onChange={(e) => setNewMedForm({ ...newMedForm, storage_requirement: e.target.value })}
-                    className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                    className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                   >
                     <option value="room_temperature">Room Temperature (15-25°C)</option>
                     <option value="cold_chain_2_8">Cold Chain Refrigerated (2-8°C)</option>
@@ -1385,7 +1385,7 @@ export default function MasterAdminPage() {
                     min="100"
                     value={newMedForm.baseline_units}
                     onChange={(e) => setNewMedForm({ ...newMedForm, baseline_units: Number(e.target.value) })}
-                    className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                    className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                   />
                 </div>
               </div>
@@ -1451,17 +1451,17 @@ export default function MasterAdminPage() {
             )}
 
             <form onSubmit={handleSubmitSanction} className="space-y-3 text-xs font-mono">
-              <div className="p-3 bg-[#FAF6F0] rounded-xl border border-bhissm-border space-y-1">
-                <div className="text-bhissm-secondary font-bold uppercase text-[10px]">
+              <div className="p-3 bg-[#F6F0E9] rounded-xl border border-bhissm-border space-y-1">
+                <div className="text-bhissm-secondary font-bold uppercase text-xs">
                   Target Facility &amp; Ward
                 </div>
                 <div className="font-bold text-bhissm-dark text-sm font-sans">
                   {sanctionTarget.facility?.name}
                 </div>
-                <div className="text-[11px] font-mono text-purple-900 font-bold uppercase">
+                <div className="text-xs font-mono text-purple-900 font-bold uppercase">
                   {sanctionTarget.careType.replace('_', ' ')} Ward
                 </div>
-                <div className="text-[10px] text-bhissm-secondary pt-1 flex justify-between">
+                <div className="text-xs text-bhissm-secondary pt-1 flex justify-between">
                   <span>Current Sanctioned: <strong>{sanctionTarget.totalBeds}</strong></span>
                   <span>Occupied: <strong>{sanctionTarget.occupiedBeds}</strong></span>
                   <span>Vacant: <strong className="text-emerald-700">{sanctionTarget.availableBeds}</strong></span>
@@ -1480,9 +1480,9 @@ export default function MasterAdminPage() {
                   onChange={(e) =>
                     setSanctionForm({ ...sanctionForm, new_total_beds: Number(e.target.value) })
                   }
-                  className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg text-sm font-bold"
+                  className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg text-sm font-bold"
                 />
-                <span className="text-[10px] text-bhissm-secondary block mt-1">
+                <span className="text-xs text-bhissm-secondary block mt-1">
                   New Vacant beds will automatically be: <strong>{Math.max(0, sanctionForm.new_total_beds - sanctionTarget.occupiedBeds - sanctionTarget.reservedBeds)}</strong>
                 </span>
               </div>
@@ -1499,7 +1499,7 @@ export default function MasterAdminPage() {
                   onChange={(e) =>
                     setSanctionForm({ ...sanctionForm, order_reference: e.target.value })
                   }
-                  className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                  className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                 />
               </div>
 
@@ -1514,7 +1514,7 @@ export default function MasterAdminPage() {
                   onChange={(e) =>
                     setSanctionForm({ ...sanctionForm, reason: e.target.value })
                   }
-                  className="w-full p-2 bg-[#FAF6F0] border border-bhissm-border rounded-lg"
+                  className="w-full p-2 bg-[#F6F0E9] border border-bhissm-border rounded-lg"
                 />
               </div>
 

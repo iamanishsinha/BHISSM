@@ -7,16 +7,14 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="h-screen bg-bhissm-bg flex flex-col font-sans text-bhissm-dark antialiased overflow-hidden">
+    <div className="min-h-screen bg-bhissm-bg text-bhissm-dark font-sans antialiased flex flex-col">
       <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-      <div className="flex-1 flex overflow-hidden relative">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto space-y-6">
-            <Outlet />
-          </div>
-        </main>
-      </div>
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <main className="flex-1 px-4 md:px-8 py-6">
+        <div className="max-w-[1400px] mx-auto space-y-6">
+          <Outlet />
+        </div>
+      </main>
     </div>
   );
 }
